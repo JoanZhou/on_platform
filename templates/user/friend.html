@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>On!主页</title>
+	<link rel="stylesheet" href="/static/css/weui.min.css" />
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css"/>
+	<link rel="stylesheet" href="/static/css/jquery-weui.min.css" />
+	<link rel="stylesheet" href="/static/css/person.css" />
+</head>
+
+<body ontouchstart>
+	<!--整个页面-->
+	<div>
+		<!--个人中心-->
+		<div class="target-header">
+			<div class="target-icon">
+				<img src="/static/images/circle.png">
+			</div>
+			<div class="target-title">
+					我的圈子
+			</div>
+		</div>
+		<ul class="info-list">
+			<!--个人信息-->
+			<li class="info-item">
+				<div class="row-space" style="padding-left: 5%;padding-right: 5%">
+					<h4>
+						个人信息
+					</h4>
+				</div>
+				<div class="row-center">
+					<img src="/static/images/avatar.jpg" class="img-circle" style="border:1px solid lightgray;width: 30%;">
+					</img>
+					<div class="coloum-center" style="margin-left:30px;">
+						<div>
+							<span>名字 :</span> 
+							<span>刘乾</span>
+						</div>
+						<div>
+							<span>年龄 :</span> 
+							<span>99</span>
+						</div>
+						<div>
+							<span>性别 :</span> 
+							<span>男</span>
+						</div>
+						<div>
+							<span>账号 :</span> 
+							<span>Lq372899855</span>
+						</div>
+					</div>
+				</div>
+			</li>
+			<!--个人信息-->
+			<li class="info-item">
+				<div class="row-space" style="padding-left: 5%;padding-right: 5%">
+					<h4>
+						历史记录
+					</h4>
+				</div>
+				<div class="row-center">
+					<div class="coloum-center">
+						<span>完成/参与次数: 4/5</span>
+						<span>总系数: 70</span>
+					</div>
+					<div class="coloum-center">
+						<span>成功率: 80%</span>
+						<span>完成天数: 90</span>
+					</div>
+				</div>
+			</li>
+            <!--他的拼图-->
+			<li class="info-item">
+				<div class="row-space" style="padding-left: 5%;padding-right: 5%">
+					<h4>
+						他的拼图
+					</h4>
+				</div>
+                <div class="sudoku-panel">
+                    <div class="weui-flex">
+                        <div class="weui-flex__item">weui</div>
+                        <div class="weui-flex__item">weui</div>
+                        <div class="weui-flex__item">weui</div>
+                        <div class="weui-flex__item">weui</div>
+                    </div>
+                    <a class="weui-btn weui-btn_mini weui-btn_default">请求</a>
+                </div>
+			</li>
+            <li class="info-item">
+				<div class="row-space" style="padding-left: 5%;padding-right: 5%">
+					<h4>
+						我的拼图
+					</h4>
+				</div>
+                <div class="sudoku-panel">
+                    <div class="weui-flex">
+                        <div class="weui-flex__item">weui</div>
+                        <div class="weui-flex__item">weui</div>
+                        <div class="weui-flex__item">weui</div>
+                        <div class="weui-flex__item">weui</div>
+                    </div>
+                    <a class="weui-btn weui-btn_mini weui-btn_default">赠送</a>
+                </div>
+			</li>
+
+		</ul>
+		<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+		<script type="text/javascript" src="/static/js/fastclick.js"></script>
+		<script>
+			// fast click binding
+			$(function () {
+				FastClick.attach(document.body);
+			});
+		</script>
+		<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
+		<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>{{ Title }}</title>
+	<link rel="stylesheet" href="/static/css/material.min.css">
+	<link rel="stylesheet" href="/static/css/weui.min.css" />
+	<link rel="stylesheet" href="/static/css/jquery-weui.min.css">
+	<link rel="stylesheet" href="/static/css/share.css" />
+	<link rel="stylesheet" href="/static/css/goal.css" />
+    <link rel="stylesheet" href="/static/css/reading.css"/>
+	<style>
+		#reading-confirm-btn{
+			border-radius: 0;
+		}
+	</style>
+</head>
+
+<body ontouchstart>
+	<div class="image-header mdl-card mdl-shadow--2dp">
+		<div class="header-title">购书阅读(尝新)</div>
+		<div class="header-mask"></div>
+		<div class="header-desc mdl-card__supporting-text">
+			<!--跑步页首-->
+			<div class="row-center between">
+                <div class="coloum-space" style="width: 30%">
+                    <div class="header_avatar-text">
+                        {{ app.active_participants }}人参与
+                    </div>
+                    <div class="header__avatars">
+                        {% for person in persons %}
+                        <img class="img-circle" src="{{ person.headimgurl }}">
+                        {% endfor %}
+				    </div>
+                </div>
+                <div class="coloum-space" style="height:100%;position: absolute;left: 50%;transform: translate(-50%,0%);">
+                <p style="font-size: 18px;font-weight:500;color: #ffffff;margin-bottom: 60px;">第一期</p>
+            </div>
+				<div class="coloum-space">
+                    <div class="header_avatar-text">累计节省</div>
+                    <div class="header__text">
+                        <span style="color: #ff931f; font-weight: 500;">{{ app.bonus_all|floatformat:"0"  }}</span>
+                        <span>元</span>
+                    </div>
+				</div>
+			</div>
+		</div>
+        <!-- 左上角的后退按钮 -->
+		<div class="mdl-card__menu">
+			<button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" id="backup-btn">
+                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                     width="36px" height="36px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                <g>
+                    <path d="M24.001,33.52c-0.539,0-1.076-0.217-1.471-0.644l-12-13c-0.707-0.766-0.707-1.947,0-2.713l12-13
+                        c0.749-0.811,2.014-0.862,2.826-0.113c0.812,0.75,0.862,2.015,0.113,2.826L14.722,18.52L25.47,30.163
+                        c0.749,0.812,0.698,2.077-0.113,2.826C24.972,33.344,24.485,33.52,24.001,33.52z"/>
+                </g>
+                </svg>
+			</button>
+		</div>
+	</div>
+	<div class="block-panel" id="profit-panel">
+		<div class="row-center">
+			<div class="coloum-space">
+				<div class="header_avatar-text goal-header-block">我的押金</div>
+				<div class="header__text">
+					<span style="color: #565c66; font-weight: 600;">{{ goal.guaranty }}</span>
+				</div>
+			</div>
+			<div class="coloum-space">
+				<div class="header_avatar-text" style="color: #B6C1C8; font-size: 0.8rem;">累计收益</div>
+				<div class="header__text">
+					<span style="color: #565c66;  font-weight: 600;">{{ goal.bonus }}</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="block-panel" id="date-panel">
+		<div class="row-center">
+            {% for day in datesinform %}
+			<div class="coloum-space">
+				<div class="header_date-text">{{ day.weekday }}</div>
+				<div class="header_date {% if forloop.counter == 4 %}active{% elif day.dayindex > 0 %}{% if forloop.counter < 4 and day.isfinish %}after-finish{% elif forloop.counter < 4 %}after-stop{% endif %}{% else %}notouch{% endif %}">
+					{{ day.date }}
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+    {% for date in datesinform %}
+        {% if goal.is_start and date.dayindex > 0 %}
+        <div class="day-index" id="dayindex{{ date.date }}" {% if forloop.counter != 4 %}style="display: none;"{% endif %}>第{{ date.dayindex }}天</div>
+        {% endif %}
+    {% endfor %}
+	<div id="upload-panel">
+        {% for date in datesinform %}
+        <div class="datespanel" id="datespanel{{ date.date }}" {% if forloop.counter != 4 %}style="display:none;" {% endif %}>
+            <div class="panel__body">
+                <div class="upload-sidebar left"></div>
+                <!--当天，还未打卡-->
+                {% if not goal.is_start %}
+                <div class="upload-card coloum-space center">
+                    <p class="panel__title">书名：{{ goal.book_name }}</p>
+                    <p class="panel__middle">书到手后即可开始第1次阅读</p>
+                </div>
+                {% elif forloop.counter == 4 and not date.isfinish %}
+                <div class="upload-card coloum-space center">
+                    <p class="panel__title">书名：{{ goal.book_name }}</p>
+                    <p class="panel__middle">已阅读至 <span class="panel__middle-focus">{{ goal.finish_page }}</span> 页</p>
+                    <p class="panel__bottom">目标：在 <span class="panel__bottom-focus">{{ goal.goal_day }}</span> 天内完成 <span class="panel__bottom-focus">{{ goal.book_name }}</span> 的阅读</p>
+                </div>
+                <!--非本日，已完成-->
+                {% elif forloop.counter <= 4 and date.isfinish %}
+                <div class="upload-card row-center center nopadding">
+                    <div class="coloum-space center">
+                        <span style="color: #B6C1C8;font-size: 14px;">阅读内容：
+                            <span style="font-size: 22px;color: #1fa2ff;">{{ date.punch.start_page|floatformat:"0" }}
+                            </span>页至
+                            <span style="font-size: 22px;color: #1fa2ff;">{{ date.punch.start_page|add:date.punch.reading_page }}
+                            </span>
+                                页
+                        </span>
+                    </div>
+                </div>
+                <!--非本日，未完成-->
+                {% elif forloop.counter < 4 and not date.isfinish %}
+                <div class="upload-card row-center center nopadding">
+                    <div class="coloum-space center">
+                        <span style="color: #B6C1C8;">今天没有读书</span>
+                    </div>
+                </div>
+                {% else %}
+                <div class="upload-card row-center center nopadding">
+                    <div class="coloum-space center">
+                        <span style="color: #B6C1C8;">别着急，任务还没开始呢！</span>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="upload-sidebar right"></div>
+            </div>
+            {% if forloop.counter == 4 and not goal.is_start %}
+            <button class="weui-btn weui-btn_primary upload-btn__style start" id="start-read-btn">
+                书已到手
+            </button>
+            {% elif forloop.counter == 4 and not date.isfinish %}
+            <button class="weui-btn weui-btn_primary upload-btn__style start" id="continue-read-btn">
+                开始阅读
+            </button>
+            {% elif forloop.counter <= 4 and date.isfinish %}
+            <button class="weui-btn weui-btn_primary upload-btn__style" disabled>
+                已打卡
+            </button>
+            {% elif forloop.counter < 4 and not date.isfinish %}
+            <button class="weui-btn weui-btn_primary upload-btn__style" disabled>
+                未打卡
+            </button>
+            {% else %}
+            <button class="weui-btn weui-btn_primary upload-btn__style" disabled>
+                还未开始
+            </button>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+	<div id="read-popup" class="weui-popup__container popup-bottom">
+		<div class="weui-popup__overlay"></div>
+		<div class="weui-popup__modal">
+			<div class="modal-content">
+                <div class="row-center center" >
+					<div>
+						<span style="font-size: 14px;color: #B6C1C8;">阅读时长</span>
+                        <span style="font-size: 16px;font-weight: 400;color: #1fa2ff;">
+                        <span id="time-hour">1</span>:
+                        <span id="time-min">00</span>:
+                        <span id="time-sec">00</span>
+                        </span>
+					</div>
+                    <div class="row-center center">
+						<span style="font-size: 14px;color: #B6C1C8;">阅读</span>
+                        <div class="mdl-textfield mdl-js-textfield" >
+                            <input class="mdl-textfield__input" type="text" id="page-input" maxlength=20>
+                            <label class="mdl-textfield__label" for="page-input"></label>
+                        </div>
+						<span style="font-size: 14px;color: #B6C1C8;">页</span>
+                    </div>
+                </div>
+				<button class="weui-btn weui-btn_primary" id="reading-confirm-btn">
+                    完成阅读
+				</button>
+			</div>
+		</div>
+	</div>
+
+	<div id="goal-id__get" hidden>{{ goal.goal_id }}</div>
+
+	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/static/js/fastclick.js"></script>
+	<script>
+		// fast click binding
+		$(function () {
+			FastClick.attach(document.body);
+		});
+	</script>
+	<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/static/js/material.min.js"></script>
+	<!--配置CSRF保护-->
+    <script>
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
+        });
+    </script>
+    <script>
+        var all = 0;
+
+		function initDateCss() {
+			var header = $(".header_date");
+			var width = 1.2 * header.height()+"px";
+			header.css('width',width);
+			header.css('height',width);
+			header.css('line-height', width);
+		}
+		$(document).ready(function () {
+			initDateCss();
+		});
+
+		$(".header_date").click(function () {
+			// 如果不能点击，则不处理
+			if($(this).hasClass("notouch")){
+				return;
+			}
+			var num = $(this).html().trim();
+			$(".header_date.active").removeClass("active");
+			$(this).addClass("active");
+			$(".datespanel").hide();
+			$("#datespanel" + num).show();
+			$(".day-index").hide();
+			$("#dayindex" + num).show();
+		});
+		$("#backup-btn").click(function () {
+			window.location.href = 'index';
+		});
+		$(".weui-popup__overlay").click(function () {
+			$("body").removeClass("popup-open");
+		});
+		$("#start-read-btn").click(function () {
+		    $.post('/api/start_reading',{
+		        goal:$("#goal-id__get").html().trim()
+            },function (response) {
+				if(response['status'] == 200){
+				    $.toast('可以开始阅读了！');
+				    window.location.reload();
+				}
+				else{
+				    $.toast('开始失败,<br/>请联系客服', 'cancel');
+				}
+            });
+		});
+		// 完成本日打卡
+		$("#reading-confirm-btn").click(function () {
+		    try{
+		        var today_page = parseInt($("#page-input").val());
+		        if(isNaN(today_page)){
+		            $.toast("请填写有效页数", "cancel");
+		            return;
+                }
+		        $.post('/api/reading_sign_in', {
+                    goal: $("#goal-id__get").html().trim(),
+                    page: today_page,
+                    // 这里的时间是按秒来计算的
+                    time: all
+                }, function (response) {
+                    if (response['status'] === 200) {
+                        $.toast('打卡成功！');
+
+                    }
+                    // 如果为400，表示已经结束了
+                    else if (response['status'] === 400) {
+                        $.toast('您已完成本次活动，<br/>所有收益已转入余额!');
+                    }
+                    setTimeout(function () {
+				        window.location.reload();
+                    }, 2000);
+                })
+            }
+            catch(e){
+		        $.toast("请填写有效页数", "cancel");
+            }
+        });
+		$("#continue-read-btn").click(function () {
+		    // 弹出阅读框
+			$("#read-popup").popup();
+			// 开始计时
+            all = 0;
+            function formatNumber(num) {
+                num = parseInt(num);
+                if(num < 10){
+                    return "0"+num;
+                }
+                else {
+                    return num;
+                }
+            }
+            function countTime() {
+                all += 0.1;
+                $("#time-hour").html(formatNumber(all/3600));
+                $("#time-min").html(formatNumber(all/60));
+                $("#time-sec").html(formatNumber(all%60));
+                //限定最多累计1个小时
+                if(all>=3600){
+                    return 0;
+                }
+                if($("#read-popup").css("display")==="none"){
+                    return 0;
+                }
+                else {
+                    setTimeout(countTime, 100);
+                }
+            }
+            countTime();
+        });
+		{% if not notice %}
+		$(document).ready(function () {
+		   $.notification({
+			  title: "修改收货地址",
+			  text: "系统检测到您的收货地址信息不完全，为保证书籍第一时间送至您手上，请尽快填写。<br/><br/>点击本通知即可跳转",
+			  media: "",
+			  data: "",
+			  onClick: function(data) {
+			      window.location.href = '/user/order';
+			  },
+			  onClose: function(data) {
+
+			  }
+			});
+		});
+    	{% endif %}
+
+    </script>
+</body>
+
+</html>

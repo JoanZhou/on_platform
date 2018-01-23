@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>{{ Title }}</title>
+	<link rel="stylesheet" href="/static/css/material.min.css">
+	<link rel="stylesheet" href="/static/css/weui.min.css" />
+	<link rel="stylesheet" href="/static/css/jquery-weui.min.css">
+	<link rel="stylesheet" href="/static/css/share.css" />
+	<link rel="stylesheet" href="/static/css/goal.css" />
+    <link rel="stylesheet" href="/static/css/sleeping.css" />
+</head>
+
+<body ontouchstart>
+	<div class="image-header mdl-card mdl-shadow--2dp">
+		<div class="header-title">作息</div>
+		<div class="header-mask"></div>
+		<div class="header-desc mdl-card__supporting-text">
+			<!--跑步页首-->
+			<div class="row-center between">
+                <div class="coloum-space" style="width: 30%">
+                    <div class="header_avatar-text">
+                        {{ app.active_participants |add:7 }}人参与
+                    </div>
+                    <div class="header__avatars">
+                        {% for person in persons %}
+                        <img class="img-circle" src="{{ person.headimgurl }}">
+                        {% endfor %}
+                        <img class="img-circle" src="/static/fake/sleeping_1.jpg">
+                    <img class="img-circle" src="/static/fake/sleeping_2.jpg">
+                    <img class="img-circle" src="/static/fake/sleeping_3.jpg">
+                    <img class="img-circle" src="/static/fake/sleeping_4.jpg">
+                    <img class="img-circle" src="/static/fake/sleeping_5.jpg">
+				    </div>
+                </div>
+				<div class="coloum-space" style="position: absolute;left: 50%;transform: translate(-50%,0%);">
+                    <div class="header_avatar-text center" >总系数</div>
+					<div class="header__text">
+                        <span style="color: #1fa2ff; font-weight: 500;">{{ app.coefficient|add:100 }}</span>
+                    </div>
+				</div>
+				<div class="coloum-space">
+                    <div class="header_avatar-text center">奖金池</div>
+                    <div class="header__text">
+                        <span style="color: #ff931f; font-weight: 500;">{{ app.bonus_all|floatformat:"0" }}</span>
+
+                        <span>元</span>
+                    </div>
+				</div>
+			</div>
+		</div>
+        <!-- 左上角的后退按钮 -->
+		<div class="mdl-card__menu">
+			<button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" id="backup-btn">
+                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                     width="36px" height="36px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                <g>
+                    <path d="M24.001,33.52c-0.539,0-1.076-0.217-1.471-0.644l-12-13c-0.707-0.766-0.707-1.947,0-2.713l12-13
+                        c0.749-0.811,2.014-0.862,2.826-0.113c0.812,0.75,0.862,2.015,0.113,2.826L14.722,18.52L25.47,30.163
+                        c0.749,0.812,0.698,2.077-0.113,2.826C24.972,33.344,24.485,33.52,24.001,33.52z"/>
+                </g>
+                </svg>
+			</button>
+		</div>
+	</div>
+	<div class="block-panel" id="profit-panel">
+		<div class="row-center">
+			<div class="coloum-space">
+				<div class="header_avatar-text goal-header-block">我的押金</div>
+				<div class="header__text">
+					<span style="color: #565c66; font-weight: 600;">{{ goal.guaranty|add:goal.down_payment }}</span>
+				</div>
+			</div>
+			<div class="coloum-space">
+				<div class="header_avatar-text" style="color: #B6C1C8; font-size: 0.8rem;">我的系数</div>
+				<div class="header__text">
+					<span style="color: #565c66;  font-weight: 600;">{{ goal.coefficient }}</span>
+				</div>
+			</div>
+			<div class="coloum-space">
+				<div class="header_avatar-text" style="color: #B6C1C8; font-size: 0.8rem;">累计收益</div>
+				<div class="header__text">
+					<span style="color: #565c66;  font-weight: 600;">{{ goal.bonus }}</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="block-panel" id="date-panel">
+		<div class="row-center">
+            {% for day in datesinform %}
+			<div class="coloum-space">
+				<div class="header_date-text">{{ day.weekday }}</div>
+				<div class="header_date {% if forloop.counter == 4 %}active{% elif day.dayindex > 0 %}{% if forloop.counter < 4 and day.isfinish %}after-finish{% elif day.isnosignin %}after-finish{% elif forloop.counter < 4 %}after-stop{% endif %}{% else %}notouch{% endif %}">
+					{{ day.date }}
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+    {% for date in datesinform %}
+        {% if date.dayindex > 0 %}
+        <div class="day-index" id="dayindex{{ date.date }}" {% if forloop.counter != 4 %}style="display: none;"{% endif %}>第{{ date.dayindex }}天</div>
+        {% endif %}
+    {% endfor %}
+	<div id="upload-panel">
+        {% for date in datesinform %}
+        <div class="datespanel" id="datespanel{{ date.date }}" {% if forloop.counter != 4 %}style="display:none;" {% endif %}>
+            <div class="panel__body">
+                <div class="upload-sidebar left"></div>
+                <!--当天，还未打卡-->
+                {% if forloop.counter == 4 and date.dayindex > 0%}
+                <div class="upload-card coloum-space center">
+                    <div class="row-center" style="position: relative;">
+                        {% if date.sleeptime %}
+                            <i class="sleep__success-icon"></i>
+                            <p class="sleeping-record__text">睡前记录</p>
+                            <p class="sleeping-record__time">
+                                    {{ date.sleeptime }}
+                            </p>
+                        {% else %}
+                            <i class="sleep__ready-icon"></i>
+                            <p class="sleeping-record__text">睡前记录</p>
+                            <p class="sleeping-record__time" id="sleep__time-text">
+                            </p>
+                        {% endif %}
+                    </div>
+                    <div class="row-center icon-vertical__line" style="flex:1;position:relative;">
+                        {% if date.getuptime %}
+                        <i class="sleep__success-icon"></i>
+                        <p class="sleeping-record__text" style="margin-left: 19px;">起床记录</p>
+                        <p class="sleeping-record__time">
+                                {{ date.getuptime }}
+                        </p>
+                        {% else %}
+                        <i class="sleep__ready-icon"></i>
+                        <p class="sleeping-record__text" style="margin-left: 19px;">起床记录</p>
+                        <p class="sleeping-record__time" id="getup__time-text"></p>
+                        {% endif %}
+                    </div>
+                    <div class="row-center">
+                        {% if date.confirmtime %}
+                        <i class="sleep__success-icon"></i>
+                        <p class="sleeping-record__text">确认记录</p>
+                        <p class="sleeping-record__time">
+                                {{ date.confirmtime }}
+                        </p>
+                        {% elif date.checktime %}
+                        <i class="sleep__ready-icon"></i>
+                        <p class="sleeping-record__text">确认时间</p>
+                        <p class="sleeping-record__time" id="confirm__time-text">
+                                {{ date.checktime }} ~ {{ date.checktimeend }}
+                        </p>
+                        {% else %}
+                        <i class="sleep__next-icon"></i>
+                        <p class="sleeping-record__text">确认时间</p>
+                        <p class="sleeping-record__time"></p>
+                        {% endif %}
+                    </div>
+                    <div class="sleeping__upload-notice small-font">
+                            目标：在<span style="color: #1fa2ff;">&nbsp;{{ goal.goal_day }}&nbsp;</span>天内每日<span style="color: #1fa2ff;">&nbsp;{{ getuptime }}&nbsp;</span>前起床
+                    </div>
+                </div>
+                <!--非本日，已完成-->
+                {% elif forloop.counter < 4 and date.isfinish%}
+                <div class="upload-card coloum-space center">
+                    <div class="row-center" style="position: relative;">
+                        {% if date.sleeptime %}
+                            <i class="sleep__success-icon"></i>
+                            <p class="sleeping-record__text">睡前记录</p>
+                            <p class="sleeping-record__time">
+                                    {{ date.sleeptime }}
+                            </p>
+                        {% else %}
+                            <i class="sleep__ready-icon"></i>
+                            <p class="sleeping-record__text">睡前记录</p>
+                            <p class="sleeping-record__time"></p>
+                        {% endif %}
+                    </div>
+                    <div class="row-center icon-vertical__line" style="flex:1;position:relative;">
+                        {% if date.getuptime %}
+                        <i class="sleep__success-icon"></i>
+                        <p class="sleeping-record__text" style="margin-left: 19px;">起床记录</p>
+                        <p class="sleeping-record__time">
+                                {{ date.getuptime }}
+                        </p>
+                        {% else %}
+                        <i class="sleep__ready-icon"></i>
+                        <p class="sleeping-record__text" style="margin-left: 19px;">起床记录</p>
+                        <p class="sleeping-record__time"></p>
+                        {% endif %}
+                    </div>
+                    <div class="row-center">
+                        {% if date.confirmtime %}
+                        <i class="sleep__success-icon"></i>
+                        <p class="sleeping-record__text">确认记录</p>
+                        <p class="sleeping-record__time">
+                                {{ date.confirmtime }}
+                        </p>
+                        {% elif date.checktime %}
+                        <i class="sleep__ready-icon"></i>
+                        <p class="sleeping-record__text">确认记录</p>
+                        <p class="sleeping-record__time">
+                                {{ date.checktime }}
+                        </p>
+                        {% else %}
+                        <i class="sleep__next-icon"></i>
+                        <p class="sleeping-record__text">确认记录</p>
+                        <p class="sleeping-record__time"></p>
+                        {% endif %}
+                    </div>
+                </div>
+                <!--非本日，未完成-->
+                {% elif forloop.counter < 4 %}
+                <div class="upload-card coloum-space center">
+                    <div class="row-center" style="position: relative;">
+                        {% if date.sleeptime %}
+                            <i class="sleep__success-icon"></i>
+                            <p class="sleeping-record__text">睡前记录</p>
+                            <p class="sleeping-record__time">
+                                    {{ date.sleeptime }}
+                            </p>
+                        {% else %}
+                            <i class="sleep__ready-icon"></i>
+                            <p class="sleeping-record__text">睡前记录</p>
+                            <p class="sleeping-record__time">无记录
+                            </p>
+                        {% endif %}
+                    </div>
+                    <div class="row-center icon-vertical__line" style="flex:1;position:relative;">
+                        {% if date.getuptime %}
+                        <i class="sleep__success-icon"></i>
+                        <p class="sleeping-record__text" style="margin-left: 19px;">起床记录</p>
+                        <p class="sleeping-record__time">
+                                {{ date.getuptime }}
+                        </p>
+                        {% else %}
+                        <i class="sleep__ready-icon"></i>
+                        <p class="sleeping-record__text" style="margin-left: 19px;">起床记录</p>
+                        <p class="sleeping-record__time">无记录</p>
+                        {% endif %}
+                    </div>
+                    <div class="row-center">
+                        {% if date.confirmtime %}
+                        <i class="sleep__success-icon"></i>
+                        <p class="sleeping-record__text">确认记录</p>
+                        <p class="sleeping-record__time">
+                                {{ date.confirmtime }}
+                        </p>
+                        {% else %}
+                        <i class="sleep__next-icon"></i>
+                        <p class="sleeping-record__text">确认记录</p>
+                        <p class="sleeping-record__time">无记录</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="upload-card row-center center nopadding">
+                    <div class="coloum-space center">
+                        <span style="color: #B6C1C8;">别着急，任务还没开始呢！</span>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="upload-sidebar right"></div>
+            </div>
+            {% if forloop.counter < 4 %}
+                {% if date.isnosignin %}
+                <button class="weui-btn weui-btn_primary upload-btn__style avoid" disabled>
+                    免签
+                </button>
+                {% elif date.isfinish %}
+                <button class="weui-btn weui-btn_primary upload-btn__style avoid" disabled>
+                    完成打卡
+                </button>
+                {% else %}
+                <button class="weui-btn weui-btn_primary upload-btn__style" disabled>
+                    打卡失败
+                </button>
+                {% endif %}
+            {% elif forloop.counter == 4 and date.dayindex > 0 %}
+                {% if date.isnosignin %}
+                <button class="weui-btn weui-btn_primary upload-btn__style avoid" disabled>
+                    免签
+                </button>
+                {% elif date.sleeptime and date.mode == "night" %}
+                <button class="weui-btn weui-btn_primary upload-btn__style sleep" disabled>
+                    已完成睡前打卡
+                </button>
+                {% elif not date.sleeptime and date.mode == "night" %}
+                <button class="weui-btn weui-btn_primary upload-btn__style sleep" id="sleep-btn">
+                    <img src="/static/images/sleep_moon_icon.png" style="height: 60%;margin-right: 5px;">
+                    <span>睡觉了</span>
+                </button>
+                {% elif date.getuptime and date.mode == "morning" %}
+                <button class="weui-btn weui-btn_primary upload-btn__style getup" disabled>
+                    已完成起床打卡
+                </button>
+                {% elif not date.getuptime and date.mode == "morning" %}
+                <button class="weui-btn weui-btn_primary upload-btn__style getup" id="getup-btn">
+                    <img src="/static/images/sleep_son_icon.png" style="height: 60%;margin-right: 5px;">
+                    <span>起床了</span>
+                </button>
+                {% elif date.confirmtime and date.mode == "check" %}
+                <button class="weui-btn weui-btn_primary upload-btn__style confirm" disabled>
+                    今日打卡成功
+                </button>
+                {% elif not date.confirmtime and date.mode == "check" %}
+                <button class="weui-btn weui-btn_primary upload-btn__style confirm" id="confirm-btn">
+                    确认
+                </button>
+                {% else %}
+                <button class="weui-btn weui-btn_primary upload-btn__style" disabled>
+                    不在打卡时间内
+                </button>
+                {% endif %}
+            {% else %}
+                <button class="weui-btn weui-btn_primary upload-btn__style" disabled>
+                    尚未开始
+                </button>
+            {% endif %}
+            <!--如果今天是打卡时间，且今天还没有完成-->
+            {% if forloop.counter == 4 and not date.isfinish and not date.isnosignin and date.dayindex > 0 %}
+            <div class="row-center" style="width: 80%;margin: auto;">
+                <button class="weui-btn weui-btn_primary" id="avoid-btn">
+                    <span>免签</span>
+                    x
+                    <span id="avoid-count">{{ nosign }}</span>
+                </button>
+                {% if not date.isdelay %}
+                <button class="weui-btn weui-btn_primary" id="delay-btn">
+                    <span>延时</span>
+                    x
+                    <span id="delay-count">{{ delay }}</span>
+                </button>
+                {% else %}
+                <button class="weui-btn delay-text">
+                    <span>延迟1小时</span>
+                </button>
+                {% endif %}
+            </div>
+            {% else %}
+
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    <div id="goal-id__get" hidden>{{ goal.goal_id }}</div>
+	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/static/js/fastclick.js"></script>
+	<script>
+		// fast click binding
+		$(function () {
+			FastClick.attach(document.body);
+		});
+	</script>
+	<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/static/js/material.min.js"></script>
+	<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <!--配置CSRF保护-->
+    <script>
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
+        });
+    </script>
+    <script>
+    $(".header_date").click(function () {
+        // 如果不能点击，则不处理
+        if($(this).hasClass("notouch")){
+            return;
+        }
+        var num = $(this).html().trim();
+        $(".header_date.active").removeClass("active");
+        $(this).addClass("active");
+        $(".datespanel").hide();
+        $("#datespanel" + num).show();
+        $(".day-index").hide();
+        $("#dayindex" + num).show();
+    });
+    $("#backup-btn").click(function () {
+        window.location.href = 'index';
+    });
+
+    $("#delay-btn").click(function(){
+        var count = parseInt($("#delay-count").html());
+        if(count > 0){
+            $.confirm({
+                title: '使用延时券',
+                text: '下次早起记录延时2小时,仅1天有效。',
+                onOK: function () {
+                    $.post('/api/sleeping_delay',{
+                        goal:$("#goal-id__get").html().trim()
+                        },function (response) {
+                            if(response['status'] === 200) {
+                                $.toast("操作成功");
+                                $("#delay-count").html((count-1).toString());
+                                uploadBtnFinish("延时");
+                            }
+                            else{
+                                $.toast("操作失败","cancel");
+                            }
+                    });
+                }
+            });
+        }
+        else{
+            $.toast("延时券不够","cancel");
+        }
+    });
+
+	$("#avoid-btn").click(function(){
+		var count = parseInt($("#avoid-count").html());
+		if(count > 0){
+			$.confirm({
+			title: '使用免签券',
+			text: '一张券可以免签一次，确认使用？',
+			onOK: function () {
+                    $("#avoid-count").html((count-1).toString());
+                    $.post('/api/sleeping_no_sign_in',{
+                        goal:$("#goal-id__get").html().trim()
+                    },function (response) {
+                        if(response['status'] === 200) {
+                            $.toast("操作成功");
+                            window.location.reload();
+                        }
+                        else{
+                            $.toast("操作失败","cancel");
+                        }
+                    });
+			    }
+			});
+		}
+		else{
+			$.toast("免签券不够","cancel");
+		}
+	});
+
+    $("#sleep-btn").click(function () {
+        $.post('/api/sleeping_sleep',{
+            goal:$("#goal-id__get").html().trim()
+        },function (response) {
+            if(response['status'] === 200){
+                window.location.reload();
+            }
+            else{
+                $.toast("不在规定时间内！","cancel");
+            }
+        });
+    });
+
+    $("#getup-btn").click(function () {
+        $.post('/api/sleeping_getup',{
+            goal:$("#goal-id__get").html().trim()
+        },function (response) {
+            if(response['status'] === 200){
+                window.location.reload();
+            }
+            else{
+                $.toast("不在规定时间内！","cancel");
+            }
+        });
+    });
+
+
+    $("#confirm-btn").click(function () {
+        $.post('/api/sleeping_confirm',{
+            goal:$("#goal-id__get").html().trim()
+        },function (response) {
+            if(response['status'] === 200){
+                window.location.reload();
+            }
+            else{
+                var time = $("#confirm__time-text").html().trim();
+                $.toast("确认时间段为<br/>"+time,"cancel");
+            }
+        });
+    });
+    function initDateCss() {
+        var header = $(".header_date");
+        var width = 1.2 * header.height()+"px";
+        header.css('width',width);
+        header.css('height',width);
+        header.css('line-height', width);
+    }
+    $(document).ready(function () {
+        initDateCss();
+    });
+    </script>
+</body>
+
+</html>

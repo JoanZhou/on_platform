@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>折纸</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/static/css/weui.min.css"/>
+    <link rel="stylesheet" href="/static/css/material.min.css">
+    <link rel="stylesheet" href="/static/css/jquery-weui.min.css">
+    <link rel="stylesheet" href="/static/css/share.css"/>
+    <link rel="stylesheet" href="/static/css/activity.css"/>
+    <link rel="stylesheet" href="/static/css/origami.css"/>
+</head>
+<body>
+<div class="image-header mdl-card mdl-shadow--2dp">
+    <div class="header-title">
+        折纸
+    </div>
+    <div class="header-mask"></div>
+    <div class="header-desc mdl-card__supporting-text">
+        <!--作息页首-->
+        <div class="row-center">
+            <div class="coloum-space" style="width: 30%">
+                <div class="header_avatar-text">
+                    {{ app.active_participants }}人参与
+                </div>
+                <div class="header__avatars">
+                    <img class="img-circle" src="/static/images/avatar.jpg">
+                    <img class="img-circle" src="/static/images/avatar.jpg">
+                    <img class="img-circle" src="/static/images/avatar.jpg">
+                    <img class="img-circle" src="/static/images/avatar.jpg">
+                    <img class="img-circle" src="/static/images/avatar.jpg">
+                </div>
+            </div>
+            <div class="coloum-space">
+                <div class="header_avatar-text">总系数</div>
+                <div class="header__text">
+                    <span style="color: #1fa2ff; font-weight: 500;">{{ app.coefficient }}</span>
+                </div>
+            </div>
+            <div class="coloum-space">
+                <div class="header_avatar-text">奖金池</div>
+                <div class="header__text">
+                    <span style="color: #ff931f; font-weight: 500;">{{ app.bonus_all }}</span>
+                    <span>元</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 左上角的后退按钮 -->
+    <div class="mdl-card__menu">
+        <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" id="backup-btn">
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                     width="36px" height="36px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                <g>
+                    <path d="M24.001,33.52c-0.539,0-1.076-0.217-1.471-0.644l-12-13c-0.707-0.766-0.707-1.947,0-2.713l12-13
+                        c0.749-0.811,2.014-0.862,2.826-0.113c0.812,0.75,0.862,2.015,0.113,2.826L14.722,18.52L25.47,30.163
+                        c0.749,0.812,0.698,2.077-0.113,2.826C24.972,33.344,24.485,33.52,24.001,33.52z"/>
+                </g>
+                </svg>
+        </button>
+    </div>
+</div>
+<div class="block-panel">
+    <ul class="setting-list">
+        <li class="setting-item reverse">
+            <div class="row-center start">
+                <div>
+                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                         width="28px" height="28px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                    <path fill="#bc6eff" d="M27.692,5H25V4.494c0-0.552-0.447-1-1-1s-1,0.448-1,1V5H13V4.494c0-0.552-0.447-1-1-1s-1,0.448-1,1V5H8.308
+                        C5.381,5,3,7.9,3,10.857V26.13C3,29.087,5.381,31,8.308,31h19.385C30.619,31,33,29.087,33,26.13V10.857C33,7.9,30.619,5,27.692,5z
+                         M8.308,7H11v1.494c0,0.552,0.447,1,1,1s1-0.448,1-1V7h10v1.494c0,0.552,0.447,1,1,1s1-0.448,1-1V7h2.692
+                        C29.517,7,31,9.002,31,10.857v0.789C30.851,11.558,30.686,11,30.5,11h-25c-0.186,0-0.351,0.558-0.5,0.647v-0.789
+                        C5,9.002,6.483,7,8.308,7z M27.692,29H8.308C6.483,29,5,27.985,5,26.13V13.34C5.149,13.429,5.314,13,5.5,13h25
+                        c0.186,0,0.351,0.429,0.5,0.34v12.79C31,27.985,29.517,29,27.692,29z"/>
+                    </svg>
+                </div>
+                <div style="margin-left: 0.8rem;">
+                    <div class="setting-title">课程等级</div>
+                </div>
+            </div>
+            <div class="row-center" style="margin-top: 5px;">
+                <div class="degree-option coloum-space active">
+                    <p>初级</p>
+                    <img src="/static/images/demo_origami.jpeg">
+                    <p class="fellowship-text">预学金:5元</p>
+                </div>
+                <div class="degree-option coloum-space">
+                    <p>中级</p>
+                    <img src="/static/images/demo_origami.jpeg">
+                    <p class="fellowship-text">预学金:8元</p>
+                </div>
+                <div class="degree-option coloum-space">
+                    <p>高级</p>
+                    <img src="/static/images/demo_origami.jpeg">
+                    <p class="fellowship-text">预学金:12元</p>
+                </div>
+            </div>
+        </li>
+        <li class="setting-item">
+            <div>
+                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                     width="28px" height="28px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                <path fill="#bc6eff" d="M27.692,5H25V4.494c0-0.552-0.447-1-1-1s-1,0.448-1,1V5H13V4.494c0-0.552-0.447-1-1-1s-1,0.448-1,1V5H8.308
+                    C5.381,5,3,7.9,3,10.857V26.13C3,29.087,5.381,31,8.308,31h19.385C30.619,31,33,29.087,33,26.13V10.857C33,7.9,30.619,5,27.692,5z
+                     M8.308,7H11v1.494c0,0.552,0.447,1,1,1s1-0.448,1-1V7h10v1.494c0,0.552,0.447,1,1,1s1-0.448,1-1V7h2.692
+                    C29.517,7,31,9.002,31,10.857v0.789C30.851,11.558,30.686,11,30.5,11h-25c-0.186,0-0.351,0.558-0.5,0.647v-0.789
+                    C5,9.002,6.483,7,8.308,7z M27.692,29H8.308C6.483,29,5,27.985,5,26.13V13.34C5.149,13.429,5.314,13,5.5,13h25
+                    c0.186,0,0.351,0.429,0.5,0.34v12.79C31,27.985,29.517,29,27.692,29z"/>
+                </svg>
+            </div>
+            <div>
+                <div class="setting-title">每日平均学习频率</div>
+                <p class="setting-desc">预学金加成:
+                    <span>0</span>元/天
+                </p>
+            </div>
+            <div class="setting-item__right position-right">
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" type="button" id="freqSetButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        <span id="freq-text">1 次</span>
+                        <span>
+                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                                  width="20px" height="24px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                            <g>
+                                <path d="M19,25c-0.47,0-0.94-0.165-1.317-0.495l-8-7c-0.831-0.728-0.915-1.99-0.188-2.822c0.728-0.829,1.99-0.915,2.822-0.188
+                                    L19,20.343l6.683-5.848c0.832-0.729,2.095-0.643,2.822,0.188c0.728,0.832,0.644,2.095-0.188,2.822l-8,7
+                                    C19.94,24.835,19.47,25,19,25z"/>
+                            </g>
+                            </svg>
+                        </span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="freqSetButton">
+                        <li><a class="freqSetMenu" href="#">1 次</a></li>
+                        <li><a class="freqSetMenu" href="#">2 次</a></li>
+                        <li><a class="freqSetMenu" href="#">3 次</a></li>
+                    </ul>
+                </div>
+            </div>
+        </li>
+        <li class="setting-item">
+            <div>
+                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                     width="28px" height="28px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                <path fill="#bc6eff" d="M27.692,5H25V4.494c0-0.552-0.447-1-1-1s-1,0.448-1,1V5H13V4.494c0-0.552-0.447-1-1-1s-1,0.448-1,1V5H8.308
+                    C5.381,5,3,7.9,3,10.857V26.13C3,29.087,5.381,31,8.308,31h19.385C30.619,31,33,29.087,33,26.13V10.857C33,7.9,30.619,5,27.692,5z
+                     M8.308,7H11v1.494c0,0.552,0.447,1,1,1s1-0.448,1-1V7h10v1.494c0,0.552,0.447,1,1,1s1-0.448,1-1V7h2.692
+                    C29.517,7,31,9.002,31,10.857v0.789C30.851,11.558,30.686,11,30.5,11h-25c-0.186,0-0.351,0.558-0.5,0.647v-0.789
+                    C5,9.002,6.483,7,8.308,7z M27.692,29H8.308C6.483,29,5,27.985,5,26.13V13.34C5.149,13.429,5.314,13,5.5,13h25
+                    c0.186,0,0.351,0.429,0.5,0.34v12.79C31,27.985,29.517,29,27.692,29z"/>
+                </svg>
+            </div>
+            <div>
+                <div class="setting-title">目标天数</div>
+                <p class="setting-desc">预学金减免:
+                    <span>0</span>元/天
+                </p>
+            </div>
+            <div class="setting-item__right position-right">
+                <div class="dropup">
+                    <button class="btn btn-default dropdown-toggle" type="button" id="timeSetButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        <span id="free__status-text">1 周</span>
+                        <span>
+                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                                  width="20px" height="24px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                            <g>
+                                <path d="M19,25c-0.47,0-0.94-0.165-1.317-0.495l-8-7c-0.831-0.728-0.915-1.99-0.188-2.822c0.728-0.829,1.99-0.915,2.822-0.188
+                                    L19,20.343l6.683-5.848c0.832-0.729,2.095-0.643,2.822,0.188c0.728,0.832,0.644,2.095-0.188,2.822l-8,7
+                                    C19.94,24.835,19.47,25,19,25z"/>
+                            </g>
+                            </svg>
+                        </span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="timeSetButton">
+                        <li><a class="timeSetMenu" href="#">1 周</a></li>
+                        <li><a class="timeSetMenu" href="#">2 周</a></li>
+                        <li><a class="timeSetMenu" href="#">3 周</a></li>
+                        <li><a class="timeSetMenu" href="#">1 月</a></li>
+                    </ul>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
+<div class="block-panel">
+    <p class="explain-title">说明</p>
+    <div class="explain-desc">
+        <p>在“折纸”活动中，用户必须在活动期间完成目标的所有课程，并在完成後在平台上上传每张作品的图片（图片包括个人信息及作品以免被抄袭），用户可以通过完成作品获得点赞数，并获得一定奖励。</p><p>1. ‘课程等级’决定用户参与活动是学习内容的难度，难度越高需支付预学金则越高。</p><p>2. “每日平均学习频率”决定用户参与活动期间将会学习的次数，频率越高需要交付的押金则越高。</p><p>3. “目标天数”决定用户需要参与活动的天数。参与的天数越长每日预学金减免越多。</p><p>为保证用户体验，用户首次参与该活动限制为3周。成功完成目标后，限制为2个月（61日）。</p><p>4. 押金=预学金（限本活动中）</p><p>&nbsp; &nbsp; 4.1 预学金：在活动中未完成则扣除活动中所提交的一天预学金金额。</p><p>&nbsp; &nbsp; 4.2 在押金为0的情况下视为活动结束。</p><p>5. 在活动生成后，用户将根据活动的难易程度获取不同的机会，所有在本活动中产生的机会只可用于此次活动，活动结束后将不再拥有（第二次参与此项活动将不会拥有上次此活动中所剩余的机会次数），在“作息”活动中可能获取的机会如下：</p><p>&nbsp; &nbsp; 5.1 “更换”机会：在用户无法完成时，可使用“更换”机会，随机更换其他课程内容。</p><p>6. “折纸”活动的每日结算时段为当日23:59，如用户对活动有疑问及争议的户可在每日22:00前联系客服，如有需要用户应被瓜分的押金部分将暂时不会被瓜分以待解决。（客服只处理因不可抗力因素，如系统问题引起的无法完成的情况。以示公平，除用户需乘坐飞机外，其他情况在正常情况下将不受理）。</p><p>※本平台拥有所有活动的最终解释权，如有疑问请与客服联系，谢谢。</p>
+    </div>
+</div>
+<div class="fixed-panel">
+    <div class="row-center" style="justify-content: space-between;margin-top: 20px;">
+        <div class="fixed-text">
+            堂数:
+            <span id="all-coefficient-value" class="fixed-text__bold" style="color: #565c66;">3</span>
+            节
+        </div>
+        <div class="fixed-text">
+            押金:
+            <span style="color: #ff931f;" id="guarantee-cash" class="fixed-text__bold">
+                100
+            </span>
+            元
+        </div>
+    </div>
+    <button class="weui-btn weui-btn_primary" id="gen-btn">
+        生成目标
+    </button>
+</div>
+
+<div id="gen-popup" class="weui-popup__container popup-bottom">
+    <div class="weui-popup__overlay"></div>
+    <div class="weui-popup__modal">
+        <div class="modal-content">
+            <div class="gen-title">
+                <div class="title-line"></div>
+                <span class="title-text">
+                    <span style="font-weight: 600;">折纸</span>
+                </span>
+                </span>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__bd">
+                    <span class="gen_title">总价</span>
+                </div>
+                <div class="weui-cell__ft" style="margin-right: 20px;">
+                        <span id="pay-count" style="color: #565c66;font-size: 1.4rem;font-weight: 600;">
+                            100
+                        </span>
+                    元
+                </div>
+            </div>
+            <div class="weui-cell no-before">
+                <div class="weui-cell__hd">
+                    <span class="gen_title">积分抵扣</span>
+                </div>
+                <div class="weui-cells_checkbox weui-cell__bd">
+                    <label class="weui-cell weui-check__label" for="s11">
+                        <div class="weui-cell__bd">
+                            <p>积分可抵扣总金额10%</p>
+                        </div>
+                        <div class="weui-cell__hd">
+                            <input type="checkbox" class="weui-check" name="checkbox1" id="s11" checked="checked">
+                            <i class="weui-icon-checked"></i>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            <p class="user-agreement__text">进入下一步即代表同意用户协议</p>
+            <button class="weui-btn weui-btn_primary" id="pay-btn">
+                <img src="/static/images/wechat-pay.png" style="width:1.2em;margin-right:10px;">
+                微信支付
+            </button>
+        </div>
+    </div>
+</div>
+
+</div>
+<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+<script type="text/javascript" src="/static/js/fastclick.js"></script>
+<script>
+    // fast click binding
+    $(function () {
+        FastClick.attach(document.body);
+    });
+</script>
+<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
+<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/static/js/material.min.js"></script>
+<script>
+    $(".weui-popup__overlay").click(
+        function () {
+            $("body").removeClass("popup-open");
+        }
+    );
+    $("#gen-btn").click(function () {
+        // 指定总价
+        $("#gen-popup").popup();
+        $("body").addClass("popup-open");
+    });
+
+    /* 跳转页面 */
+    $("#backup-btn").click(function () {
+        window.location.href = "index";
+    });
+    $("#pay-btn").click(function () {
+        window.location.href = "/goal/share/123";
+    });
+
+</script>
+</body>
+</html>

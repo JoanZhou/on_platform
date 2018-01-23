@@ -1,0 +1,109 @@
+html, body{
+    height: 100%;
+}
+
+.image-header{
+    background-size: 100% 50%; 
+    width: 100%;
+}
+
+.image-header .mdl-card__title{
+    height: 240px;
+    color: white; 
+    background: url(../images/getup.jpg) center / cover;  
+}
+
+.setting-list{
+    list-style: none;
+}
+
+.setting-list li{
+    width: 85%;
+    margin: auto;
+    margin-top: 10px;
+}
+
+.setting-list li span{
+    font-size: 0.8rem;
+}
+
+.mdl-card__supporting-text span{
+    font-size: 0.5rem;
+    line-height: 1rem;
+}
+
+.mdl-card__supporting-text {
+    padding:16px 5px;
+    width: 95%;
+}
+
+.row-center{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: flex-end;
+}
+
+.coloum-space{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: flex-start;
+    margin-left: 5px;
+}
+
+.mdl-card__supporting-text .img-circle{
+    box-sizing: border-box;
+    border-radius: 50%;
+    padding: 2px;
+    background-color: white;
+    border:1px solid #ddd;
+    width: 30%;
+    margin-top: 2px;
+}
+
+h1{
+    margin: 0px;
+}
+
+.inform-des-list{
+    list-style: none;
+    text-indent: 2em;
+}
+
+.fix-height{
+    max-height: 300px;
+    overflow-y: scroll;
+}
+
+.popup-open{
+    overflow: hidden;
+}
+
+.table-full{
+    width:100%;
+}
+
+.mdl-data-table{
+    border-right: 0px;
+    border-left: 0px;
+}
+
+.mdl-data-table th{
+    font-size: medium;
+}
+
+#gen-popup button.weui-btn, input.weui-btn{
+    margin-top: 15px;
+    border-radius: 0px;
+    width: 95%;
+}
+
+.mdl-data-table__cell--non-numeric img{
+    width: 2em;
+    margin-right: 5px;
+}
+
+.weui-cell_warn{
+    font-weight: bold;
+}

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" style="height:100%;width:100%;">
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>目标完成页面</title>
+	<link rel="stylesheet" href="/static/css/weui.min.css">
+	<link rel="stylesheet" href="/static/css/jquery-weui.min.css">
+</head>
+<body ontouchstart style="height:100%;width:100%;">
+    <div style="margin:auto;text-align:center;display:absolute;padding-top:50px;padding-bottom:30px;">
+        {% if goal.status == "SUCCESS" %}
+        <img src="/static/images/target_on.png" style="width:4rem;display:inline;">
+                    {% else %}
+        <img src="/static/images/target_off.png" style="width:2rem;display:inline;">
+                    {% endif %}
+
+        <p style="font-weight:600;margin-top: 20px;">
+            {% if goal.status == "SUCCESS" %}
+            完成目标
+            {% else %}
+            挑战失败
+            {% endif %}
+        </p>
+    </div>
+    <div style="text-align: center;padding:20px;">
+       <div class="weui-cells weui-cells_form">
+            <div class="weui-cell" style="border-left:1px solid #e5e5e5;border-right:1px solid #e5e5e5;">
+                <div class="weui-cell__bd">
+                    <textarea class="weui-textarea" placeholder="评价" rows="3"></textarea>
+                    <div class="weui-textarea-counter"><span id="exist-text">0</span>/200</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="padding:20px;text-align: center;">
+        <p>累计收益 ：{{ goal.bonus }}</p>
+        <p>剩余押金 ：{{ goal.guaranty |add:goal.down_payment }}</p>
+    </div>
+    <div style="height:max-content;display:absolute;">
+        <a class="weui-btn weui-btn_plain-primary" style="width:40%;display:absolute;top:10%;" id="finish-goal-btn">结束</a>
+    </div>
+    <div id="goal-id__get" hidden>{{ goal.goal_id }}</div>
+    <div id="goal-type__get" hidden>{{ goal_type }}</div>
+    <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/static/js/fastclick.js"></script>
+	<script>
+    // fast click binding
+    $(function () {
+        FastClick.attach(document.body);
+    });
+    </script>
+        <!--配置CSRF保护-->
+    <script>
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
+        });
+    </script>
+    <script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
+    <script>
+        $(".weui-textarea").bind('input propertychange','textarea',function(){
+            var curLength=$(this).val().trim().length;
+            if(curLength > 199)
+            {
+                var num=$(this).val().trim().substr(0,199);
+                $(this).val(num);
+                //alert("超过字数限制，多出的字将被截断！" );
+            }
+            $("#exist-text").text(curLength);
+         });
+        $("#finish-goal-btn").click(function () {
+            $.post('/api/finish_goal', {
+                goal:$("#goal-id__get").html().trim(),
+                goal_type:$("#goal-type__get").html().trim()
+            },function (response) {
+                if(response['status'] === 403){
+                    $.toast("退还失败,<br/>请联系客服", 'cancel');
+                }
+                else if(response['status'] === 200){
+                    $.toast("结算成功!");
+                    setTimeout('window.location.href = \'/activity/index\';', 2000)
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>跑步</title>
+	<link rel="stylesheet" href="/static/css/bootstrap.min.css"/>
+	<link rel="stylesheet" href="/static/css/weui.min.css" />
+	<link rel="stylesheet" href="/static/css/material.min.css">
+	<link rel="stylesheet" href="/static/css/jquery-weui.min.css">
+	<link rel="stylesheet" href="/static/css/share.css" />
+	<link rel="stylesheet" href="/static/css/activity.css" />
+	<link rel="stylesheet" href="/static/css/running.css" />
+</head>
+
+<body ontouchstart>
+	<!--页面上方的活动信息栏-->
+	<div class="image-header mdl-card mdl-shadow--2dp">
+		<div class="header-title">跑步</div>
+		<div class="header-mask"></div>
+		<div class="header-desc mdl-card__supporting-text">
+			<!--跑步页首-->
+			<div class="row-center between">
+                <div class="coloum-space" style="width: 30%">
+                    <div class="header_avatar-text">
+                        {{ app.active_participants }}人参与
+                    </div>
+                    <div class="header__avatars">
+                        {% for person in persons %}
+                        <img class="img-circle" src="{{ person.headimgurl }}">
+                        {% endfor %}
+                        <img class="img-circle" src="/static/fake/running_1.jpg">
+                        <img class="img-circle" src="/static/fake/running_2.jpg">
+                        <img class="img-circle" src="/static/fake/running_3.jpg">
+                        <img class="img-circle" src="/static/fake/running_4.jpg">
+                        <img class="img-circle" src="/static/fake/running_5.jpg">
+				    </div>
+                </div>
+				<div class="coloum-space" style="position: absolute;left: 50%;transform: translate(-50%,0%);">
+                    <div class="header_avatar-text center">总系数</div>
+					<div class="header__text">
+                        <span style="color: #1fa2ff; font-weight: 500;">{{ app.coefficient }}</span>
+                    </div>
+				</div>
+				<div class="coloum-space">
+                    <div class="header_avatar-text center">奖金池</div>
+                    <div class="header__text">
+                        <span style="color: #ff931f; font-weight: 500;">{{ app.bonus_all|floatformat:"0" }}</span>
+                        <span>元</span>
+                    </div>
+				</div>
+			</div>
+		</div>
+        <!-- 左上角的后退按钮 -->
+		<div class="mdl-card__menu">
+			<button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" id="backup-btn">
+                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                     width="36px" height="36px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                <g>
+                    <path d="M24.001,33.52c-0.539,0-1.076-0.217-1.471-0.644l-12-13c-0.707-0.766-0.707-1.947,0-2.713l12-13
+                        c0.749-0.811,2.014-0.862,2.826-0.113c0.812,0.75,0.862,2.015,0.113,2.826L14.722,18.52L25.47,30.163
+                        c0.749,0.812,0.698,2.077-0.113,2.826C24.972,33.344,24.485,33.52,24.001,33.52z"/>
+                </g>
+                </svg>
+			</button>
+		</div>
+	</div>
+	<div class="block-panel">
+		<ul class="setting-list">
+			<li class="setting-item" style="justify-content: center;">
+				<div class="setting-mode__background">
+                    <button id="discipline-mode" class="setting-mode__button setting-mode__button-active">
+						日常模式
+					</button>
+					<button id="free-mode" class="setting-mode__button">
+						自由模式
+					</button>
+				</div>
+			</li>
+            <div class="panel-layout" id="discipline-panel">
+                <li class="setting-item">
+                    <div>
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                             width="28px" height="28px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                        <path fill="#bc6eff" d="M27.692,5H25V4.494c0-0.552-0.447-1-1-1s-1,0.448-1,1V5H13V4.494c0-0.552-0.447-1-1-1s-1,0.448-1,1V5H8.308
+                            C5.381,5,3,7.9,3,10.857V26.13C3,29.087,5.381,31,8.308,31h19.385C30.619,31,33,29.087,33,26.13V10.857C33,7.9,30.619,5,27.692,5z
+                             M8.308,7H11v1.494c0,0.552,0.447,1,1,1s1-0.448,1-1V7h10v1.494c0,0.552,0.447,1,1,1s1-0.448,1-1V7h2.692
+                            C29.517,7,31,9.002,31,10.857v0.789C30.851,11.558,30.686,11,30.5,11h-25c-0.186,0-0.351,0.558-0.5,0.647v-0.789
+                            C5,9.002,6.483,7,8.308,7z M27.692,29H8.308C6.483,29,5,27.985,5,26.13V13.34C5.149,13.429,5.314,13,5.5,13h25
+                            c0.186,0,0.351,0.429,0.5,0.34v12.79C31,27.985,29.517,29,27.692,29z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="setting-title">目标周数</div>
+                        <p class="setting-desc">保证金: <span id="discipline__deposit-value">85</span>元
+                            底金:<span id="discipline__excess-value">15</span>元 <br/>
+                            系数:<span id="discipline__base-coeff">10</span>
+                            免签: <span id="discipline__avoid-value">1</span>
+                    </div>
+                    <div class="setting-item__right position-right">
+                        <div class="dropdown">
+                            <button class="btn btn-default dropdown-toggle" type="button" id="discipline__timeSetButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span id="discipline__time-text">1 周</span>
+                                <span>
+                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                                          width="20px" height="24px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                                    <g>
+                                        <path d="M19,25c-0.47,0-0.94-0.165-1.317-0.495l-8-7c-0.831-0.728-0.915-1.99-0.188-2.822c0.728-0.829,1.99-0.915,2.822-0.188
+                                            L19,20.343l6.683-5.848c0.832-0.729,2.095-0.643,2.822,0.188c0.728,0.832,0.644,2.095-0.188,2.822l-8,7
+                                            C19.94,24.835,19.47,25,19,25z"/>
+                                    </g>
+                                    </svg>
+                                </span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="discipline__timeSetButton">
+                                <li><a class="timeSetMenu" href="#">1 周</a></li>
+                                <li><a class="timeSetMenu" href="#">2 周</a></li>
+                                <li><a class="timeSetMenu" href="#">3 周</a></li>
+                                <!--
+                                <li><a class="timeSetMenu" href="#">1 月</a></li>
+                                <li><a class="timeSetMenu" href="#">2 月</a></li>-->
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+                <li class="setting-item">
+                    <div>
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                             width="28px" height="28px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                        <g>
+                            <path fill="#ff9947" d="M25.723,14c0-3.86-3.141-7-7-7s-7,3.14-7,7s3.141,7,7,7S25.723,17.86,25.723,14z M13.723,14c0-2.757,2.243-5,5-5
+                                s5,2.243,5,5s-2.243,5-5,5S13.723,16.757,13.723,14z"/>
+                            <path fill="#ff9947" d="M29,32h-9l8.818-10.02c1.876-2.307,2.907-5.213,2.904-8.183c0-5.755-3.698-10.751-9.202-12.433
+                                c-1.234-0.376-2.512-0.568-3.797-0.568c-4.331,0-8.361,2.145-10.782,5.737c-3.216,4.773-2.94,10.983,0.712,15.484L17.445,32H9v-2H7
+                                v4h24v-4h-2V32z M9.6,7.652c2.049-3.04,5.459-4.855,9.124-4.855c1.087,0,2.168,0.162,3.213,0.481
+                                c4.657,1.422,7.786,5.65,7.786,10.521c0.003,2.512-0.869,4.97-2.431,6.89l-8.569,9.736l-8.543-9.697
+                                C7.112,16.945,6.879,11.691,9.6,7.652z"/>
+                        </g>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="setting-title">目标距离</div>
+                        <p class="setting-desc">系数: X <span id="discipline__distance-coeff-times">1</span></p>
+                    </div>
+                    <div class="setting-item__right">
+                        <div style="display: flex;flex-direction: row;justify-content: space-between;color: #B6C1C8; font-size: 16px;">
+                            <span>1km</span>
+                            <span style="color: #1fa2ff;"><span id="discipline__distance-desc">1</span>km/天</span>
+                            <span>5km</span>
+                        </div>
+                        <div class="mdl-slider__container">
+                            <input class="mdl-slider" type="range" min="0" max="8" value="0" tabindex="0">
+                            <div class="mdl-slider__background-flex">
+                                <div class="mdl-slider__background-upper" style="flex: 1 1 0%;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="setting-item">
+                    <div>
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                             width="28px" height="28px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                        <g>
+                            <path fill="#45d3ba" d="M32.958,18.917c-1.641-1.815-3.957-2.994-6.549-3.139l-0.774-0.051l0.809-0.954
+                                c0.273-0.501,0.333-1.046,0.397-1.622l0.009-0.076l0.032-3.479c0-0.488-0.114-0.913-0.369-1.375l-0.006-0.01L26.433,7.99
+                                l0.017-0.044c0.112-0.282,0.156-0.486,0.156-0.726c0-0.635-0.332-1.229-0.987-1.765c-0.621-0.507-1.516-0.954-2.661-1.328
+                                c-2.126-0.697-5.024-1.095-7.949-1.095c-2.926,0-5.823,0.399-7.949,1.093C5.916,4.498,5.02,4.945,4.4,5.453
+                                C3.745,5.99,3.413,6.582,3.413,7.218c0,0.266,0.054,0.521,0.152,0.717l0.023,0.048L3.512,8.21L3.506,8.22
+                                C3.251,8.683,3.137,9.107,3.137,9.597v3.486c0,0.573,0.206,1.154,0.578,1.636l0.054,0.069l-0.209,0.35
+                                c-0.284,0.516-0.423,0.984-0.423,1.429v3.486c0,0.517,0.169,1.042,0.532,1.649l0.044,0.074l-0.211,0.284
+                                c-0.284,0.514-0.42,0.979-0.42,1.424v3.485c0,1.445,1.21,2.799,3.407,3.811c2.228,1.027,5.235,1.593,8.466,1.593
+                                c1.353,0,3.938-0.292,3.963-0.294l0.063-0.007l0.044,0.046c1.283,1.33,2.945,2.287,4.813,2.696
+                                c-0.646-0.074,0.646,0.215,2.005,0.215h0.013c5.271,0,9.56-4.311,9.56-9.609c0-0.036,0.001-0.079,0.001-0.121
+                                c0-2.46-0.934-4.702-2.465-6.391L32.958,18.917z M7.78,5.683c1.932-0.592,4.518-0.918,7.285-0.918
+                                c5.916,0,10.039,1.468,10.039,2.785c0,0.649-1.004,1.329-2.754,1.866c-1.932,0.594-4.518,0.919-7.284,0.919
+                                c-5.916,0-10.039-1.468-10.039-2.785C5.026,6.901,6.03,6.22,7.78,5.683L7.78,5.683z M4.806,9.858l0.216,0.197
+                                c0.841,0.768,2.27,1.403,4.133,1.837c1.739,0.405,3.764,0.619,5.855,0.619c2.09,0,4.115-0.214,5.855-0.619
+                                c1.863-0.434,3.293-1.069,4.133-1.837l0.216-0.197v3.17c0,1.057-1.051,2.139-2.884,2.968c-1.951,0.882-4.55,1.367-7.32,1.367
+                                c-2.77,0-5.368-0.485-7.32-1.367c-1.831-0.828-2.884-1.91-2.884-2.968V9.858z M18.479,19.396l-0.173,0.237
+                                c-0.954,1.288-1.58,2.873-1.725,4.594c0.136-0.955,0.116-0.856,0.095-0.752c-0.052,0.256-0.106,0.521-0.106,0.785v0.129h-0.129
+                                c-0.189,0-0.396,0.014-0.597,0.027c-0.201,0.014-0.417,0.028-0.614,0.028c-2.772,0-5.382-0.485-7.347-1.367
+                                c-1.851-0.829-2.911-1.911-2.911-2.968l-0.061-3.631l0.224,0.219c0.911,0.888,2.308,1.631,4.042,2.147
+                                c1.765,0.526,3.839,0.804,5.999,0.804c1.039,0,2.043-0.112,3.013-0.221L18.479,19.396z M18.053,30.308
+                                c-0.855,0.106-1.845,0.167-2.849,0.167c-0.029,0-0.059,0-0.088,0c-2.799,0-5.423-0.403-7.384-1.137
+                                c-1.86-0.695-2.926-1.619-2.926-2.535v-2.978l0.209,0.167c1.903,1.518,5.775,2.463,10.105,2.463c0.439,0,0.818,0,1.25-0.054
+                                l0.123-0.015l0.02,0.122c0.166,1.001,0.494,1.916,0.974,2.722l0.005,0.009c0.146,0.293,0.342,0.556,0.637,0.853l0.187,0.19
+                                L18.053,30.308z M31.495,30.969c-1.483,1.502-3.467,2.329-5.583,2.329c-2.21,0-4.256-0.898-5.764-2.53
+                                c-0.337-0.339-0.62-0.737-0.893-1.121l-0.004-0.006c-0.773-1.206-1.232-2.678-1.232-4.257c0-0.006,0-0.012,0-0.018v-0.055
+                                c0-0.451,0.057-0.905,0.111-1.344c0.056-0.398,0.169-0.796,0.279-1.181l0.002-0.006c0.992-2.883,3.536-4.981,6.608-5.308
+                                c0.165-0.035,0.505-0.035,0.835-0.035h0.28c2.038,0.082,3.947,0.943,5.38,2.425c1.38,1.419,2.232,3.36,2.232,5.499v0.007
+                                C33.775,27.48,32.974,29.47,31.495,30.969L31.495,30.969z M31.495,30.969"/>
+                            <path fill="#45d3ba" d="M29.809,24.655c-0.125-0.095-0.283-0.152-0.455-0.152c-0.247,0-0.467,0.118-0.605,0.301L27.08,27.03v-6.821
+                                c0-0.418-0.339-0.758-0.758-0.758c-0.419,0-0.758,0.339-0.758,0.758v6.821l-1.667-2.223c-0.14-0.185-0.359-0.303-0.606-0.303
+                                c-0.419,0-0.758,0.339-0.758,0.758c0,0.171,0.057,0.33,0.153,0.456l3.03,4.04c0.14,0.185,0.359,0.303,0.606,0.303
+                                c0.247,0,0.466-0.118,0.605-0.301l3.033-4.044c0.095-0.125,0.152-0.283,0.152-0.455c0-0.247-0.118-0.466-0.301-0.605L29.809,24.655
+                                z M29.809,24.655"/>
+                        </g>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="setting-title">降低投入</div>
+                        <p class="setting-desc">系数: X <span id="discipline__status-coeff-value">1</span></p>
+                    </div>
+                    <div class="setting-item__right position-right">
+                        <div class="dropup">
+                            <button class="btn btn-default dropdown-toggle" type="button" id="discipline__statusSetButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span id="discipline__status-text">普 通</span>
+                                <span>
+                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                                          width="20px" height="24px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                                    <g>
+                                        <path d="M19,25c-0.47,0-0.94-0.165-1.317-0.495l-8-7c-0.831-0.728-0.915-1.99-0.188-2.822c0.728-0.829,1.99-0.915,2.822-0.188
+                                            L19,20.343l6.683-5.848c0.832-0.729,2.095-0.643,2.822,0.188c0.728,0.832,0.644,2.095-0.188,2.822l-8,7
+                                            C19.94,24.835,19.47,25,19,25z"/>
+                                    </g>
+                                    </svg>
+                                </span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="statusSetButton">
+                                <li><a class="statusSetMenu" href="#">普 通</a></li>
+                                <li><a class="statusSetMenu" href="#">学 生</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+            </div>
+            <div class="panel-layout" id="free-panel" style="display: none;">
+                <li class="setting-item">
+                    <div>
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                             width="28px" height="28px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                        <path fill="#bc6eff" d="M27.692,5H25V4.494c0-0.552-0.447-1-1-1s-1,0.448-1,1V5H13V4.494c0-0.552-0.447-1-1-1s-1,0.448-1,1V5H8.308
+                            C5.381,5,3,7.9,3,10.857V26.13C3,29.087,5.381,31,8.308,31h19.385C30.619,31,33,29.087,33,26.13V10.857C33,7.9,30.619,5,27.692,5z
+                             M8.308,7H11v1.494c0,0.552,0.447,1,1,1s1-0.448,1-1V7h10v1.494c0,0.552,0.447,1,1,1s1-0.448,1-1V7h2.692
+                            C29.517,7,31,9.002,31,10.857v0.789C30.851,11.558,30.686,11,30.5,11h-25c-0.186,0-0.351,0.558-0.5,0.647v-0.789
+                            C5,9.002,6.483,7,8.308,7z M27.692,29H8.308C6.483,29,5,27.985,5,26.13V13.34C5.149,13.429,5.314,13,5.5,13h25
+                            c0.186,0,0.351,0.429,0.5,0.34v12.79C31,27.985,29.517,29,27.692,29z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="setting-title">目标周数</div>
+                        <p class="setting-desc">保证金:
+                            <span id="free__deposit-value">85</span>元
+                            底金:<span id="free__excess-value">15</span>元
+                            系数: <span id="free__base-coeff">10</span>
+                           </p>
+                    </div>
+                    <div class="setting-item__right position-right">
+                        <div class="dropdown">
+                            <button class="btn btn-default dropdown-toggle" type="button" id="free__timeSetButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span id="free__time-text">1 周</span>
+                                <span>
+                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                                          width="20px" height="24px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                                    <g>
+                                        <path d="M19,25c-0.47,0-0.94-0.165-1.317-0.495l-8-7c-0.831-0.728-0.915-1.99-0.188-2.822c0.728-0.829,1.99-0.915,2.822-0.188
+                                            L19,20.343l6.683-5.848c0.832-0.729,2.095-0.643,2.822,0.188c0.728,0.832,0.644,2.095-0.188,2.822l-8,7
+                                            C19.94,24.835,19.47,25,19,25z"/>
+                                    </g>
+                                    </svg>
+                                </span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="free__timeSetButton">
+                                <li><a class="timeSetMenu" href="#">1 周</a></li>
+                                <li><a class="timeSetMenu" href="#">2 周</a></li>
+                                <li><a class="timeSetMenu" href="#">3 周</a></li>
+                                <!--
+                                <li><a class="timeSetMenu" href="#">1 月</a></li>
+                                <li><a class="timeSetMenu" href="#">2 月</a></li>-->
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+                <li class="setting-item">
+                    <div>
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                             width="28px" height="28px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                        <g>
+                            <path fill="#ff9947" d="M25.723,14c0-3.86-3.141-7-7-7s-7,3.14-7,7s3.141,7,7,7S25.723,17.86,25.723,14z M13.723,14c0-2.757,2.243-5,5-5
+                                s5,2.243,5,5s-2.243,5-5,5S13.723,16.757,13.723,14z"/>
+                            <path fill="#ff9947" d="M29,32h-9l8.818-10.02c1.876-2.307,2.907-5.213,2.904-8.183c0-5.755-3.698-10.751-9.202-12.433
+                                c-1.234-0.376-2.512-0.568-3.797-0.568c-4.331,0-8.361,2.145-10.782,5.737c-3.216,4.773-2.94,10.983,0.712,15.484L17.445,32H9v-2H7
+                                v4h24v-4h-2V32z M9.6,7.652c2.049-3.04,5.459-4.855,9.124-4.855c1.087,0,2.168,0.162,3.213,0.481
+                                c4.657,1.422,7.786,5.65,7.786,10.521c0.003,2.512-0.869,4.97-2.431,6.89l-8.569,9.736l-8.543-9.697
+                                C7.112,16.945,6.879,11.691,9.6,7.652z"/>
+                        </g>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="setting-title">目标距离</div>
+                        <p class="setting-desc">系数: X <span id="free__distance-coeff-times">1</span></p>
+                    </div>
+                    <div class="setting-item__right">
+                        <div style="display: flex;flex-direction: row;justify-content: space-between;color: #B6C1C8; font-size: 16px;">
+                            <span><span id="distance-min">6</span>km</span>
+                            <span style="color: #1fa2ff;"><span id="free__distance-desc">6</span>km</span>
+                            <span><span id="distance-max">30</span>km</span>
+                        </div>
+                        <div class="mdl-slider__container">
+                            <input class="mdl-slider" type="range" min="0" max="8" value="0" tabindex="0">
+                            <div class="mdl-slider__background-flex">
+                                <div class="mdl-slider__background-upper" style="flex: 1 1 0%;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="setting-item">
+                    <div>
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                             width="28px" height="28px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                        <g>
+                            <path fill="#45d3ba" d="M32.958,18.917c-1.641-1.815-3.957-2.994-6.549-3.139l-0.774-0.051l0.809-0.954
+                                c0.273-0.501,0.333-1.046,0.397-1.622l0.009-0.076l0.032-3.479c0-0.488-0.114-0.913-0.369-1.375l-0.006-0.01L26.433,7.99
+                                l0.017-0.044c0.112-0.282,0.156-0.486,0.156-0.726c0-0.635-0.332-1.229-0.987-1.765c-0.621-0.507-1.516-0.954-2.661-1.328
+                                c-2.126-0.697-5.024-1.095-7.949-1.095c-2.926,0-5.823,0.399-7.949,1.093C5.916,4.498,5.02,4.945,4.4,5.453
+                                C3.745,5.99,3.413,6.582,3.413,7.218c0,0.266,0.054,0.521,0.152,0.717l0.023,0.048L3.512,8.21L3.506,8.22
+                                C3.251,8.683,3.137,9.107,3.137,9.597v3.486c0,0.573,0.206,1.154,0.578,1.636l0.054,0.069l-0.209,0.35
+                                c-0.284,0.516-0.423,0.984-0.423,1.429v3.486c0,0.517,0.169,1.042,0.532,1.649l0.044,0.074l-0.211,0.284
+                                c-0.284,0.514-0.42,0.979-0.42,1.424v3.485c0,1.445,1.21,2.799,3.407,3.811c2.228,1.027,5.235,1.593,8.466,1.593
+                                c1.353,0,3.938-0.292,3.963-0.294l0.063-0.007l0.044,0.046c1.283,1.33,2.945,2.287,4.813,2.696
+                                c-0.646-0.074,0.646,0.215,2.005,0.215h0.013c5.271,0,9.56-4.311,9.56-9.609c0-0.036,0.001-0.079,0.001-0.121
+                                c0-2.46-0.934-4.702-2.465-6.391L32.958,18.917z M7.78,5.683c1.932-0.592,4.518-0.918,7.285-0.918
+                                c5.916,0,10.039,1.468,10.039,2.785c0,0.649-1.004,1.329-2.754,1.866c-1.932,0.594-4.518,0.919-7.284,0.919
+                                c-5.916,0-10.039-1.468-10.039-2.785C5.026,6.901,6.03,6.22,7.78,5.683L7.78,5.683z M4.806,9.858l0.216,0.197
+                                c0.841,0.768,2.27,1.403,4.133,1.837c1.739,0.405,3.764,0.619,5.855,0.619c2.09,0,4.115-0.214,5.855-0.619
+                                c1.863-0.434,3.293-1.069,4.133-1.837l0.216-0.197v3.17c0,1.057-1.051,2.139-2.884,2.968c-1.951,0.882-4.55,1.367-7.32,1.367
+                                c-2.77,0-5.368-0.485-7.32-1.367c-1.831-0.828-2.884-1.91-2.884-2.968V9.858z M18.479,19.396l-0.173,0.237
+                                c-0.954,1.288-1.58,2.873-1.725,4.594c0.136-0.955,0.116-0.856,0.095-0.752c-0.052,0.256-0.106,0.521-0.106,0.785v0.129h-0.129
+                                c-0.189,0-0.396,0.014-0.597,0.027c-0.201,0.014-0.417,0.028-0.614,0.028c-2.772,0-5.382-0.485-7.347-1.367
+                                c-1.851-0.829-2.911-1.911-2.911-2.968l-0.061-3.631l0.224,0.219c0.911,0.888,2.308,1.631,4.042,2.147
+                                c1.765,0.526,3.839,0.804,5.999,0.804c1.039,0,2.043-0.112,3.013-0.221L18.479,19.396z M18.053,30.308
+                                c-0.855,0.106-1.845,0.167-2.849,0.167c-0.029,0-0.059,0-0.088,0c-2.799,0-5.423-0.403-7.384-1.137
+                                c-1.86-0.695-2.926-1.619-2.926-2.535v-2.978l0.209,0.167c1.903,1.518,5.775,2.463,10.105,2.463c0.439,0,0.818,0,1.25-0.054
+                                l0.123-0.015l0.02,0.122c0.166,1.001,0.494,1.916,0.974,2.722l0.005,0.009c0.146,0.293,0.342,0.556,0.637,0.853l0.187,0.19
+                                L18.053,30.308z M31.495,30.969c-1.483,1.502-3.467,2.329-5.583,2.329c-2.21,0-4.256-0.898-5.764-2.53
+                                c-0.337-0.339-0.62-0.737-0.893-1.121l-0.004-0.006c-0.773-1.206-1.232-2.678-1.232-4.257c0-0.006,0-0.012,0-0.018v-0.055
+                                c0-0.451,0.057-0.905,0.111-1.344c0.056-0.398,0.169-0.796,0.279-1.181l0.002-0.006c0.992-2.883,3.536-4.981,6.608-5.308
+                                c0.165-0.035,0.505-0.035,0.835-0.035h0.28c2.038,0.082,3.947,0.943,5.38,2.425c1.38,1.419,2.232,3.36,2.232,5.499v0.007
+                                C33.775,27.48,32.974,29.47,31.495,30.969L31.495,30.969z M31.495,30.969"/>
+                            <path fill="#45d3ba" d="M29.809,24.655c-0.125-0.095-0.283-0.152-0.455-0.152c-0.247,0-0.467,0.118-0.605,0.301L27.08,27.03v-6.821
+                                c0-0.418-0.339-0.758-0.758-0.758c-0.419,0-0.758,0.339-0.758,0.758v6.821l-1.667-2.223c-0.14-0.185-0.359-0.303-0.606-0.303
+                                c-0.419,0-0.758,0.339-0.758,0.758c0,0.171,0.057,0.33,0.153,0.456l3.03,4.04c0.14,0.185,0.359,0.303,0.606,0.303
+                                c0.247,0,0.466-0.118,0.605-0.301l3.033-4.044c0.095-0.125,0.152-0.283,0.152-0.455c0-0.247-0.118-0.466-0.301-0.605L29.809,24.655
+                                z M29.809,24.655"/>
+                        </g>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="setting-title">降低投入</div>
+                        <p class="setting-desc">系数: X <span id="free__status-coeff-value">1</span></p>
+                    </div>
+                    <div class="setting-item__right position-right">
+                        <div class="dropup">
+                            <button class="btn btn-default dropdown-toggle" type="button" id="free__statusSetButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span id="free__status-text">普 通</span>
+                                <span>
+                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                                          width="20px" height="24px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                                    <g>
+                                        <path d="M19,25c-0.47,0-0.94-0.165-1.317-0.495l-8-7c-0.831-0.728-0.915-1.99-0.188-2.822c0.728-0.829,1.99-0.915,2.822-0.188
+                                            L19,20.343l6.683-5.848c0.832-0.729,2.095-0.643,2.822,0.188c0.728,0.832,0.644,2.095-0.188,2.822l-8,7
+                                            C19.94,24.835,19.47,25,19,25z"/>
+                                    </g>
+                                    </svg>
+                                </span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="free__statusSetButton">
+                                <li><a class="statusSetMenu" href="#">普 通</a></li>
+                                <li><a class="statusSetMenu" href="#">学 生</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+            </div>
+		</ul>
+	</div>
+	<div class="block-panel">
+		<p class="explain-title">说明</p>
+		<p class="explain-desc" id="discipline-explain">在“跑步”活动“日常模式”中，用户必须在活动期间每日完成目标距离，并在平台上上传一张当日跑步的截图包括距离、日期、速度（快于12’00’’，慢于2’11’’）等信息，用户可以通过完成当日记录瓜分其他未完成用户的部分押金。（跑步机拍照带非水印信息）<br/>1. “目标天数”决定用户需要坚持的天数：<br/>为保证用户体验，用户首次参与该活动限制为3周（21日）。成功完成目标后，限制为61日。在押金不为0的情况下，完成所有天数则活动结束，并拿回剩余押金及累计金额。<br/>2. ‘每日目标距离’决定用户在完成目标时每日至少需要完成的距离。<br/>3. “降低投入”决定用户需要投入的比例：<br/>用户可选择此项（学生）从而降低参与时所需投入押金的总额，但同时该用户参与此次活动的系数也随之减小。<br/>4. 系数越大每日在奖金池中瓜分的比例就越高。<br/>5. 押金=保证金+底金 （仅限该活动）：<br/>    5.1 保证金：在活动中未完成则扣除活动中所提交的全额保证金；<br/> 5.2 底金：在无保证金的前提下，在此活动中未完成则扣除活动中15元底金（降低投入时为10.5元），直至扣完为止；<br/>    5.3 在押金为0的情况下直接视为活动结束，并拿回累计金额。<br/>6. 在活动生成后，用户将根据活动的难易程度获取不同的机会，所有在本活动中产生的机会只可用于此次活动，活动结束后将不再拥有（第二次参与此项活动将不会拥有上次此活动中所剩余的机会次数），在“跑步”活动中可能获取的机会如下：<br/>    6.1 “免签”机会：用户可在未完成并无法完成的情况下使用该机会直接默认完成此次记录（在未完成情况下每日结算时段前，“免签”机会则将自动被使用，因此用户不会在拥有“免签”机会的情况下目标失败）。<br/>7. “跑步”活动的每日结算时段为当日23:59，如用户对活动有疑问及争议的户可在每日22:00前联系客服，如有需要用户应被瓜分的押金部分将暂时冻结以待解决。（客服只处理因不可抗力因素，如系统问题引起的无法完成的情况。以示公平，在正常情况下将不受理）。<br/>※本平台拥有所有活动的最终解释权，如有疑问请与客服联系，谢谢。<br/></p>
+		<p class="explain-desc" id="free-explain" style="display: none;">在“跑步”活动“自由模式”中，用户必须在活动期间内自由分次完成用户个人定的目标距离，并在平台上上传一张当日跑步的截图包括距离、日期、速度（快于12’00’’，慢于2’11’’）等信息，用户可以通过完成当日记录瓜分其他未完成用户的部分押金。（跑步机拍照带非水印信息）<br/>1. “目标天数”决定用户需要坚持的天数：<br/>为保证用户体验，用户首次参与该活动限制为3周（21日）。成功完成目标后，限制为61日。在押金不为0的情况下，完成所有天数则活动结束，并拿回剩余押金及累计金额。<br/>2. ‘每日目标距离’决定用户在完成目标时每日至少需要完成的距离。<br/>3. “降低投入”决定用户需要投入的比例：<br/>用户可选择此项（学生）从而降低参与时所需投入押金的总额，但同时该用户参与此次活动的系数也随之减小。<br/>4. 系数越大每日在奖金池中瓜分的比例就越高。<br/>5. 押金=保证金+底金 （仅限该活动）：<br/>    5.1 保证金：在活动中未完成则扣除活动中所提交的全额保证金；<br/> 5.2 底金：在无保证金的前提下，在此活动中未完成则扣除活动中15元底金（降低投入时为10.5元），直至扣完为止；<br/>    5.3 在押金为0的情况下直接视为活动结束，并拿回累计金额。<br/>6. 在自由模式中，为了保证用户在自由模式中并非一次性完成目标距离，在自由模式中设置了每日最高累计距离。（用户至少需要平均每周跑3天才可完成该模式中的跑步活动）<br/>7. “跑步”活动的每日结算时段为当日23:59，如用户对活动有疑问及争议的户可在每日22:00前联系客服，如有需要用户应被瓜分的押金部分将暂时冻结以待解决。（客服只处理因不可抗力因素，如系统问题引起的无法完成的情况。以示公平，在正常情况下将不受理）。<br/>※本平台拥有所有活动的最终解释权，如有疑问请与客服联系，谢谢。<br/></p>
+	</div>
+	<div class="fixed-panel">
+		<div class="row-center" style="justify-content: space-between;margin-top: 20px;">
+			<div class="fixed-text">
+				系数:
+				<span id="all-coefficient-value" class="fixed-text__bold" style="color: #565c66;">10.0</span>
+			</div>
+			<div class="fixed-text">
+				押金:
+				<span style="color: #ff931f;" id="guarantee-cash" class="fixed-text__bold">
+					100
+				</span>
+				元
+			</div>
+		</div>
+		<button class="weui-btn weui-btn_primary" id="gen-btn">
+			生成目标
+		</button>
+	</div>
+
+	<div id="gen-popup" class="weui-popup__container popup-bottom">
+		<div class="weui-popup__overlay"></div>
+		<div class="weui-popup__modal">
+			<div class="modal-content">
+				<div class="gen-title">
+					<div class="title-line"></div>
+					<span class="title-text">
+						<span style="font-weight: 600;">跑步</span>
+						<span id="free-gen-title" class="gen-title-text">自由模式</span>
+                        <span id="discipline-gen-title" class="gen-title-text" style="display: none;">自律模式</span>
+					</span>
+				</div>
+				<div class="weui-cell">
+						<div class="weui-cell__bd">
+						<span class="gen_title">总价</span>
+						</div>
+						<div class="weui-cell__ft" style="margin-right: 20px;">
+							<span id="pay-count"style="color: #565c66;font-size: 1.4rem;font-weight: 600;">
+								100
+							</span>
+							元
+						</div>
+				  </div>
+				<div class="weui-cell no-before">
+						<div class="weui-cell__hd">
+							<span class="gen_title">积分抵扣</span>
+						</div>
+						<div class="weui-cells_checkbox weui-cell__bd">
+							<label class="weui-cell weui-check__label" for="s11">
+								<div class="weui-cell__bd">
+								  <p>积分可抵扣总金额10%</p>
+								</div>
+								<div class="weui-cell__hd">
+								  <input type="checkbox" class="weui-check" name="checkbox1" id="s11" checked="checked">
+								  <i class="weui-icon-checked"></i>
+								</div>
+						  </label>
+						</div>
+					</div>
+				<p class="user-agreement__text">进入下一步即代表同意用户协议</p>
+				<button class="weui-btn weui-btn_primary" id="pay-btn">
+					<img src="/static/images/wechat-pay.png" style="width:1.2em;margin-right:10px;">
+					微信支付
+				</button>
+			</div>
+		</div>
+	</div>
+    <div id="activity-get__id" hidden>{{ app.activity_id }}</div>
+
+	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/static/js/fastclick.js"></script>
+	<script>
+		// fast click binding
+		$(function() {
+			FastClick.attach(document.body);
+		});
+	</script>
+	<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/static/js/material.min.js"></script>
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <!--配置CSRF保护-->
+    <script>
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
+        });
+    </script>
+    <!--注入Config信息-->
+	<script>
+	{{ WechatJSConfig|safe}}
+	</script>
+	<script>
+        var day_map = {
+            '1 周': 7,
+			'2 周': 14,
+			'3 周': 21,
+			'1 月': 30,
+			'2 月': 61
+        };
+		var coefficient_map = {
+			'1 周':'10',
+			'2 周':'15',
+			'3 周':'20',
+			'1 月':'24',
+			'2 月':'30'
+		};
+		//保证金，两个模式下是一致的
+		var deposit_map = {
+			'1 周':'85',
+			'2 周':'150',
+			'3 周':'180',
+			'1 月':'300',
+			'2 月':'500'
+		};
+		//底金，押金=保证金+底金
+		var excess_map = {
+			'1 周':'15',
+			'2 周':'30',
+			'3 周':'60',
+			'1 月':'0',
+			'2 月':'0'
+		};
+		//自律模式下的免签
+		var avoid_map = {
+		    '1 周':'1',
+			'2 周':'2',
+			'3 周':'4',
+			'1 月':'6',
+			'2 月':'12'
+		};
+		var coeff_time_map = {
+		    '普 通':'1',
+			'学 生':'0.8'
+		};
+		var mode_map = {
+		    '普 通':'N',
+            '学 生':'S'
+        };
+		// 判断是否处于自由模式
+		function is_free_mode(){
+		    return $("#free-mode").hasClass("setting-mode__button-active");
+        }
+        // 修改总系数与押金值
+		function updateTotal(){
+		    var coefficient = 0;
+		    var times = 0.0;
+		    var status = 1.0;
+		    var excess = 0;
+		    var deposit = 0;
+		    var total = 0;
+		    if(is_free_mode()) {
+                //计算总系数
+                coefficient = parseInt($("#free__base-coeff").html().trim());
+                times = parseFloat($("#free__distance-coeff-times").html().trim());
+                status = parseFloat($("#free__status-coeff-value").html().trim());
+                //计算总押金，押金 = 底金 + 保证金
+                excess = parseInt($("#free__excess-value").html().trim());
+                deposit = parseInt($("#free__deposit-value").html().trim());
+                total = excess + deposit;
+            }
+            else{
+		        //计算总系数
+                coefficient = parseInt($("#discipline__base-coeff").html().trim());
+                times = parseFloat($("#discipline__distance-coeff-times").html().trim());
+                status = parseFloat($("#discipline__status-coeff-value").html().trim());
+                //计算总押金，押金 = 底金 + 保证金
+                excess = parseInt($("#discipline__excess-value").html().trim());
+                deposit = parseInt($("#discipline__deposit-value").html().trim());
+                total = excess + deposit;
+            }
+            $("#all-coefficient-value").html((coefficient * times * status).toFixed(2));
+		    var paymoney = total.toFixed(0);
+		    $("#guarantee-cash").html(paymoney);
+		    $("#pay-count").html(paymoney);
+		}
+		// 修改状态系数倍率
+		function updateCoffTimes(obj) {
+		    var option = obj.html().trim();
+		    if(is_free_mode()) {
+                $("#free__status-coeff-value").html(coeff_time_map[option]);
+            }
+            else{
+                $("#discipline__status-coeff-value").html(coeff_time_map[option]);
+            }
+        }
+		// 修改周数系数基准值
+		function updateBaseCoff(obj) {
+		    var option = obj.html().trim();
+		    var moneytimes = 1.0;
+			//如果是在自由模式下
+            if(is_free_mode()){
+                if($("#free__status-text").html().trim() === "学 生"){
+                    moneytimes = 0.7;
+                }
+                $("#free__base-coeff").html(coefficient_map[option]);
+                $("#free__excess-value").html((excess_map[option] * moneytimes).toFixed(0));
+                $("#free__deposit-value").html((deposit_map[option] * moneytimes).toFixed(0));
+            }
+            //如果是在自律模式下
+            else{
+                if($("#discipline__status-text").html().trim() === "学 生"){
+                    moneytimes = 0.7;
+                }
+                $("#discipline__base-coeff").html(coefficient_map[option]);
+                $("#discipline__excess-value").html((excess_map[option] * moneytimes).toFixed(0));
+                $("#discipline__deposit-value").html((deposit_map[option] * moneytimes).toFixed(0));
+                $("#discipline__avoid-value").html(avoid_map[option]);
+			}
+        }
+        // 点击设置时间按钮
+        $(".dropdown-menu .timeSetMenu").click(function () {
+			updateBaseCoff($(this));
+			updateTotal();
+			if(is_free_mode()) {
+			    var free_time =$("#free__time-text");
+			    // 更新自由模式下的进度条
+                var _timeMap = {
+                    "1 周": 6,
+                    "2 周": 12,
+                    "3 周": 18,
+                    "1 月": 25,
+                    "2 月": 50
+                };
+		        var min_dis = _timeMap[$(this).html().trim()];
+		        var max_dis = min_dis * 5;
+		        $("#distance-min").html(min_dis);
+		        $("#distance-max").html(max_dis);
+                $("#free__distance-desc").text(min_dis);
+                $(".mdl-slider").val(0);
+                $("#free__distance-coeff-times").html(1);
+			    free_time.text($(this).text());
+            }
+            else{
+			    $("#discipline__time-text").text($(this).text());
+            }
+        });
+		// 点击设置降低投入
+		$(".dropdown-menu .statusSetMenu").click(function () {
+		    updateCoffTimes($(this));
+			if(is_free_mode()){
+			    $("#free__status-text").text($(this).text());
+			    updateBaseCoff($("#free__time-text"));
+            }
+            else{
+			    $("#discipline__status-text").text($(this).text());
+			    updateBaseCoff($("#discipline__time-text"));
+            }
+            updateTotal();
+        });
+		// 修改每日距离产生的倍率
+		$(".mdl-slider").change(function (){
+            var min_dis = 1;
+            var max_dis = 5;
+            if(is_free_mode()){
+                min_dis = parseInt($("#distance-min").html().trim());
+		        max_dis = min_dis * 5;
+            }
+            //以 0.5 为单位
+            var delta = (max_dis - min_dis) / 8;
+            var dis = delta * parseInt($(this).val()) + min_dis;
+		    var cofficient_value = (1 + 0.1 * $(this).val() ).toFixed(1);
+		    if(is_free_mode()) {
+                $("#free__distance-desc").text(dis);
+                $("#free__distance-coeff-times").html(cofficient_value);
+            }
+            else{
+		        $("#discipline__distance-desc").text(dis);
+		        $("#discipline__distance-coeff-times").html(cofficient_value);
+            }
+			updateTotal();
+        });
+
+		$(".weui-popup__overlay").click(
+		    function () {
+				$("body").removeClass("popup-open");
+            }
+		);
+		$("#gen-btn").click(function(){
+		    // 指定总价
+			$("#gen-popup").popup();
+			$("body").addClass("popup-open");
+		});
+		$(".setting-mode__button").click(function () {
+		    // 将当前按钮设置为活动按钮
+		    var active_btn = $(".setting-mode__button-active");
+            active_btn.removeClass("setting-mode__button-active");
+            $(this).addClass("setting-mode__button-active");
+            // 隐藏所有布局
+            $(".panel-layout").hide();
+            $(".explain-desc").hide();
+            $(".gen-title-text").hide();
+            // 根据选择的种类打开不同的类别
+            if(is_free_mode()){
+                $("#free-explain").show();
+                $("#free-panel").show();
+                $("#free-gen-title").show();
+            }
+            else{
+                $("#discipline-explain").show();
+                $("#discipline-panel").show();
+                $("#discipline-gen-title").show();
+            }
+            //重新计算总系数与押金值
+            updateTotal();
+        });
+		/* 跳转页面 */
+		$("#backup-btn").click(function () {
+			window.location.href = "index";
+        });
+
+	</script>
+    <script>
+        wx.ready(function() {
+            $("#pay-btn").click(function () {
+                // 底金
+                var excess = parseFloat($("#discipline__excess-value").html());
+                // 保证金
+                var deposit = parseFloat($("#discipline__deposit-value").html());
+                // 总系数
+                var coefficient = parseFloat($("#all-coefficient-value").html());
+                // 跑步类型
+                var runningtype = "DES";
+                // 目标天数
+                var goalday = day_map[$("#discipline__time-text").html().trim()];
+                // 模式
+                var mode = mode_map[$("#discipline__status-text").html().trim()];
+                // 目标距离
+                var distance = parseInt($("#discipline__distance-desc").html());
+                // 免签卡
+                var avoid = parseInt($("#discipline__avoid-value").html());
+                if(is_free_mode()){
+                    excess = parseFloat($("#free__excess-value").html());
+                    deposit = parseFloat($("#free__deposit-value").html());
+                    runningtype = "FREE";
+                    goalday = day_map[$("#free__time-text").html().trim()];
+                    mode = mode_map[$("#free__status-text").html().trim()];
+                    distance = parseInt($("#free__distance-desc").html())
+                }
+                //TODO:唤起微信支付的接口，如果支付成功则继续支付
+                $.post('/api/create_goal',{
+                    activity : $("#activity-get__id").html().trim(),
+                    goal_type: runningtype,
+                    down_payment: excess,
+                    guaranty: deposit,
+                    coefficient: coefficient,
+                    mode: mode,
+                    goal_day: goalday,
+                    distance: distance,
+                    nosign: avoid
+                },function (reponse) {
+                    $.post('/wechatpay', {
+                        'goal': reponse['goal'],
+                        'price':deposit + excess
+                    },function (response) {
+                        {% if DEBUG %}
+                        // 唤起微信支付接口
+                        $.post('/payback', {
+                            goal:reponse['goal']
+                        },function (res) {
+                                // 重定向到分享页面
+                                window.location.href = "/goal/share/" + reponse['goal'];
+                        });
+                        {% else %}
+                        wx.chooseWXPay({
+                            timestamp: response['timeStamp'], // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+                            nonceStr: response['nonceStr'], // 支付签名随机串，不长于 32 位
+                            package: response['package'], // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
+                            signType: response['signType'], // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+                            paySign: response['paySign'], // 支付签名
+                            success: function (res) {
+                                // 重定向到分享页面
+                                window.location.href = "/goal/share/" + reponse['goal'];
+                            }
+                        });
+                        {% endif %}
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

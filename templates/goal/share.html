@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>On!</title>
+</head>
+<link rel="stylesheet" href="/static/css/buttons.min.css">
+<style>
+    html, body{
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        background: url("/static/images/target_share_background.jpg") no-repeat 0 center;
+        background-size: auto 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .target-header__layer{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        flex: 0.2;
+        margin-top: 20px;
+    }
+    .target-bottom__layer{
+        flex: 0.6;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        margin-bottom: 20px;
+    }
+    #share-btn, #close-btn{
+        width: 40%;
+        padding: 0 20px;
+        margin-bottom: 15px;
+    }
+    .target-bottom__layer img{
+        width: 60%;
+        box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+        margin-bottom: 25px;
+    }
+</style>
+<body>
+    <div class="target-header__layer">
+        <p style="margin-bottom: 5px;color:#1fa2ff;font-size: 1.5rem;font-weight: 400;">
+            目标生成成功!
+        </p>
+        <p style="margin-top:5px; color: #000;font-size: 1rem;font-weight: 600;">{{ goal_intro }}</p>
+    </div>
+    <div class="target-bottom__layer">
+        <p style="margin-bottom: 10px;color: #B6C1C8;font-size: 0.8rem;font-weight: 600;">识别二维码进入活动群参与更多活动</p>
+        {% if activity == "0" %}
+        <img src="/static/images/on_share_sleep.jpg">
+        {% elif activity == "1" %}
+        <img src="/static/images/on_share_run.jpg">
+        {% else %}
+        <img src="/static/images/on_share_reading.jpg">
+        {% endif %}
+        <p style="margin-top:0;margin-bottom: 20px;color: #B6C1C8;font-size: 1rem;font-weight: 600;">快点击右上角分享给好友们吧！</p>
+        <a href="#" id="close-btn" class="button button-primary button-pill">完成</a>
+    </div>
+</body>
+<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<script>
+    {{ WechatJSConfig|safe}}
+</script>
+<script>
+    wx.ready(function() {
+        wx.onMenuShareTimeline({
+            title: '2018年到了，敢不敢和我一起立个Flag?', // 分享标题
+            link: 'https://mp.weixin.qq.com/s?__biz=MzI2Mjc4OTU4Ng==&mid=2247483757&idx=1&sn=bad525c9dfd25e2afc74608058c2210d&chksm=ea4481d0dd3308c670620a8c9ada954888e37a618710ff0dbe41942fc2555f495a980ece56e3#rd', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+            imgUrl: 'http://wechat.onmytarget.cn/static/images/on_logo.jpeg', // 分享图标
+            success: function () {
+                // 用户确认分享后执行的回调函数
+            },
+            cancel: function () {
+            }
+        });
+    });
+    $("#close-btn").click(function () {
+        window.location.href = "/activity/index";
+    });
+</script>
+</html>

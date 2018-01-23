@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>On!主页</title>
+	<link rel="stylesheet" href="/static/css/weui.min.css" />
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css"/>
+	<link rel="stylesheet" href="/static/css/jquery-weui.min.css" />
+	<style type="text/css">
+	.whole-pannel{
+		display:flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		padding-top: 20%;
+		padding-bottom: 20%;
+	}
+	.text-style{
+		margin-top: 40px;
+		font-size: 0.8rem;
+		color: gray;
+	}
+	.money{
+		color: #179b16;
+		font-size: 2rem;
+		margin-top: 10px;
+		margin-bottom: 10px;
+	}
+	.width-set{
+		width: 50%;
+		max-width: 384px;
+	}
+	.whole-pannel a{
+		text-decoration:none !important;
+	}
+    </style>
+</head>
+<body ontouchstart="">
+	<div class="whole-pannel">
+		<img src="/static/images/diamonds.png" class="img-circle width-set">
+		<p class="text-style">钱包余额</p>
+		<p class="money">¥ {{ balance }}</p>
+		<a id="transfer-btn" href="javascript:;" class="weui-btn weui-btn_plain-primary width-set">全部提现</a>
+		<div class="weui-footer" style="margin-top: 30px;">
+			<!--
+			<p class="weui-footer__links">
+				<a href="javascript:void(0);" class="weui-footer__link" style="text-decoration-style: none;font-size: 0.8rem;">钱包明细</a>
+			</p>
+			-->
+		</div>
+	</div>
+	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/static/js/fastclick.js"></script>
+	<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
+	<script>
+		// fast click binding
+		$(function () {
+			FastClick.attach(document.body);
+		});
+	</script>
+	    <!--配置CSRF保护-->
+    <script>
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
+        });
+    </script>
+
+	<script>
+		$("#transfer-btn").click(function () {
+		    $.post('/transfer',{
+		        'price':{{ balance }}
+			},function (response) {
+		        if(response['status'] == 200){
+		            $.toast('提现成功！');
+				}
+				else if(response['status'] == 201){
+		            $.toast('余额需大于1元', 'cancel');
+				}
+				else if(response['status'] == 401){
+				    $.toast('提现失败,<br/>请联系客服', 'cancel');
+				}
+				else{
+				    $.toast('提现金额大于余额!', 'cancel');
+                }
+            });
+        });
+ 	</script>
+</body>
+
+</html>

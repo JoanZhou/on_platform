@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+	<title>我的订单</title>
+	<link rel="stylesheet" href="/static/css/weui.min.css" />
+	<link rel="stylesheet" href="/static/css/bootstrap.min.css"/>
+	<link rel="stylesheet" href="/static/css/share.css"/>
+	<link rel="stylesheet" href="/static/css/person.css" />
+	<style>
+		h5 {
+			font-size: 16px;
+			font-weight: 600;
+		}
+		.info-list{
+			margin-top: 0;
+		}
+        #modify-btn{
+            text-align: center;
+            color: #03BC49;
+            font-weight: 600;
+            padding: 10px 0px;
+        }
+
+        #modify-btn:active{
+            text-decoration: none;
+        }
+        .inform-input__text{
+            outline: none;
+            max-width: 250px;
+            border: none;
+            background: white;
+            margin-top: 9px;
+            border-bottom: 1px solid white;
+        }
+
+        .input-activated{
+            transition:border linear .5s;
+            border-bottom: 1px solid #efebe9;
+        }
+
+        .input-focus{
+            transition:border linear .8s;
+            border-bottom: 1px solid #1fa2ff;
+        }
+        .icon-vertical__line:after{
+            content: ' ';
+            height: calc(100% + 10px);
+            width: 2px;
+            background: #1fa2ff;
+            bottom: -5px;
+            position: absolute;
+            left: 20px;
+            z-index: 5;
+        }
+        .ready-icon{
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #1fa2ff;
+            margin-left: 17px;
+            z-index: 15;
+        }
+
+        .record__time{
+            margin-bottom: 0;
+            margin-left: 20px;
+            font-size: 12px;
+            color: #B6C1C8;
+        }
+        .record-item{
+            position:relative;
+            margin-top: 10px;
+        }
+        .record-item:nth-child(1):before{
+            content: ' ';
+            height: calc(100% + 3px);
+            width: 2px;
+            background: #B6C1C8;
+            bottom: 5px;
+            position: absolute;
+            left: 20px;
+            z-index: 10;
+        }
+	</style>
+</head>
+
+<body ontouchstart="">
+	<!--整个页面-->
+	<div class="top-pannel">
+		<!--个人中心-->
+		<ul class="info-list">
+			<!--收货地址-->
+			<li class="info-item">
+				<div class="wallet-card">
+                    <div class="row-space">
+                        <p style="font-weight: 600;font-size: 16px;margin-bottom: 0;">收货地址</p>
+                        <a id="modify-btn">修改</a>
+                    </div>
+                    <div class="row-space">
+                        <div class="coloum-center" style="flex:0.3;">
+                            <span class="wallet-card__entry">姓名 :
+                           </span>
+                            <span class="wallet-card__entry">电话 :
+                         </span>
+                            <span class="wallet-card__entry">收货地址 :
+                          </span>
+                        </div>
+                        <div class="coloum-center" style="flex: 1;">
+							<input type="text" id="name-input" value="{{ address.name }}" class="inform-input__text" disabled>
+							<input type="text" id="phone-input" value="{{ address.phone }}" class="inform-input__text" disabled>
+							<input type="text" id="address-input" value="{{ address.address }}" class="inform-input__text" disabled>
+                        </div>
+                    </div>
+				</div>
+			</li>
+			<!--个人信息-->
+			{% for order in orders %}
+			<li class="info-item">
+				<div class="row-center user-header__panel" style="height: 150px;">
+                    <div style="width: 25%;height: 100%;">
+                        <img src="{{ order.order_image }}" style="height: 100%;">
+                    </div>
+                    <div class="coloum-center" style="margin-left: 20px;flex: 1;height: 100%;">
+                        <div>
+                            <div style="">商品：{{ order.order_name }}</div>
+                            <div style="margin-top: 8px;color: #B6C1C8;">数量: {{ order.order_count }}</div>
+                        </div>
+                        <div style="flex:1;vertical-align: bottom;display: flex;flex-direction: column;justify-content: flex-end;">
+                            <div style="color: #B6C1C8;">价格:   <span style="font-size: 20px;color: #ff931f;">{{ order.order_money }}</span>  元</div>
+                        </div>
+                    </div>
+				</div>
+				<p style="font-size: 15px;margin-left: 25px;margin-bottom: 0;">订单状态</p>
+				<div class="coloum-center wallet-card" style="padding-bottom: 30px;">
+                    {% if order.confirm_time != None %}
+                    <div class="row-center icon-vertical__line record-item">
+                        <i class="ready-icon"></i>
+                        <p class="record__time">已收件</p>
+                        <p class="record__time">{{ order.confirm_time|date:"Y年m月d日"  }}</p>
+                    </div>
+                    {% elif order.delivery_time != None %}
+                    <div class="row-center icon-vertical__line record-item">
+                        <i class="ready-icon"></i>
+                        <p class="record__time" style="margin-left: 19px;">已发货</p>
+                        <p class="record__time">{{ order.delivery_time|date:"Y年m月d日" }}</p>
+                    </div>
+                    {% else %}
+                    <div class="row-center icon-vertical__line record-item">
+                        <i class="ready-icon"></i>
+                        <p class="record__time" style="margin-left: 19px;">已下单</p>
+                        <p class="record__time">{{ order.order_time|date:"Y年m月d日" }}</p>
+                    </div>
+                    {% endif %}
+				</div>
+			</li>
+			{% endfor %}
+		</ul>
+    </div>
+	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/static/js/fastclick.js"></script>
+	<script>
+		// fast click binding
+		$(function () {
+			FastClick.attach(document.body);
+		});
+	</script>
+	<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
+	<script>
+        $("#modify-btn").click(function(){
+            var status = $(this).attr("checked");
+            if(status !== "checked"){
+                $(this).text("保存");
+                $(this).attr("checked","checked");
+                $('input[type="text"]').removeAttr("disabled");
+                $('input[type="text"]').addClass('input-activated');
+            }
+            else{
+                $(this).text("修改");
+                $(this).removeAttr("checked");
+                $('input[type="text"]').attr("disabled");
+                $('input[type="text"]').removeClass('input-activated');
+                //向后端发送更新信息的请求
+                var data = JSON.stringify({'name':$("#name-input").val().trim(),
+                        'phone':$("#phone-input").val().trim(),
+                        'address':$("#address-input").val().trim()});
+                $.post('/api/update_address',
+                    {
+                        'data': data
+                    },function (response) {
+
+                });
+            }
+        });
+
+        function resizeInput(){
+            $(this).attr('size', Math.max($(this).val().length*1.5 + 2), 20);
+        }
+
+		$('input[type="text"]').bind('input propertychange', function(){
+			$(this).attr('size', Math.min($(this).val().length*1.5 + 2), 20);
+		});
+
+        $("#phone-input").change(function () {
+            if(!/^\d+$/.test($(this).val()))
+            {
+                $(this).val($(this).val().replace(/[^\d]+/g,''));
+            }
+        });
+        $('input[type="text"]').focus(function(){
+            $(this).addClass('input-focus');
+        });
+        $('input[type="text"]').focusout(function(){
+            $(this).removeClass('input-focus');
+        });
+
+		$(document).ready(function(){
+			$('input[type="text"]').each(resizeInput);
+		});
+	</script>
+</body>
+
+</html>

@@ -1,0 +1,196 @@
+body{
+    background-color: #f5f6f9;
+}
+
+.bottom-absolute-part {
+    position: fixed;
+    bottom: 0px;
+}
+
+.swiper-container {
+    width: 100%;
+}
+
+.swiper-container img {
+    display: block;
+    width: 100%;
+}
+
+.top-pannel {
+    padding-bottom: 60px;
+}
+
+/*下方导航部分CSS样式*/
+
+.tabpage-panel {
+    width: 100%;
+    border-top: 1px solid #eee;
+}
+
+
+.tabpage-panel .weui-bar__item--on::after{
+    display: block;
+    height: 6px;
+    border-radius: 6px;
+    position: absolute;
+    top: 42px;
+    width: 160%;
+    left: -65%;
+    content: '';
+    background:-moz-linear-gradient(left,#2CA7FF,lightblue);/*火狐*/
+    background:-webkit-gradient(linear, 0% 0%, 100% 0%,from(#2CA7FF), to(lightblue));/*谷歌*/
+}
+
+.tabpage-panel a {
+    text-decoration: none;
+}
+
+.tabpage-panel .weui-navbar__item {
+    background: white;
+    padding: 10px 0;
+    line-height: 25px;
+    height: 48px;
+    font-size: 1rem;-
+    color: #565c66;
+}
+
+.tabpage-panel .weui-navbar__item > svg{
+    width: 1.2rem;
+    height: 1.2rem;
+    vertical-align: middle;
+}
+
+.tabpage-panel .weui-navbar__item > svg *{  
+    fill: #a7b4cd;
+}
+
+.tabpage-panel .weui-bar__item--on > svg *{
+    fill: #1fa2ff;
+}
+
+.weui-navbar__item::after {
+    border-right: 0px solid white;
+}
+
+.weui-navbar + .weui-tab__bd {
+    padding-top: 46px;
+}
+
+.nav-card {
+    -moz-box-shadow: rgba(0, 0, 0, 0.19) 0 0 1px 0;
+    -webkit-box-shadow: rgba(0, 0, 0, 0.19) 0 0 1px 0;
+    box-shadow: rgba(0, 0, 0, 0.19) 0 0 1px 0;
+    height: auto;
+    background-size: 100% 100%;
+    display: flex;
+    flex-direction: column;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+    margin-top: 10px;
+    position: relative;
+}
+
+.weui-tab__bd .col-xs-6 {
+    padding-top: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.nav-card .card-header {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.nav-card .card-header .card-stage {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    display: inline-block;
+    vertical-align: middle;
+    width: 10px;
+    height: 10px;
+    overflow: hidden;
+    border-radius: 50%;
+    padding: 0;
+    margin: 0 2px;
+    background: #A1A1A4;
+    text-indent: -9999px;
+    color: transparent;
+    line-height: 16px;
+}
+
+.nav-card .card-name {
+    position: absolute;
+    top: -22px;
+    margin-left: 2vw;
+    height: 23px;
+    color: #ffffff;
+    text-shadow: 0 0 10px #00a3ff;
+    transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    font-size: 16.0px;
+    padding: 0px;
+    border-radius: 0px;
+    border-width: 0px;
+    border-style: solid;
+    text-align: left;
+    line-height: 23px;
+    font-weight: bold;
+    z-index: 6;
+    opacity: 1;
+    pointer-events: auto;
+    vertical-align: middle;
+}
+
+.card-progress {
+    position: absolute;
+    background-color: rgba(0,0,0,0.5);
+    width: 100%;
+    font-size: 0.8em;
+    height: 38.1%;
+    bottom: 0;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 1vw 1vh 1vh 1vw;
+}
+
+.card-tag {
+    width: 90%;
+    display: inline-block;
+    color: #FFF;
+    margin-left: 2vw;
+    font-size: 1em;
+    cursor: default;
+    text-align: left;
+    line-height:2vh;
+}
+
+.card-tag > span{
+    vertical-align: middle;
+}
+.card-tag > svg{
+    vertical-align: middle;
+    fill: #B9B8B7;
+    width: 1.5em;
+    height: 1.5em;
+}
+
+.card-tag .span-text{
+    color:#52D0FF;
+    font-weight: 600;
+}
+
+#nav1 {
+    padding-bottom: 8px;
+}
+
+.weui-navbar__item > span{
+    font-size: 16px;
+}

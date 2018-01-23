@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>On!主页</title>
+	<link rel="stylesheet" href="/static/css/weui.min.css">
+	<link rel="stylesheet" href="/static/css/material.min.css">
+	<link rel="stylesheet" href="/static/css/jquery-weui.min.css">
+	<link rel="stylesheet" href="/static/css/share.css" />
+	<style type="text/css">
+		.history-header {
+			height: 3.5rem;
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			border-bottom: 1px solid rgba(0,0,0,.12);
+			margin-bottom: 10px;
+		}
+		
+		.history-title {
+			font-size: 1.25rem;
+			line-height: 2rem;
+			background: white;
+			text-align: center;
+			color: #212122;
+		}
+		
+		.history-icon {
+			height: 90%;
+			margin-right: 10px;
+		}
+		
+		.history-icon img {
+			height: 100%;
+		}
+		
+		.history-body {
+			list-style: none;
+			padding: 10px;
+		}
+		
+		.row-center {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-around;
+			margin-top: 5px;
+		}
+		
+		.coloum-center {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			justify-content: space-between;
+		}
+		
+		.history-text {
+			margin-left: 10px;
+			margin-right: 10px;
+			margin-bottom: 10px;
+		}
+		
+		.history-card {
+			width: 95%;
+			margin-left: auto;
+			margin-right: auto;
+			margin-bottom: 10px;
+		}
+		
+		.history-card>.mdl-card__title {
+			height: 40%;
+			color: #fff;
+			background: #616161;
+		}
+		
+		.history-card>.mdl-card__title>.mdl-card__title-text {
+			font-size: 1rem;
+		}
+
+		.history-card>.mdl-card__title>img {
+			height: 90%;
+		}
+		
+		.history-body .mdl-list__item {
+			padding-top: 0px;
+			padding-bottom: 0px;
+			min-height: 36px;
+		}
+		
+		.history-body .mdl-card__supporting-text {
+			padding: 0px;
+		}
+		
+		.run-background {
+			background: #7e57c2 !important;
+		}
+		
+		.reading-background {
+			background: #1976d2 !important;
+		}
+		
+		.getup-background {
+			background: #d32f2f !important;
+		}
+
+		.history-text span{
+			font-size: 0.8rem;
+			color: #424242;
+		}
+		
+		.minilogo {
+			width: 40px;
+			height: 40px;
+			background-position: center;
+			background-repeat: no-repeat;
+			background-size: 20px 20px;
+			border-radius: 20px;
+			background-color: #E1E2E1;
+			margin-right: 10px;
+		}
+	</style>
+</head>
+
+<body ontouchstart="">
+	<div class="history-header">
+		<div class="history-icon">
+			<img src="/static/images/person_history.png">
+		</div>
+		<div class="history-title">
+			历史记录
+		</div>
+	</div>
+	<div class="row-center history-text">
+		<div class="coloum-center">
+			<div class="row-center">					
+				<span class="minilogo" style="background-image:url(/static/images/his_icon_times.png);"></span>
+				<span>完成/参与次数: {{ punchinform.finish_times }}/{{ punchinform.join_times }}</span>
+			</div>
+			<div class="row-center">					
+				<span class="minilogo" style="background-image:url(/static/images/his_icon_com.png);"></span>
+				<span>成功率 : {{ successrate }}%</span>
+			</div>
+		</div>
+		<div class="coloum-center">
+			<div class="row-center">					
+				<span class="minilogo" style="background-image:url(/static/images/his_icon_day.png);"></span>
+				<span>完成天数: {{ punchinform.finish_days }}</span>
+			</div>
+			<div class="row-center">					
+				<span class="minilogo" style="background-image:url(/static/images/his_icon_set.png);"></span>
+				<span>总系数: {{ punchinform.all_coefficient }}</span>
+			</div>
+		</div>
+	</div>
+	<ul class="history-body">
+		{% for punch in punchs %}
+		<li class="history-card mdl-card mdl-shadow--2dp">
+			<div class="mdl-card__title run-background">
+				<h3 class="mdl-card__title-text">{{ punch.time }}</h3>
+			</div>
+			<div class="mdl-card__supporting-text">
+				<ul class="mdl-list">
+					<li class="mdl-list__item">
+						<span class="mdl-list__item-primary-content">
+						<i class="material-icons mdl-list__item-icon">star</i>
+					项目: {{ punch.type }}</span>
+					</li>
+					<li class="mdl-list__item">
+						<span class="mdl-list__item-primary-content">
+						<i class="material-icons mdl-list__item-icon">star</i>
+					目标: {{ punch.target }}</span>
+					</li>
+					<li class="mdl-list__item">
+						<span class="mdl-list__item-primary-content">
+						<i class="material-icons mdl-list__item-icon">star</i>
+					收益: {{ punch.bonus }}</span>
+					</li>
+				</ul>
+			</div>
+		</li>
+		{% endfor %}
+		<li class="history-card mdl-card mdl-shadow--2dp">
+			<div class="mdl-card__title reading-background">
+				<h3 class="mdl-card__title-text">2017年7月1日</h3>
+			</div>
+			<div class="mdl-card__supporting-text">
+				<ul class="mdl-list">
+					<li class="mdl-list__item">
+						<span class="mdl-list__item-primary-content">
+						<i class="material-icons mdl-list__item-icon">star</i>
+					项目: 跑步 自由模式</span>
+					</li>
+					<li class="mdl-list__item">
+						<span class="mdl-list__item-primary-content">
+						<i class="material-icons mdl-list__item-icon">star</i>
+					目标: 3周, 50km</span>
+					</li>
+					<li class="mdl-list__item">
+						<span class="mdl-list__item-primary-content">
+						<i class="material-icons mdl-list__item-icon">star</i>
+					收益: 30</span>
+					</li>
+				</ul>
+			</div>
+		</li>
+		<li class="history-card mdl-card mdl-shadow--2dp">
+			<div class="mdl-card__title">
+				<h3 class="mdl-card__title-text">2017年6月1日</h3>
+			</div>
+			<div class="mdl-card__supporting-text">
+				<ul class="mdl-list">
+					<li class="mdl-list__item">
+						<span class="mdl-list__item-primary-content">
+						<i class="material-icons mdl-list__item-icon">star</i>
+					项目: 跑步 自由模式</span>
+					</li>
+					<li class="mdl-list__item">
+						<span class="mdl-list__item-primary-content">
+						<i class="material-icons mdl-list__item-icon">star</i>
+					目标: 3周, 50km</span>
+					</li>
+					<li class="mdl-list__item">
+						<span class="mdl-list__item-primary-content">
+						<i class="material-icons mdl-list__item-icon">star</i>
+					收益: 30</span>
+					</li>
+				</ul>
+			</div>
+		</li>
+	</ul>
+	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/static/js/fastclick.js"></script>
+	<script>
+		// fast click binding
+		$(function () {
+			FastClick.attach(document.body);
+		});
+	</script>
+	<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
+	<script type="text/javascript" src="/static/js/material.min.js"></script>
+</body>
+
+</html>

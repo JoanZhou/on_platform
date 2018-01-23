@@ -1,0 +1,137 @@
+* {
+  font-family: "Helvetica Neue","Helvetica","Arial","PingFang SC","Hiragino Sans GB", "Microsoft YaHei","WenQuanYi Micro Hei", sans-serif;
+}
+.bottom-absolute-part{
+	position: fixed;
+	bottom: 0px;
+}
+.swiper-container {
+    width: 100%;
+}
+.swiper-container img {
+    display: block;
+    width: 100%;
+}
+.weui-tabbar p{
+    margin: 0px;
+}
+.weui-tabbar a{
+    text-decoration: none;
+}
+
+.top-pannel {
+  padding-bottom: 60px;
+}
+
+.weui-tabbar{
+  position: fixed;
+}
+
+.target-header{
+    padding-left: 20%;
+    padding-right: 20%;
+    height: 3rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid lightgray;
+    border-bottom: 1px solid lightgray;
+}
+
+.target-title {
+    font-size: 1rem;
+    line-height: 1.5rem;
+    background: white;
+    text-align: center;
+    color: #212122;
+}
+
+.target-icon{
+    height: 70%;
+}
+.target-icon img{
+    height: 100%;
+}
+
+.target-list{
+    list-style: none;
+    border-bottom: 1px solid gray;
+}
+
+li.target-list-item:last-child{
+    border-bottom: 0px solid gray;
+}
+
+.target-list-item {
+    margin-top: 10px;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: flex-start;
+    background-size: 100% 100%;
+    position: relative;
+}
+
+.item-text{
+    margin-left:0.5rem;
+    font-size: 18px;
+    z-index: 5;
+    color: white;
+    font-weight: 500;
+}
+
+.item-status{
+    height: inherit;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.status-text{
+    font-size: 12px;
+    color: white;
+    padding: 3px;
+    padding-bottom: 2px;
+    border-radius: 2px;
+    z-index: 5;
+}
+.status-icon{
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.header-mask{
+    position: absolute;
+    width: 100%;
+    height: 100px;
+    top: 0;
+}
+
+.icon-active{
+    height: auto;
+    width: auto;
+    background: #FFAB18;
+}
+
+.icon-start{
+    height: auto;
+    width: auto;
+    background: #1fa2ff;
+}
+
+
+.icon-success{
+    height: auto;
+    width: auto;
+    background: #1EC771;
+}
+
+.icon-fail{
+    height: auto;
+    width: auto;
+    background: #f44336;
+}

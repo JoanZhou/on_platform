@@ -1,0 +1,176 @@
+
+#upload-panel .panel__title{
+    color: #000;
+    font-size: 0.7rem;
+}
+
+#upload-panel .panel__middle{
+    color: #B6C1C8;
+    font-size: 0.6rem;
+    margin-bottom: 5px;
+}
+
+#upload-panel .panel__middle-focus{
+    color: #1fa2ff;
+    font-size: 1.2rem;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+#upload-panel .panel__bottom{
+    color: #B6C1C8;
+    font-size: 0.6rem;
+    margin-bottom: 5px;
+}
+
+#upload-panel .panel__bottom-focus{
+    color: #1fa2ff;
+}
+
+#upload-panel .upload-card{
+    padding: 5px 5px 5px 5px;
+}
+
+.reading-book {
+    width: 40%;
+}
+
+.reading-book > img{
+    width: 100%;
+}
+
+.setting-item__right > div{
+    width: 100%;
+}
+
+.setting-item__right {
+    margin-top: 0; !important;
+    margin-left: 0 !important;
+}
+
+.row-center.between{
+    justify-content: space-between;
+}
+.coloum-space.between{
+    justify-content: space-between;
+}
+
+.intro-multi-row{
+    position:relative;
+    font-size: 14px;
+    line-height: 16px;
+    /* 3 times the line-height to show 3 lines */
+    height: 48px;
+    overflow:hidden;
+    color: #B6C1C8;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.image-header{
+    background: url(../images/reading_bar.jpeg) center / cover;
+}
+
+.reading-book__tail{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.reading-book__tail > p{
+    margin-bottom: 2px;
+    font-size: 14px;
+    line-height: 16px;
+}
+
+
+.setting-item{
+    margin-right: 0;
+    padding-right: 0.8rem;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f4f4f4;
+}
+
+.setting-item:last-child{
+    border-width: 0;
+}
+
+.panel__title{
+    color: #B6C1C8;
+}
+
+.panel__target-text{
+    font-size: 24px;
+    margin-right: 5px;
+}
+
+.setting-item > .coloum-space {
+    align-items: center;
+}
+
+.pay-icon{
+    margin-left: 0 !important;
+    padding-left: 10%;
+    padding-right: 10%;
+    width: 50%;
+}
+
+.pay-icon:first-child{
+    border-right: 1px solid #f4f4f4;
+}
+
+#intro-popup .modal-content {
+    padding-top: 1rem;
+    display: flex;
+    box-sizing: border-box;
+    flex-direction: column;
+    justify-content: space-between;
+    background: #ffffff;
+}
+
+
+#read-popup .modal-content{
+    padding-top: 16px;
+    background: #ffffff;
+}
+
+.mdl-textfield__label:after{
+    background-color: #1fa2ff !important;
+}
+
+#intro-popup .weui-popup__modal{
+    max-height: 200px;
+    left: 50%;
+    top: 50%;
+    width: 80%;
+    transform: translate(-50%, -50%);
+    border-radius: 4px;
+    box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    background: #ffffff;
+}
+
+.popup-open{
+    overflow: hidden;
+}
+
+.upload-btn__style.start{
+    background: #1EC771;
+}
+
+#start-read-btn:active,#start-read-btn:focus,#continue-read-btn:active,#continue-read-btn:focus{
+    background: #1EC771 !important;
+}
+
+.mdl-textfield {
+    width: 48px;
+}
+
+#page-input{
+    text-align: center;
+    font-size: 16px;
+    color: #1fa2ff;
+    font-weight: 100;
+    font-family: Tahoma, Arial, STXihei, "华文细黑", "Microsoft YaHei", "微软雅黑", SimSun, "宋体", Heiti, "黑体", sans-serif;
+}
+
