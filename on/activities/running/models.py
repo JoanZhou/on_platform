@@ -15,8 +15,9 @@ class RunningGoalManager(models.Manager):
         if settings.DEBUG:
             start_time = timezone.now()
         else:
-            # start_time = timezone.now() + timedelta(days=1)
-            start_time = datetime.strptime("2018-01-01 00:00:01", "%Y-%m-%d %H:%M:%S")
+            # 当天创建活动只有后一天才能参加，所以以后一天为开始日期
+            start_time = timezone.now() + timedelta(days=1)
+            # start_time = datetime.strptime("2018-01-01 00:00:01", "%Y-%m-%d %H:%M:%S")
         kilos_day, goal_distance, left_distance = None, None, None
         if running_type:
             kilos_day = distance
@@ -31,7 +32,9 @@ class RunningGoalManager(models.Manager):
             goal_distance = distance
             left_distance = distance
             kilos_day = 2 * distance // actual_day_map[goal_day]
+        # 查询出没有支付的活动
         goal = self.filter(user_id=user_id).filter(start_time=start_time).filter(status="PENDING")
+        # 如果存在的话就删掉
         if goal:
             goal.first().delete()
         goal = self.create(user_id=user_id,
@@ -73,6 +76,8 @@ class RunningGoal(Goal):
     # 剩余距离, 只针对自由模式有效
     left_distance = models.FloatField(null=True)
     objects = RunningGoalManager()
+    def __str__(self):
+        return "用户编号{}".format(self.user_id)
 
     @staticmethod
     def get_start_date():
@@ -124,7 +129,7 @@ class RunningGoal(Goal):
             # 更新值
             self.save()
             # 把本次瓜分金额写入数据库记录中
-            UserSettlement.objects.loose_pay(goal_id=self.goal_id,bonus=pay_out)
+            UserSettlement.objects.loose_pay(goal_id=self.goal_id, bonus=pay_out)
         # 完成所有瓜分金额的计算
         return pay_out
 
@@ -134,7 +139,8 @@ class RunningGoal(Goal):
 
     def update_activity(self, user_id):
         # 更新该种活动的总系数
-        Activity.objects.add_bonus_coeff(RunningGoal.get_activity(), self.guaranty + self.down_payment, self.coefficient)
+        Activity.objects.add_bonus_coeff(RunningGoal.get_activity(), self.guaranty + self.down_payment,
+                                         self.coefficient)
         # 增加用户的累计参加次数
         UserRecord.objects.update_join(user=UserInfo.objects.get(user_id=user_id), coeff=self.coefficient)
 
@@ -163,13 +169,16 @@ class RunningPunchRecordManager(models.Manager):
             goal.save()
         return record
 
+    #
     # 获取时间
     def get_day_record(self, daydelta):
         """
         :param day: 表示一个timedelta
         :return:
         """
+        # 今天的日期加上
         today = timezone.now().date() + timedelta(daydelta)
+        # 明天
         end = today + timedelta(1)
         return self.filter(record_time__range=(today, end))
 
@@ -234,9 +243,11 @@ class RunningPunchRecord(models.Model):
     report = models.IntegerField(default=0)
     # 指定一个Manager
     objects = RunningPunchRecordManager()
+    def __str__(self):
+        return self.punch_id
 
 
-# 点赞与举报
+# 点赞
 class RunningPunchPraise(models.Model):
     # 点赞的人
     user_id = models.IntegerField()
@@ -247,12 +258,12 @@ class RunningPunchPraise(models.Model):
         unique_together = ("punch_id", "user_id")
 
 
-# 点赞与举报
+# 举报
 class RunningPunchReport(models.Model):
     # 举报的人
     user_id = models.IntegerField(null=False, default=0)
     # punch id
-    punch_id = models.UUIDField(null=False,default=uuid.uuid4)
+    punch_id = models.UUIDField(null=False, default=uuid.uuid4)
 
     class Meta:
         unique_together = ("punch_id", "user_id")
