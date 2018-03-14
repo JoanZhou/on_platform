@@ -257,3 +257,7 @@ input[type=range]::-ms-track {
     background: #BDBDBD !important;
 }
 
+.news-item__tail-text{
+    margin-left: 0px;
+}
+

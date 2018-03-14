@@ -179,7 +179,7 @@ html, body{
     bottom: 0;
     width: 0;
     height: 0;
-    left: 50%;
+    /*left: 50%;*/
     margin-left: -10px;
     content: " ";
     border-bottom: 15px solid  #f5f6f9 ;
@@ -196,6 +196,7 @@ html, body{
 
 #upload-panel{
     margin-top: 10px;
+    height: 250px;
 }
 
 #upload-panel .panel__body{
@@ -203,8 +204,9 @@ html, body{
     flex-direction:row;
     justify-content: space-between;
     align-items: center;
-    height: 160px;
+    height: 130px;
     margin-bottom: 10px;
+    margin-top: 10px;
     position: relative;
 }
 
@@ -225,7 +227,7 @@ html, body{
     box-shadow: 1px 1px 6px rgba(0,0,0, 0.1);
 }
 #upload-panel .upload-card.nopadding{
-    padding: 0;
+
 }
 
 
@@ -308,6 +310,9 @@ html, body{
     align-items: center;
 }
 
+#date-panel .coloum-space{
+    width: 100px;
+}
 #upload-popup__distance-text{
     margin-left: 15px;
     padding: 20px 0 20px 0;

@@ -16,314 +16,318 @@
 
 <body ontouchstart>
 <!--页面上方的活动信息栏-->
-<div class="image-header mdl-card mdl-shadow--2dp">
-    <div class="header-title">
-        购书阅读(尝新)
-    </div>
-    <div class="header-mask"></div>
-    <div class="header-desc mdl-card__supporting-text">
-        <!--读书页首-->
-        <div class="row-center between">
-            <div class="coloum-space" style="width: 30%">
-                <div class="header_avatar-text">
-                    {{ app.active_participants }}人参与
+    <div class="image-header mdl-card mdl-shadow--2dp">
+        <div class="header-title">
+            购书阅读(尝新)
+        </div>
+        <div class="header-mask"></div>
+        <div class="header-desc mdl-card__supporting-text">
+            <!--读书页首-->
+            <div class="row-center between">
+                <div class="coloum-space" style="width: 30%">
+                    <div class="header_avatar-text">
+                        {{ app.active_participants }}人参与
+                    </div>
+                    <div class="header__avatars">
+                        {% for person in persons %}
+                        <img class="img-circle" src="{{ person.headimgurl }}">
+                        {% endfor %}
+                    </div>
                 </div>
-                <div class="header__avatars">
-                    {% for person in persons %}
-                    <img class="img-circle" src="{{ person.headimgurl }}">
-                    {% endfor %}
+                <div class="coloum-space" style="height:100%;position: absolute;left: 50%;transform: translate(-50%,0%);">
+                    <p style="font-size: 18px;font-weight:500;color: #ffffff;margin-bottom: 60px;">第一期</p>
                 </div>
-            </div>
-            <div class="coloum-space" style="height:100%;position: absolute;left: 50%;transform: translate(-50%,0%);">
-                <p style="font-size: 18px;font-weight:500;color: #ffffff;margin-bottom: 60px;">第一期</p>
-            </div>
-            <div class="coloum-space">
-                <div class="header_avatar-text">累计节省</div>
-                <div class="header__text">
-                    <span style="color: #ff931f; font-weight: 500;">{{ app.bonus_all|floatformat:"0"  }}</span>
-                    <span>元</span>
+                <div class="coloum-space">
+                    <div class="header_avatar-text">累计节省</div>
+                    <div class="header__text">
+                        <span style="color: #ff931f; font-weight: 500;">{{ app.bonus_all|floatformat:"0"  }}</span>
+                        <span>元</span>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <!-- 左上角的后退按钮 -->
-    <div class="mdl-card__menu">
-        <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" id="backup-btn">
-            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
-                     width="36px" height="36px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
-                <g>
-                    <path d="M24.001,33.52c-0.539,0-1.076-0.217-1.471-0.644l-12-13c-0.707-0.766-0.707-1.947,0-2.713l12-13
-                        c0.749-0.811,2.014-0.862,2.826-0.113c0.812,0.75,0.862,2.015,0.113,2.826L14.722,18.52L25.47,30.163
-                        c0.749,0.812,0.698,2.077-0.113,2.826C24.972,33.344,24.485,33.52,24.001,33.52z"/>
-                </g>
-                </svg>
-        </button>
-    </div>
-</div>
-<div class="block-panel">
-    <ul class="setting-list">
-        <li class="setting-item">
-            <div class="reading-book">
-                <img id="readinggoal_image" src="{{ readinginfo.imageurl }}">
-            </div>
-            <div class="setting-item__right position-right coloum-space between">
-                <div class="row-center between">
-                    <span style="font-size: 16px;" id="book-name">{{ readinginfo.title }}</span>
-                    <a style="color: #1fa2ff;" id="more-intro">更多</a>
-                </div>
-                <div class="row-center">
-                    <p class="intro-multi-row">本书探讨了以下问题：高竞争的工作、高不可攀的房价和房租、 拥挤的交通、糟糕的空气、不安全的食品……在竭尽全力才能生存的时代，年轻人如何追求自己的梦想？在这样的时代，我们的生命又有什么可能？如何才能越过现实和理想的鸿沟，找到和进入自己希望的人生？如何修炼自己在现实中活得更好的能力？如何在现实之中发展自己的兴趣？如何连接现实和理想？如何面对生命里的苦难、贫穷、不完美或者不公正？如何获得心灵的自由？
-                    </p>
-                </div>
-                <div class="reading-book__tail">
-                    <p>
-                        <span style="color: #B6C1C8;">页数：</span>
-                        <span id="page-value">{{ readinginfo.page }}</span>
-                    </p>
-                    <p>
-                        <span style="color: #B6C1C8;">价格：</span>
-                        <span>{{ readinginfo.price }}元</span>
-                    </p>
-                </div>
-            </div>
-        </li>
-        <li class="setting-item row-center center" style="padding-right: 0;">
-            <div class="coloum-space center pay-icon">
-                <p class="panel__title">保证金</p>
-                <div class="row-center center" style="width: 100%;">
-                    <div>
-                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                             width="20px" height="30px" viewBox="0 0 595.28 841.89" enable-background="new 0 0 595.28 841.89" xml:space="preserve">
-                        <g>
-                            <path fill="#B6C1C8" d="M577.808,240.248c0-78.204-140.99-120.41-273.649-120.41c-131.89,0-272.006,41.719-273.635,119.049l-0.016-0.008v347.148
-                                l0.067,0.025c3.382,76.381,142.543,117.563,273.585,117.563c131.044,0,270.211-41.184,273.582-117.569l0.07-0.019V240.597h-0.006
-                                C577.805,240.483,577.808,240.365,577.808,240.248L577.808,240.248z M64.833,423.921c45.421,36.755,133.118,60.578,239.323,60.578
-                                c106.202,0,193.9-23.822,239.326-60.573v59.758c-11.494,38.498-106.559,78.299-239.326,78.299
-                                c-132.795,0-227.869-39.818-239.323-78.327V423.921z M543.486,371.861c-11.497,38.498-106.564,78.302-239.326,78.302
-                                c-132.798,0-227.869-39.823-239.326-78.33v-70.869c49.895,39.088,146.641,59.693,239.326,59.693
-                                c92.682,0,189.429-20.602,239.326-59.693V371.861z M304.156,154.18c138.193,0,241.458,45.441,241.458,86.068
-                                c0,40.628-103.266,86.069-241.458,86.069S62.701,280.876,62.701,240.248C62.701,199.621,165.967,154.18,304.156,154.18
-                                L304.156,154.18z M304.156,669.276c-126.632,0-223.929-38.153-239.323-75.799v-57.736c45.421,36.756,133.118,60.581,239.323,60.581
-                                c106.202,0,193.9-23.822,239.326-60.576v57.728C528.089,631.123,430.791,669.276,304.156,669.276L304.156,669.276z
-                                 M304.156,669.276"/>
-                        </g>
-                        </svg>
-                    </div>
-                    <div>
-                        <span class="panel__target-text" style="color: #1fa2ff;">{{ readinginfo.guaranty }}</span>
-                        <span class="panel__target-text__side">元</span>
-                    </div>
-                </div>
-            </div>
-            <div class="coloum-space center pay-icon">
-                <p class="panel__title">最高返还</p>
-                <div class="row-center center"  style="width: 100%;">
-                    <div>
-                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                            width="20px" height="30px" viewBox="0 0 595.28 841.89" enable-background="new 0 0 595.28 841.89" xml:space="preserve">
-                        <g>
-                            <path fill="#B6C1C8" d="M577.808,240.248c0-78.204-140.99-120.41-273.649-120.41c-131.89,0-272.006,41.719-273.635,119.049l-0.016-0.008v347.148
-                                l0.067,0.025c3.382,76.381,142.543,117.563,273.585,117.563c131.044,0,270.211-41.184,273.582-117.569l0.07-0.019V240.597h-0.006
-                                C577.805,240.483,577.808,240.365,577.808,240.248L577.808,240.248z M64.833,423.921c45.421,36.755,133.118,60.578,239.323,60.578
-                                c106.202,0,193.9-23.822,239.326-60.573v59.758c-11.494,38.498-106.559,78.299-239.326,78.299
-                                c-132.795,0-227.869-39.818-239.323-78.327V423.921z M543.486,371.861c-11.497,38.498-106.564,78.302-239.326,78.302
-                                c-132.798,0-227.869-39.823-239.326-78.33v-70.869c49.895,39.088,146.641,59.693,239.326,59.693
-                                c92.682,0,189.429-20.602,239.326-59.693V371.861z M304.156,154.18c138.193,0,241.458,45.441,241.458,86.068
-                                c0,40.628-103.266,86.069-241.458,86.069S62.701,280.876,62.701,240.248C62.701,199.621,165.967,154.18,304.156,154.18
-                                L304.156,154.18z M304.156,669.276c-126.632,0-223.929-38.153-239.323-75.799v-57.736c45.421,36.756,133.118,60.581,239.323,60.581
-                                c106.202,0,193.9-23.822,239.326-60.576v57.728C528.089,631.123,430.791,669.276,304.156,669.276L304.156,669.276z
-                                 M304.156,669.276"/>
-                        </g>
-                        </svg>
-                    </div>
-                    <div>
-                        <span class="panel__target-text" style="color: #ff931f;" id="maxreturn-pay">{{ readinginfo.return }}</span>
-                        <span class="panel__target-text__side">元</span>
-                    </div>
-                </div>
-            </div>
-        </li>
-    </ul>
-</div>
-<div class="block-panel">
-    <p class="explain-title">说明</p>
-    <div class="explain-desc"><p>在“购书阅读”活动中，用户需要在一个月内完成一本在平台上购买的书的阅读，用户在通过记录阅读情况的过程赚取返还金。（此项活动中的保证金将不会被瓜分，平台已将此费用纳入最高返还金额预算内）。<br/>1. 生成目标后，用户需要在商城中“我的订单”页面内填写邮寄信息（若未填写），完成後书将在1至3个工作日内送至用户手中，偏远地区产生的额外费用将于活动结束后，从保证金中扣除，平台发货前通知予以确认。（若未送至请联系客服）<br/>2. 在此活动中平台每期仅提供一本畅销读物，平台每隔一段时间（每一至三周，取决于此活动参与人数）则会更换一本新书。在活动进行的过程中即使更新，也不会影响当前已生成的目标进行。<br/>3. 用户需要在一个月（30日，从用户收到书本开始计算）内完成此书的阅读记录，完成所有页码的阅读后直接视为活动结束。（在书未到前开始记录，将自行负责）<br/>4. 记录规则：<br/>   4.1 开始阅读：用户在开始阅读前点击“开始阅读”按钮，开始记录；<br/>   4.2 结束阅读：用户在结束阅读后输入阅读至的页码后点击“结束阅读”，结束记录。<br/>5. 每次记录都将根据用户阅读情况返还一定金额。<br/>6. 押金=保证金 （仅限该活动）：<br/>    6.1 保证金：在活动中未完成则扣除活动中所提交的全额保证金（此项保证金将不会瓜分给其他用户，平台以将此费用纳入最高返还金额预算内）；<br/>6.2 在押金为0的情况下视为活动结束（即30日过后）。<br/>6.3 输入尾页后视为活动结束，并结算累计的返还金至余额。<br/>7. “购书阅读”活动的每日结算时段为当日23:59，如用户对活动有疑问及争议的户可在每日22:00前联系客服，如有需要用户应被扣除的押金部分将暂时冻结以待解决。（客服只处理因不可抗力因素，如系统问题引起的无法完成的情况。以示公平，在正常情况下将不受理）。<br/>※本平台拥有所有活动的最终解释权，如有疑问请与客服联系，谢谢。<br/></p>
-    </div>
-<div class="fixed-panel">
-    <div class="row-center" style="justify-content: space-between;margin-top: 20px;">
-        <div class="fixed-text">
-            价格:
-            <span id="price-value" class="fixed-text__bold" style="color: #565c66;">
-                {{ readinginfo.price }}
-            </span>
-            元
-        </div>
-        <div class="fixed-text">
-            押金:
-            <span style="color: #ff931f;" id="guarantee-value" class="fixed-text__bold">
-					{{ readinginfo.guaranty }}
-            </span>
-            元
-        </div>
-    </div>
-    <button class="weui-btn weui-btn_primary" id="gen-btn">
-        生成目标
-    </button>
-</div>
-
-<div id="gen-popup" class="weui-popup__container popup-bottom">
-    <div class="weui-popup__overlay"></div>
-    <div class="weui-popup__modal">
-        <div class="modal-content">
-            <div class="gen-title">
-                <div class="title-line"></div>
-                <span class="title-text">
-						<span style="font-weight: 600;">读书</span>
-					</span>
-            </div>
-            <div class="weui-cell">
-                <div class="weui-cell__bd">
-                    <span class="gen_title">总价</span>
-                </div>
-                <div class="weui-cell__ft" style="margin-right: 20px;">
-							<span id="pay-count" style="color: #565c66;font-size: 1.4rem;font-weight: 600;">
-					{{ readinginfo.guaranty |add:readinginfo.price }}
-							</span>
-                    元
-                </div>
-            </div>
-            <div class="weui-cell no-before">
-                <div class="weui-cell__hd">
-                    <span class="gen_title">积分抵扣</span>
-                </div>
-                <div class="weui-cells_checkbox weui-cell__bd">
-                    <label class="weui-cell weui-check__label" for="s11">
-                        <div class="weui-cell__bd">
-                            <p>积分可抵扣总金额10%</p>
-                        </div>
-                        <div class="weui-cell__hd">
-                            <input type="checkbox" class="weui-check" name="checkbox1" id="s11" checked="checked">
-                            <i class="weui-icon-checked"></i>
-                        </div>
-                    </label>
-                </div>
-            </div>
-            <p class="user-agreement__text">进入下一步即代表同意用户协议</p>
-            <button class="weui-btn weui-btn_primary" id="pay-btn">
-                <img src="/static/images/wechat-pay.png" style="width:1.2em;margin-right:10px;">
-                微信支付
+        <!-- 左上角的后退按钮 -->
+        <div class="mdl-card__menu">
+            <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" id="backup-btn">
+                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                         width="36px" height="36px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                    <g>
+                        <path d="M24.001,33.52c-0.539,0-1.076-0.217-1.471-0.644l-12-13c-0.707-0.766-0.707-1.947,0-2.713l12-13
+                            c0.749-0.811,2.014-0.862,2.826-0.113c0.812,0.75,0.862,2.015,0.113,2.826L14.722,18.52L25.47,30.163
+                            c0.749,0.812,0.698,2.077-0.113,2.826C24.972,33.344,24.485,33.52,24.001,33.52z"/>
+                    </g>
+                    </svg>
             </button>
         </div>
     </div>
-</div>
-
-<div id="intro-popup" class="weui-popup__container popup-bottom">
-    <div class="weui-popup__overlay"></div>
-    <div class="weui-popup__modal">
-        <div class="modal-content">
-            <p style="color: #B6C1C8;padding-left: 10px;padding-right: 10px;">
-                {{ readinginfo.intro }}
+    <div class="block-panel">
+        <ul class="setting-list">
+            <li class="setting-item">
+                <div class="reading-book">
+                    <img id="readinggoal_image" src="{{ readinginfo.imageurl }}">
+                </div>
+                <div class="setting-item__right position-right coloum-space between">
+                    <div class="row-center between">
+                        <span style="font-size: 16px;" id="book-name">{{ readinginfo.title }}</span>
+                        <a style="color: #1fa2ff;" id="more-intro">更多</a>
+                    </div>
+                    <div class="row-center">
+                        <p class="intro-multi-row">本书探讨了以下问题：高竞争的工作、高不可攀的房价和房租、 拥挤的交通、糟糕的空气、不安全的食品……在竭尽全力才能生存的时代，年轻人如何追求自己的梦想？在这样的时代，我们的生命又有什么可能？如何才能越过现实和理想的鸿沟，找到和进入自己希望的人生？如何修炼自己在现实中活得更好的能力？如何在现实之中发展自己的兴趣？如何连接现实和理想？如何面对生命里的苦难、贫穷、不完美或者不公正？如何获得心灵的自由？
+                        </p>
+                    </div>
+                    <div class="reading-book__tail">
+                        <p>
+                            <span style="color: #B6C1C8;">页数：</span>
+                            <span id="page-value">{{ readinginfo.page }}</span>
+                        </p>
+                        <p>
+                            <span style="color: #B6C1C8;">价格：</span>
+                            <span>{{ readinginfo.price }}元</span>
+                        </p>
+                    </div>
+                </div>
+            </li>
+            <li class="setting-item row-center center" style="padding-right: 0;">
+                <div class="coloum-space center pay-icon">
+                    <p class="panel__title">保证金</p>
+                    <div class="row-center center" style="width: 100%;">
+                        <div>
+                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                 width="20px" height="30px" viewBox="0 0 595.28 841.89" enable-background="new 0 0 595.28 841.89" xml:space="preserve">
+                            <g>
+                                <path fill="#B6C1C8" d="M577.808,240.248c0-78.204-140.99-120.41-273.649-120.41c-131.89,0-272.006,41.719-273.635,119.049l-0.016-0.008v347.148
+                                    l0.067,0.025c3.382,76.381,142.543,117.563,273.585,117.563c131.044,0,270.211-41.184,273.582-117.569l0.07-0.019V240.597h-0.006
+                                    C577.805,240.483,577.808,240.365,577.808,240.248L577.808,240.248z M64.833,423.921c45.421,36.755,133.118,60.578,239.323,60.578
+                                    c106.202,0,193.9-23.822,239.326-60.573v59.758c-11.494,38.498-106.559,78.299-239.326,78.299
+                                    c-132.795,0-227.869-39.818-239.323-78.327V423.921z M543.486,371.861c-11.497,38.498-106.564,78.302-239.326,78.302
+                                    c-132.798,0-227.869-39.823-239.326-78.33v-70.869c49.895,39.088,146.641,59.693,239.326,59.693
+                                    c92.682,0,189.429-20.602,239.326-59.693V371.861z M304.156,154.18c138.193,0,241.458,45.441,241.458,86.068
+                                    c0,40.628-103.266,86.069-241.458,86.069S62.701,280.876,62.701,240.248C62.701,199.621,165.967,154.18,304.156,154.18
+                                    L304.156,154.18z M304.156,669.276c-126.632,0-223.929-38.153-239.323-75.799v-57.736c45.421,36.756,133.118,60.581,239.323,60.581
+                                    c106.202,0,193.9-23.822,239.326-60.576v57.728C528.089,631.123,430.791,669.276,304.156,669.276L304.156,669.276z
+                                     M304.156,669.276"/>
+                            </g>
+                            </svg>
+                        </div>
+                        <div>
+                            <span class="panel__target-text" style="color: #1fa2ff;">{{ readinginfo.guaranty }}</span>
+                            <span class="panel__target-text__side">元</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="coloum-space center pay-icon">
+                    <p class="panel__title">最高返还</p>
+                    <div class="row-center center"  style="width: 100%;">
+                        <div>
+                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                width="20px" height="30px" viewBox="0 0 595.28 841.89" enable-background="new 0 0 595.28 841.89" xml:space="preserve">
+                            <g>
+                                <path fill="#B6C1C8" d="M577.808,240.248c0-78.204-140.99-120.41-273.649-120.41c-131.89,0-272.006,41.719-273.635,119.049l-0.016-0.008v347.148
+                                    l0.067,0.025c3.382,76.381,142.543,117.563,273.585,117.563c131.044,0,270.211-41.184,273.582-117.569l0.07-0.019V240.597h-0.006
+                                    C577.805,240.483,577.808,240.365,577.808,240.248L577.808,240.248z M64.833,423.921c45.421,36.755,133.118,60.578,239.323,60.578
+                                    c106.202,0,193.9-23.822,239.326-60.573v59.758c-11.494,38.498-106.559,78.299-239.326,78.299
+                                    c-132.795,0-227.869-39.818-239.323-78.327V423.921z M543.486,371.861c-11.497,38.498-106.564,78.302-239.326,78.302
+                                    c-132.798,0-227.869-39.823-239.326-78.33v-70.869c49.895,39.088,146.641,59.693,239.326,59.693
+                                    c92.682,0,189.429-20.602,239.326-59.693V371.861z M304.156,154.18c138.193,0,241.458,45.441,241.458,86.068
+                                    c0,40.628-103.266,86.069-241.458,86.069S62.701,280.876,62.701,240.248C62.701,199.621,165.967,154.18,304.156,154.18
+                                    L304.156,154.18z M304.156,669.276c-126.632,0-223.929-38.153-239.323-75.799v-57.736c45.421,36.756,133.118,60.581,239.323,60.581
+                                    c106.202,0,193.9-23.822,239.326-60.576v57.728C528.089,631.123,430.791,669.276,304.156,669.276L304.156,669.276z
+                                     M304.156,669.276"/>
+                            </g>
+                            </svg>
+                        </div>
+                        <div>
+                            <span class="panel__target-text" style="color: #ff931f;" id="maxreturn-pay">{{ readinginfo.return }}</span>
+                            <span class="panel__target-text__side">元</span>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="block-panel">
+        <p class="explain-title">说明</p>
+        <div class="explain-desc">
+            <p>
+                在“购书阅读”活动中，用户需要在一个月内完成一本在平台上购买的书的阅读，用户在通过记录阅读情况的过程赚取返还金。（此项活动中的保证金将不会被瓜分，平台已将此费用纳入最高返还金额预算内）。<br/>1. 生成目标后，用户需要在商城中“我的订单”页面内填写邮寄信息（若未填写），完成後书将在1至3个工作日内送至用户手中，偏远地区产生的额外费用将于活动结束后，从保证金中扣除，平台发货前通知予以确认。（若未送至请联系客服）<br/>2. 在此活动中平台每期仅提供一本畅销读物，平台每隔一段时间（每一至三周，取决于此活动参与人数）则会更换一本新书。在活动进行的过程中即使更新，也不会影响当前已生成的目标进行。<br/>3. 用户需要在一个月（30日，从用户收到书本开始计算）内完成此书的阅读记录，完成所有页码的阅读后直接视为活动结束。（在书未到前开始记录，将自行负责）<br/>4. 记录规则：<br/>   4.1 开始阅读：用户在开始阅读前点击“开始阅读”按钮，开始记录；<br/>   4.2 结束阅读：用户在结束阅读后输入阅读至的页码后点击“结束阅读”，结束记录。<br/>5. 每次记录都将根据用户阅读情况返还一定金额。<br/>6. 押金=保证金 （仅限该活动）：<br/>    6.1 保证金：在活动中未完成则扣除活动中所提交的全额保证金（此项保证金将不会瓜分给其他用户，平台以将此费用纳入最高返还金额预算内）；<br/>6.2 在押金为0的情况下视为活动结束（即30日过后）。<br/>6.3 输入尾页后视为活动结束，并结算累计的返还金至余额。<br/>7. “购书阅读”活动的每日结算时段为当日23:59，如用户对活动有疑问及争议的户可在每日22:00前联系客服，如有需要用户应被扣除的押金部分将暂时冻结以待解决。（客服只处理因不可抗力因素，如系统问题引起的无法完成的情况。以示公平，在正常情况下将不受理）。<br/>※本平台拥有所有活动的最终解释权，如有疑问请与客服联系，谢谢。<br/>
             </p>
         </div>
     </div>
-</div>
-<div id="activity-get__id" hidden>{{ app.activity_id }}</div>
+    <div class="fixed-panel">
+        <div class="row-center" style="justify-content: space-between;margin-top: 20px;">
+            <div class="fixed-text">
+                价格:
+                <span id="price-value" class="fixed-text__bold" style="color: #565c66;">
+                    {{ readinginfo.price }}
+                </span>
+                元
+            </div>
+            <div class="fixed-text">
+                押金:
+                <span style="color: #ff931f;" id="guarantee-value" class="fixed-text__bold">
+                        {{ readinginfo.guaranty }}
+                </span>
+                元
+            </div>
+        </div>
+        <button class="weui-btn weui-btn_primary" id="gen-btn">
+            生成目标
+        </button>
+    </div>
 
-<script type="text/javascript" src="/static/js/jquery.min.js"></script>
-<script type="text/javascript" src="/static/js/fastclick.js"></script>
-<script>
-    // fast click binding
-    $(function () {
-        FastClick.attach(document.body);
-    });
-</script>
-<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
-<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="/static/js/material.min.js"></script>
-<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
-<!--配置CSRF保护-->
-<script>
-    $.ajaxSetup({
-        data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
-    });
-</script>
-<!--注入Config信息-->
-<script>
-{{ WechatJSConfig|safe}}
-</script>
-<script>
+    <div id="gen-popup" class="weui-popup__container popup-bottom">
+        <div class="weui-popup__overlay"></div>
+        <div class="weui-popup__modal">
+            <div class="modal-content">
+                <div class="gen-title">
+                    <div class="title-line"></div>
+                    <span class="title-text">
+                            <span style="font-weight: 600;">读书</span>
+                        </span>
+                </div>
+                <div class="weui-cell">
+                    <div class="weui-cell__bd">
+                        <span class="gen_title">总价</span>
+                    </div>
+                    <div class="weui-cell__ft" style="margin-right: 20px;">
+                                <span id="pay-count" style="color: #565c66;font-size: 1.4rem;font-weight: 600;">
+                        {{ readinginfo.guaranty |add:readinginfo.price }}
+                                </span>
+                        元
+                    </div>
+                </div>
+                <div class="weui-cell no-before">
+                    <div class="weui-cell__hd">
+                        <span class="gen_title">积分抵扣</span>
+                    </div>
+                    <div class="weui-cells_checkbox weui-cell__bd">
+                        <label class="weui-cell weui-check__label" for="s11">
+                            <div class="weui-cell__bd">
+                                <p>积分可抵扣总金额10%</p>
+                            </div>
+                            <div class="weui-cell__hd">
+                                <input type="checkbox" class="weui-check" name="checkbox1" id="s11" checked="checked">
+                                <i class="weui-icon-checked"></i>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <p class="user-agreement__text">进入下一步即代表同意用户协议</p>
+                <button class="weui-btn weui-btn_primary" id="pay-btn">
+                    <img src="/static/images/wechat-pay.png" style="width:1.2em;margin-right:10px;">
+                    微信支付
+                </button>
+            </div>
+        </div>
+    </div>
 
-    $(".weui-popup__overlay").click(
-        function () {
-            $("body").removeClass("popup-open");
-        }
-    );
-    /* 跳转页面 */
-    $("#backup-btn").click(function () {
-        window.location.href = "index";
-    });
-    $("#gen-btn").click(function(){
-        $("#gen-popup").popup();
-        $("body").addClass("popup-open");
-    });
-    wx.ready(function() {
-        $("#pay-btn").click(function () {
-            var maxreturn = $("#maxreturn-pay").html().trim();
-            var bookname = $("#book-name").html().trim();
-            var goalpage = $("#page-value").html().trim();
-            var deposit = $("#guarantee-value").html().trim();
-            var allpay = $("#pay-count").html().trim();
-            $.post('/api/create_goal', {
-                activity: $("#activity-get__id").html().trim(),
-                guaranty: deposit,
-                down_payment: 0,
-                bookname: bookname,
-                goalpage: goalpage,
-                maxreturn: maxreturn,
-                coefficient: 0,
-                mode: "N",
-                goal_day: 30,
-                goal_type: 0,
-                bookprice: $("#price-value").html().trim(),
-                imageurl: $("#readinggoal_image").attr('src')
-            }, function (reponse) {
-                $.post('/wechatpay', {
-                    'goal': reponse['goal'],
-                    'price': allpay
-                },function (response) {
-                    // 唤起微信支付接口
-                       {% if DEBUG %}
+    <div id="intro-popup" class="weui-popup__container popup-bottom">
+        <div class="weui-popup__overlay"></div>
+        <div class="weui-popup__modal">
+            <div class="modal-content">
+                <p style="color: #B6C1C8;padding-left: 10px;padding-right: 10px;">
+                    {{ readinginfo.intro }}
+                </p>
+            </div>
+        </div>
+    </div>
+    <div id="activity-get__id" hidden>{{ app.activity_id }}</div>
+
+    <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/js/fastclick.js"></script>
+    <script>
+        // fast click binding
+        $(function () {
+            FastClick.attach(document.body);
+        });
+    </script>
+    <script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/js/material.min.js"></script>
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <!--配置CSRF保护-->
+    <script>
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
+        });
+    </script>
+    <!--注入Config信息-->
+    <script>
+    {{ WechatJSConfig|safe}}
+    </script>
+    <script>
+
+        $(".weui-popup__overlay").click(
+            function () {
+                $("body").removeClass("popup-open");
+            }
+        );
+        /* 跳转页面 */
+        $("#backup-btn").click(function () {
+            window.location.href = "index";
+        });
+        $("#gen-btn").click(function(){
+            $("#gen-popup").popup();
+            $("body").addClass("popup-open");
+        });
+        wx.ready(function() {
+            $("#pay-btn").click(function () {
+                var maxreturn = $("#maxreturn-pay").html().trim();
+                var bookname = $("#book-name").html().trim();
+                var goalpage = $("#page-value").html().trim();
+                var deposit = $("#guarantee-value").html().trim();
+                var allpay = $("#pay-count").html().trim();
+                $.post('/api/create_goal', {
+                    activity: $("#activity-get__id").html().trim(),
+                    guaranty: deposit,
+                    down_payment: 0,
+                    bookname: bookname,
+                    goalpage: goalpage,
+                    maxreturn: maxreturn,
+                    coefficient: 0,
+                    mode: "N",
+                    goal_day: 30,
+                    goal_type: 0,
+                    bookprice: $("#price-value").html().trim(),
+                    imageurl: $("#readinggoal_image").attr('src')
+                }, function (reponse) {
+                    $.post('/wechatpay', {
+                        'goal': reponse['goal'],
+                        'price': allpay
+                    },function (response) {
                         // 唤起微信支付接口
-                        $.post('/payback', {
-                            goal:reponse['goal']
-                        },function (res) {
-                                // 重定向到分享页面
-                                window.location.href = "/goal/share/" + reponse['goal'];
-                        });
-                        {% else %}
+                           {% if DEBUG %}
+                            // 唤起微信支付接口
+                            $.post('/payback', {
+                                goal:reponse['goal']
+                            },function (res) {
+                                    // 重定向到分享页面
+                                    window.location.href = "/goal/share/" + reponse['goal'];
+                            });
+                            {% else %}
 
-                        wx.chooseWXPay({
-                            timestamp: response['timeStamp'], // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
-                            nonceStr: response['nonceStr'], // 支付签名随机串，不长于 32 位
-                            package: response['package'], // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
-                            signType: response['signType'], // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
-                            paySign: response['paySign'], // 支付签名
-                            success: function (res) {
-                                // 重定向到分享页面
-                                window.location.href = "/goal/share/" + reponse['goal'];
-                            }
-                        });
-                       {% endif %}
+                            wx.chooseWXPay({
+                                timestamp: response['timeStamp'], // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+                                nonceStr: response['nonceStr'], // 支付签名随机串，不长于 32 位
+                                package: response['package'], // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
+                                signType: response['signType'], // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+                                paySign: response['paySign'], // 支付签名
+                                success: function (res) {
+                                    // 重定向到分享页面
+                                    window.location.href = "/goal/share/" + reponse['goal'];
+                                }
+                            });
+                           {% endif %}
+                    });
                 });
             });
         });
-    });
 
-    $("#more-intro").click(function () {
-        $("#intro-popup").popup();
-        $("body").addClass("popup-open");
-    });
-</script>
+        $("#more-intro").click(function () {
+            $("#intro-popup").popup();
+            $("body").addClass("popup-open");
+        });
+    </script>
 </body>
 
 </html>

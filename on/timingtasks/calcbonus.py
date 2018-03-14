@@ -31,13 +31,16 @@ def init_jobs():
     for sub_model_key in sub_models:
         goal_class = sub_models[sub_model_key]
         start_time = goal_class.get_start_date()
+        # sched.add_job(calc_bonus_job, 'cron', day_of_week='0-6',
+        #               hour=start_time.hour,
+        #               minute=start_time.minute,
+        #               timezone=pytz.timezone('Asia/Shanghai'),
+        #               args=[goal_class])
         sched.add_job(calc_bonus_job, 'cron', day_of_week='0-6',
                       hour=start_time.hour,
                       minute=start_time.minute,
                       timezone=pytz.timezone('Asia/Shanghai'),
                       args=[goal_class])
-
-
 # 清空用户的今日收益值
 def clear_user_bonus_job():
     print("Begin to Clear")
@@ -61,7 +64,7 @@ def test_calculate(request):
         pass
     return HttpResponse({'status':200})
 
-
+# 任务函数
 def calc_bonus_job(goal_class):
     print("Begin to calculate")
     app_logger.warning("Activity {0} start ... calcbonus.py -> calc_bonus_job ".format(goal_class.__name__))
@@ -87,6 +90,7 @@ def calc_bonus_job(goal_class):
         Activity.objects.update_bonus(goal_class.get_activity(), -all_pay)
     except Exception:
         pass
+    #活动强制结束
     app_logger.warning("Activity {0} end ... calcbonus.py -> calc_bonus_job ".format(goal_class.__name__))
 
 
