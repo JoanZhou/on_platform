@@ -2,62 +2,69 @@
 <html lang="zh-cmn-Hans">
 
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>跑步</title>
-	<link rel="stylesheet" href="/static/css/material.min.css">
-	<link rel="stylesheet" href="/static/css/weui.min.css" />
-	<link rel="stylesheet" href="/static/css/jquery-weui.min.css">
-	<link rel="stylesheet" href="/static/css/share.css" />
-	<link rel="stylesheet" href="/static/css/running.css" />
-	<link rel="stylesheet" href="/static/css/goal.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>跑步</title>
+    <link rel="stylesheet" href="/static/css/material.min.css">
+    <link rel="stylesheet" href="/static/css/weui.min.css"/>
+    <link rel="stylesheet" href="/static/css/jquery-weui.min.css">
+    <link rel="stylesheet" href="/static/css/share.css"/>
+    <link rel="stylesheet" href="/static/css/goal.css"/>
+    <link rel="stylesheet" href="/static/css/running.css"/>
+    <style>
+        .after-finish, .after-stop, .today {
+            color: #000000;
+        }
+    </style>
+
 </head>
 
 <body ontouchstart>
-	<div class="image-header mdl-card mdl-shadow--2dp">
-        {% if goal.goal_type == 0 %}
-		<div class="header-title">自由模式</div>
-        {% else %}
+<div class="image-header mdl-card mdl-shadow--2dp">
+    {% if goal.goal_type == 0 %}
+        <div class="header-title">自由模式</div>
+    {% else %}
         <div class="header-title">日常模式</div>
-        {% endif %}
-		<div class="header-mask"></div>
-		<div class="header-desc mdl-card__supporting-text">
-			<!--跑步页首-->
-			<div class="row-center between">
-                <div class="coloum-space" style="width: 30%">
-                    <div class="header_avatar-text">
-                        {{ app.active_participants }}人参与
-                    </div>
-                    <div class="header__avatars">
-                        {% for person in persons %}
-                        <img class="img-circle" src="{{ person.headimgurl }}">
-                        {% endfor %}
-                        <img class="img-circle" src="/static/fake/running_1.jpg">
-                        <img class="img-circle" src="/static/fake/running_2.jpg">
-                        <img class="img-circle" src="/static/fake/running_3.jpg">
-                        <img class="img-circle" src="/static/fake/running_4.jpg">
-                        <img class="img-circle" src="/static/fake/running_5.jpg">
-				    </div>
+    {% endif %}
+    <div class="header-mask"></div>
+    <div class="header-desc mdl-card__supporting-text">
+        <!--跑步页首-->
+        <div class="row-center between">
+            <div class="coloum-space" style="width: 30%">
+                <div class="header_avatar-text">
+                    {{ app.active_participants }}人参与
                 </div>
-				<div class="coloum-space" style="position: absolute;left: 50%;transform: translate(-50%,0%);">
-                    <div class="header_avatar-text center">总系数</div>
-					<div class="header__text">
-                        <span style="color: #1fa2ff; font-weight: 500;">{{ app.coefficient }}</span>
-                    </div>
-				</div>
-				<div class="coloum-space">
-                    <div class="header_avatar-text center">奖金池</div>
-                    <div class="header__text">
-                        <span style="color: #ff931f; font-weight: 500;">{{ app.bonus_all|floatformat:"0" }}</span>
-                        <span>元</span>
-                    </div>
-				</div>
-			</div>
-		</div>
-        <!-- 左上角的后退按钮 -->
-		<div class="mdl-card__menu">
-			<button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" id="backup-btn">
-                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                <div class="header__avatars">
+                    {% for person in persons %}
+                        <img class="img-circle" src="{{ person.headimgurl }}">
+                    {% endfor %}
+                    <img class="img-circle" src="/static/fake/running_1.jpg">
+                    <img class="img-circle" src="/static/fake/running_2.jpg">
+                    <img class="img-circle" src="/static/fake/running_3.jpg">
+                    <img class="img-circle" src="/static/fake/running_4.jpg">
+                    <img class="img-circle" src="/static/fake/running_5.jpg">
+
+                </div>
+            </div>
+            <div class="coloum-space" style="position: absolute;left: 50%;transform: translate(-50%,0%);">
+                <div class="header_avatar-text center">总系数</div>
+                <div class="header__text">
+                    <span style="color: #1fa2ff; font-weight: 500;">{{ app.coefficient }}</span>
+                </div>
+            </div>
+            <div class="coloum-space">
+                <div class="header_avatar-text center">奖金池</div>
+                <div class="header__text">
+                    <span style="color: #ff931f; font-weight: 500;">{{ app.bonus_all|floatformat:"0" }}</span>
+                    <span>元</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 左上角的后退按钮 -->
+    <div class="mdl-card__menu">
+        <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" id="backup-btn">
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
                      width="36px" height="36px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
                 <g>
                     <path d="M24.001,33.52c-0.539,0-1.076-0.217-1.471-0.644l-12-13c-0.707-0.766-0.707-1.947,0-2.713l12-13
@@ -65,202 +72,204 @@
                         c0.749,0.812,0.698,2.077-0.113,2.826C24.972,33.344,24.485,33.52,24.001,33.52z"/>
                 </g>
                 </svg>
-			</button>
-		</div>
-	</div>
-	<div class="block-panel" id="profit-panel">
-		<div class="row-center">
-			<div class="coloum-space">
-				<div class="header_avatar-text goal-header-block">我的押金</div>
-				<div class="header__text">
-					<span style="color: #565c66; font-weight: 600;">{{ goal.guaranty|add:goal.down_payment }}</span>
-				</div>
-			</div>
-			<div class="coloum-space">
-				<div class="header_avatar-text" style="color: #B6C1C8; font-size: 0.8rem;">我的系数</div>
-				<div class="header__text">
-					<span style="color: #565c66;  font-weight: 600;">{{ goal.coefficient }}</span>
-				</div>
-			</div>
-			<div class="coloum-space">
-				<div class="header_avatar-text" style="color: #B6C1C8; font-size: 0.8rem;">累计收益</div>
-				<div class="header__text">
-					<span style="color: #565c66;  font-weight: 600;">{{ goal.bonus }}</span>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="block-panel" id="date-panel">
-		<div class="row-center">
-            {% for day in datesinform %}
-			<div class="coloum-space">
-				<div class="header_date-text">{{ day.weekday }}</div>
-				<div class="header_date {% if forloop.counter == 4 %}active{% elif day.dayindex > 0 %}{% if forloop.counter < 4 and day.isfinish %}after-finish{% elif forloop.counter < 4 %}after-stop{% endif %}{% else %}notouch{% endif %}">
-					{{ day.date }}
-				</div>
-			</div>
-			{% endfor %}
-		</div>
-	</div>
-    {% for date in datesinform %}
-        {% if date.dayindex > 0 %}
-        <div class="day-index" id="dayindex{{ date.date }}" {% if forloop.counter != 4 %}style="display: none;"{% endif %}>第{{ date.dayindex }}天</div>
-        {% endif %}
-    {% endfor %}
-	<div id="upload-panel">
-        {% for date in datesinform %}
-        <div class="datespanel" id="datespanel{{ date.date }}" {% if forloop.counter != 4 %}style="display:none;" {% endif %}>
-            <div class="panel__body">
-                <div class="upload-sidebar left"></div>
-                <!--当天，还未打卡-->
-                {% if forloop.counter == 4 and not date.isfinish and date.dayindex > 0 %}
-                    <!--如果处于自由模式-->
-                    {% if goal.goal_type == 0 %}
-                    <div class="upload-card row-center center">
-                        <div class="coloum-space center">
-                            <p class="panel__title">今日上限</p>
-                            <div class="row-center center">
-                                <div>
-                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                                         width="28px" height="28px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
-                                    <g>
-                                        <path fill="#1fa2ff" d="M25.723,14c0-3.86-3.141-7-7-7s-7,3.14-7,7s3.141,7,7,7S25.723,17.86,25.723,14z M13.723,14c0-2.757,2.243-5,5-5
-                                            s5,2.243,5,5s-2.243,5-5,5S13.723,16.757,13.723,14z"/>
-                                        <path fill="#1fa2ff" d="M29,32h-9l8.818-10.02c1.876-2.307,2.907-5.213,2.904-8.183c0-5.755-3.698-10.751-9.202-12.433
-                                            c-1.234-0.376-2.512-0.568-3.797-0.568c-4.331,0-8.361,2.145-10.782,5.737c-3.216,4.773-2.94,10.983,0.712,15.484L17.445,32H9v-2H7
-                                            v4h24v-4h-2V32z M9.6,7.652c2.049-3.04,5.459-4.855,9.124-4.855c1.087,0,2.168,0.162,3.213,0.481
-                                            c4.657,1.422,7.786,5.65,7.786,10.521c0.003,2.512-0.869,4.97-2.431,6.89l-8.569,9.736l-8.543-9.697
-                                            C7.112,16.945,6.879,11.691,9.6,7.652z"/>
-                                    </g>
-                                    </svg>
-                                </div>
-                                <span class="panel__target-text">{{ goal.kilos_day }}</span>
-                                <span class="panel__target-text__side">km</span>
-                            </div>
-                        </div>
-                        <div class="panel__split"></div>
-                        <div class="coloum-space center">
-                            <p class="panel__title">剩余距离</p>
-                            <div class="row-center center">
-                                <div>
-                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                                         width="28px" height="28px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
-                                        <g>
-                                            <path fill="#ff9947" d="M25.723,14c0-3.86-3.141-7-7-7s-7,3.14-7,7s3.141,7,7,7S25.723,17.86,25.723,14z M13.723,14c0-2.757,2.243-5,5-5
-                                                s5,2.243,5,5s-2.243,5-5,5S13.723,16.757,13.723,14z"/>
-                                            <path fill="#ff9947" d="M29,32h-9l8.818-10.02c1.876-2.307,2.907-5.213,2.904-8.183c0-5.755-3.698-10.751-9.202-12.433
-                                                c-1.234-0.376-2.512-0.568-3.797-0.568c-4.331,0-8.361,2.145-10.782,5.737c-3.216,4.773-2.94,10.983,0.712,15.484L17.445,32H9v-2H7
-                                                v4h24v-4h-2V32z M9.6,7.652c2.049-3.04,5.459-4.855,9.124-4.855c1.087,0,2.168,0.162,3.213,0.481
-                                                c4.657,1.422,7.786,5.65,7.786,10.521c0.003,2.512-0.869,4.97-2.431,6.89l-8.569,9.736l-8.543-9.697
-                                                C7.112,16.945,6.879,11.691,9.6,7.652z"/>
-                                        </g>
-                                    </svg>
-                                </div>
-                                <span class="panel__target-text" style="color: #ff931f;">{{ goal.left_distance }}</span>
-                                <span class="panel__target-text__side">km</span>
-                            </div>
-                        </div>
-                        <div class="running__upload-notice small-font">
-                            目标：在<span style="color: #1fa2ff;">&nbsp;{{ goal.goal_day }}&nbsp;</span>天内跑步累计<span style="color: #1fa2ff;">&nbsp;{{ goal.goal_distance }}&nbsp;</span>km
-                        </div>
-                    </div>
-                    {% else %}
-                    <div class="upload-card row-center center">
-                        <div class="coloum-space center">
-                            <p class="panel__title">剩余天数</p>
-                            <div class="row-center center">
-                                <div>
-                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
-                                         width="28px" height="28px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
-                                    <path fill="#bc6eff" d="M27.692,5H25V4.494c0-0.552-0.447-1-1-1s-1,0.448-1,1V5H13V4.494c0-0.552-0.447-1-1-1s-1,0.448-1,1V5H8.308
-                                        C5.381,5,3,7.9,3,10.857V26.13C3,29.087,5.381,31,8.308,31h19.385C30.619,31,33,29.087,33,26.13V10.857C33,7.9,30.619,5,27.692,5z
-                                         M8.308,7H11v1.494c0,0.552,0.447,1,1,1s1-0.448,1-1V7h10v1.494c0,0.552,0.447,1,1,1s1-0.448,1-1V7h2.692
-                                        C29.517,7,31,9.002,31,10.857v0.789C30.851,11.558,30.686,11,30.5,11h-25c-0.186,0-0.351,0.558-0.5,0.647v-0.789
-                                        C5,9.002,6.483,7,8.308,7z M27.692,29H8.308C6.483,29,5,27.985,5,26.13V13.34C5.149,13.429,5.314,13,5.5,13h25
-                                        c0.186,0,0.351,0.429,0.5,0.34v12.79C31,27.985,29.517,29,27.692,29z"/>
-                                    </svg>
-                                </div>
-                                <span class="panel__target-text" style="margin-left: 20px;margin-right: 20px;font-weight: 600;">{{ goal.left_day }}</span>
-                                <span style="color: #B6C1C8;">天</span>
-                            </div>
-                        </div>
-                        <div class="running__upload-notice small-font">
-                            目标：在<span style="color: #1fa2ff;">&nbsp;{{ goal.goal_day }}&nbsp;</span>天内每日跑步<span style="color: #1fa2ff;">&nbsp;{{ goal.kilos_day }}&nbsp;</span>km
-                        </div>
-                    </div>
-                    {% endif %}
-                <!--非本日，已完成-->
-                {% elif forloop.counter <= 4 and date.isfinish %}
-                <div class="upload-card row-center center nopadding">
-                    <div class="coloum-space center">
-                        <span style="color: #B6C1C8;">完成任务</span>
-                        <div>
-                            <span style="color: #1fa2ff; font-size: 1.5rem;font-weight: 500;">{{ date.punch.distance }}</span>
-                            <span style="color: #B6C1C8;">km</span>
-                        </div>
-                    </div>
-                    <img src="{{ date.punch.voucher_ref }}">
-                </div>
-                <!--非本日，未完成-->
-                {% elif forloop.counter < 4 and not date.isfinish and date.isnosignin %}
-                <div class="upload-card row-center center nopadding">
-                    <div class="coloum-space center">
-                        <span style="color: #B6C1C8;">已使用免签券抵消</span>
-                    </div>
-                </div>
-                {% elif forloop.counter < 4 and not date.isfinish %}
-                <div class="upload-card row-center center nopadding">
-                    <div class="coloum-space center">
-                        <span style="color: #B6C1C8;">未完成任务</span>
-                    </div>
-                </div>
-                {% else %}
-                <div class="upload-card row-center center nopadding">
-                    <div class="coloum-space center">
-                        <span style="color: #B6C1C8;">别着急，任务还没开始呢！</span>
-                    </div>
-                </div>
-                {% endif %}
-                <div class="upload-sidebar right"></div>
-            </div>
-            {% if forloop.counter == 4 and not date.isfinish and not date.isnosignin and date.dayindex > 0 %}
-            <button class="weui-btn weui-btn_primary upload-btn__style" id="upload-btn">
-                上传任务
-            </button>
-            {% elif forloop.counter <= 4 and date.isfinish %}
-            <button class="weui-btn weui-btn_primary upload-btn__style" disabled>
-                已成功打卡
-            </button>
-            {% elif forloop.counter <= 4 and date.isnosignin %}
-            <button class="weui-btn weui-btn_primary upload-btn__style" disabled>
-                免签
-            </button>
-            {% elif forloop.counter < 4 and not date.isfinish %}
-            <button class="weui-btn weui-btn_primary upload-btn__style" disabled>
-                未打卡
-            </button>
-            {% else %}
-            <button class="weui-btn weui-btn_primary upload-btn__style" disabled>
-                尚未开始
-            </button>
-            {% endif %}
-            {% if forloop.counter == 4 and not date.isfinish and not date.isnosignin and goal.goal_type and date.dayindex > 0 %}
-            <button class="weui-btn weui-btn_primary" id="avoid-btn">
-                <span>免签</span>
-                x
-                <span id="avoid-count">{{ nosign }}</span>
-            </button>
-            {% endif %}
-        </div>
-        {% endfor %}
+        </button>
     </div>
-    <!--上传任务弹出框-->
-    <div id="upload-popup" class="weui-popup__container popup-bottom">
-		<div class="weui-popup__overlay"></div>
-		<div class="weui-popup__modal">
-			<div class="modal-content">
-                <div class="row-center center" id="upload-popup__distance-panel">
-                    {% if goal.goal_type == 0 %}
+</div>
+<div class="block-panel" id="profit-panel">
+    <div class="row-center">
+        <div class="coloum-space">
+            <div class="header_avatar-text goal-header-block">我的押金</div>
+            <div class="header__text">
+                <span style="color: #565c66; font-weight: 600;">{{ goal.guaranty|add:goal.down_payment }}</span>
+            </div>
+        </div>
+        <div class="coloum-space">
+            <div class="header_avatar-text" style="color: #B6C1C8; font-size: 0.8rem;">我的系数</div>
+            <div class="header__text">
+                <span style="color: #565c66;  font-weight: 600;">{{ goal.coefficient }}</span>
+            </div>
+        </div>
+        <div class="coloum-space">
+            <div class="header_avatar-text" style="color: #B6C1C8; font-size: 0.8rem;">累计收益</div>
+            <div class="header__text">
+                <span style="color: #565c66;  font-weight: 600;">{{ goal.bonus }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="block-panel" id="date-panel">
+    <div class="row-center  row-center_1">
+
+        <div class="coloum-space">
+            <div class="header_date-text">一</div>
+        </div>
+        <div class="coloum-space">
+            <div class="header_date-text">二</div>
+        </div>
+        <div class="coloum-space">
+            <div class="header_date-text">三</div>
+        </div>
+        <div class="coloum-space">
+            <div class="header_date-text">四</div>
+        </div>
+        <div class="coloum-space">
+            <div class="header_date-text">五</div>
+        </div>
+        <div class="coloum-space">
+            <div class="header_date-text">六</div>
+        </div>
+        <div class="coloum-space">
+            <div class="header_date-text">日</div>
+        </div>
+    </div>
+    {#<li>{{ datesinform }}</li>#}
+    <div class="swiper-container_1">
+        <div class="swiper-wrapper">
+
+            {% for day in datesinform %}
+                <div class="swiper-slide">
+                    <div class="row-center">
+                        {% for dates in day %}
+                            <div class="coloum-space">
+                                <div num="{{ dates.dayindex }}" class="header_date
+                               {% if  dates.is_day_now|yesno:"1,0" == "1" %}
+                               active today
+                               {% else %}
+
+
+                                   {% if dates.dayindex == "0" %}
+                                        notouch
+                                   {% elif dates.isnosignin|yesno:"1,0" == "1" or dates.isfinish|yesno:"1,0" == "1" %}
+                                        after-finish
+                                   {% else %}
+                                        after-stop
+                                   {% endif %}
+                               {% endif %} ">
+
+                                    {% if dates.date == "0" %}
+
+                                    {% else %}
+                                        {{ dates.date }}
+                                    {% endif %}
+
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                    </div>
+                </div>
+            {% endfor %}
+
+        </div>
+    </div>
+
+</div>
+
+
+<div id="upload-panel">
+
+
+    {% for day in datesinform %}
+        {% for dates in day %}
+            {% if dates.dayindex > 0 %}
+
+                <div class="day-index dayindex_{{ dates.dayindex }}"
+                     {% if dates.date == "0" %}style="display: none;" {% else %}
+                     {% if dates.is_day_now|yesno:"1,0" == "1" %}{% else %}style="display: none;"{% endif %}{% endif %}>
+                    第{{ dates.dayindex }}天
+                    <div class="panel__body">
+                        <div class="upload-sidebar left"></div>
+                        <!-- -->
+                        {% if dates.isfinish %}
+
+                            <div class="upload-card row-center center nopadding">
+                                <div class="coloum-space center">
+                                    <span style="color: #B6C1C8;">完成任务</span>
+                                    <div>
+                                        <span style="color: #1fa2ff; font-size: 1.5rem;font-weight: 500;">{{ dates.punch.distance }}</span>
+                                        <span style="color: #B6C1C8;">km</span>
+                                    </div>
+                                </div>
+                                <img src="{{ dates.punch.voucher_ref }}">
+                            </div>
+                        {% elif not dates.isfinish and dates.isnosignin %}
+                            <div class="upload-card row-center center nopadding">
+                                <div class="coloum-space center">
+                                    <span style="color: #B6C1C8;">已使用免签券抵消</span>
+                                </div>
+                            </div>
+                        {% elif not dates.isfinish %}
+                            <div class="upload-card row-center center nopadding">
+                                <div class="coloum-space center">
+                                    <span style="color: #B6C1C8;">未完成任务</span>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="upload-card row-center center nopadding">
+                                <div class="coloum-space center">
+                                    <span style="color: #B6C1C8;">别着急，任务还没开始呢！</span>
+                                </div>
+                            </div>
+
+                        {% endif %}
+
+                        <div class="upload-sidebar right"></div>
+                    </div>
+
+
+                    {% if dates.is_day_now|yesno:"1,0" == "1" and not dates.isfinish %}
+                        <button class="weui-btn weui-btn_primary upload-btn__style" id="upload-btn">
+                            上传任务
+                        </button>
+                    {% elif dates.is_day_now|yesno:"1,0" == "0" and not dates.isfinish %}
+                        <button class="weui-btn weui-btn_primary upload-btn__style" disabled>
+                            未打卡
+                        </button>
+                    {% elif dates.is_day_now|yesno:"1,0" == "0" and dates.isfinish %}
+                        <button class="weui-btn weui-btn_primary upload-btn__style" disabled>
+                            已成功打卡
+                        </button>
+                    {% elif dates.is_day_now|yesno:"1,0" == "0" and dates.isnosignin %}
+                        <button class="weui-btn weui-btn_primary upload-btn__style" disabled>
+                            免签
+                        </button>
+                    {% elif dates.is_day_now|yesno:"1,0" == "0" and not date.isfinish and not date.isnosignin and goal.goal_type and date.dayindex > 0 %}
+                        <button class="weui-btn weui-btn_primary" id="avoid-btn">
+                            <span>免签</span>
+                            x
+                            <span id="avoid-count">{{ nosign }}</span>
+                        </button>
+
+                    {% else %}
+                        <button class="weui-btn weui-btn_primary upload-btn__style" disabled>
+                            尚未开始
+                        </button>
+
+                    {% endif %}
+
+                </div>
+
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+
+</div>
+
+<div style="display: block;">
+    <p>---------------------------------------------------------------</p>
+    <p>测试数据</p>
+    {{ test }}
+
+    <p>测试数据</p>
+    <p>---------------------------------------------------------------</p>
+</div>
+<!--上传任务弹出框-->
+<div id="upload-popup" class="weui-popup__container popup-bottom">
+    <div class="weui-popup__overlay"></div>
+    <div class="weui-popup__modal">
+        <div class="modal-content">
+            <div class="row-center center" id="upload-popup__distance-panel">
+                {% if goal.goal_type == 0 %}
                     <span style="font-size: 1rem;font-weight: 600;">公里数</span>
                     </span>
                     <div class="row-center center">
@@ -270,27 +279,28 @@
                         </div>
                         <span class="panel__target-text__side">km</span>
                     </div>
-                    {% else %}
+                {% else %}
                     <span style="font-size: 1rem;font-weight: 600;">公里数</span>
                     </span>
                     <div class="row-center center">
                         <span id="page-input" style="margin-right: 10px;">{{ goal.kilos_day }}</span>
                         <span class="panel__target-text__side">km</span>
                     </div>
-                    {% endif %}
-                </div>
-                <div id="upload-image-panel">
-                    <p>+ 点击上传照片</p>
-                </div>
-				<button class="weui-btn weui-btn_primary" id="reading-confirm-btn">
-                    确认
-				</button>
-			</div>
-		</div>
-	</div>
-    <!--跑步记录朋友圈-->
-	<ul class="news-list">
-        {% for new in news %}
+                {% endif %}
+            </div>
+            <div id="upload-image-panel">
+                <p>+ 点击上传照片</p>
+            </div>
+            <button class="weui-btn weui-btn_primary" id="reading-confirm-btn">
+                确认
+            </button>
+        </div>
+    </div>
+</div>
+<!--跑步记录朋友圈-->
+<ul class="news-list">
+
+    {% for new in news %}
         <li class="news-item" data-punch="{{ new.punch_id }}">
             <div class="new-item__content">
                 <div>
@@ -308,123 +318,141 @@
                     <span style="color: #B6C1C8;">{{ new.date }}</span>
                 </div>
                 <div class="weui-flex__item weui-flex">
-                    <a href="javascript:;" class="news-item__tail-btn weui-flex__item parise-btn">
+                    <button href="javascript:;" class="news-item__tail-btn weui-flex__item parise-btn">
                         <span class="news-item__tail-img__parise"></span>
                         <span class="news-item__tail-text">赞</span>
-                    </a>
-                    <a href="javascript:;" class="news-item__tail-btn weui-flex__item report-btn" style="margin-left: 5px;">
+                    </button>
+                    <button href="javascript:;" class="news-item__tail-btn weui-flex__item report-btn"
+                            style="margin-left: 5px;">
                         <span class="news-item__tail-text">举报</span>
-                    </a>
+                    </button>
                 </div>
             </div>
         </li>
-        {% endfor %}
-	</ul>
-    <div id="goal-id__get" hidden>{{ goal.goal_id }}</div>
-	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
-	<script type="text/javascript" src="/static/js/fastclick.js"></script>
-	<script>
-		// fast click binding
-		$(function () {
-			FastClick.attach(document.body);
-		});
-	</script>
-	<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
-	<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
-	<script type="text/javascript" src="/static/js/material.min.js"></script>
-	<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
-    <!--配置CSRF保护-->
-    <script>
-        $.ajaxSetup({
-            data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
-        });
-    </script>
-    <!--注入Config信息-->
-	<script>
-	{{ WechatJSConfig|safe}}
-	</script>
-    <script>
-        $(".header_date").click(function () {
-            // 如果不能点击，则不处理
-            if($(this).hasClass("notouch")){
-                return;
-            }
-            var num = $(this).html().trim();
-            $(".header_date.active").removeClass("active");
-            $(this).addClass("active");
-            $(".datespanel").hide();
-            $("#datespanel" + num).show();
-            $(".day-index").hide();
-            $("#dayindex" + num).show();
-        });
+    {% endfor %}
+</ul>
+<div id="goal-id__get" hidden>{{ goal.goal_id }}</div>
+<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+<script type="text/javascript" src="/static/js/fastclick.js"></script>
+<script>
+    // fast click binding
+    $(function () {
+        FastClick.attach(document.body);
+    });
+</script>
+<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
+<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/static/js/material.min.js"></script>
+<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<script type='text/javascript' src='/static/js/swiper.min.js' charset='utf-8'></script>
+
+<!--配置CSRF保护-->
+<script>
+    $.ajaxSetup({
+        data: {csrfmiddlewaretoken: '{{ csrf_token }}'}
+    });
+</script>
+<!--注入Config信息-->
+<script>
+    {{ WechatJSConfig|safe}}
+</script>
+<script>
+    $(".header_date").click(function () {
+        // 如果不能点击，则不处理
+        if ($(this).hasClass("notouch")) {
+            return;
+        }
+        var num = $(this).attr("num");
+        $(".header_date.active").removeClass("active");
+        $(this).addClass("active");
+        //$(".datespanel").hide();
+        //$("#datespanel" + num).show();
+        $(".day-index").hide();
+        $(".dayindex_" + num).show();
+    });
+
     function uploadBtnFinish(text) {
         var upload_btn = $("#upload-btn");
         upload_btn.text(text);
         upload_btn.addClass("finish");
-        upload_btn.attr({"disabled":"disabled"});
+        upload_btn.attr({"disabled": "disabled"});
         $("#avoid-btn").hide();
     }
+
     $("#backup-btn").click(function () {
         window.location.href = 'index';
     });
-    $(".weui-popup__overlay").click(function () {
-        $("body").removeClass("popup-open");
-    });
-	$("#avoid-btn").click(function(){
-		var count = parseInt($("#avoid-count").html());
-		if(count > 0){
-			$.confirm({
-			title: '使用免签券',
-			text: '一张券可以免签一次，确认使用？',
-			onOK: function () {
-                    $("#avoid-count").html((count-1).toString());
-                    $.post('/api/running_no_sign_in',{
-                        goal:$("#goal-id__get").html().trim()
-                    },function (response) {
-                        if(response['status'] === 200) {
+
+    $("#avoid-btn").click(function () {
+        var count = parseInt($("#avoid-count").html());
+        if (count > 0) {
+            $.confirm({
+                title: '使用免签券',
+                text: '一张券可以免签一次，确认使用？',
+                onOK: function () {
+                    $("#avoid-count").html((count - 1).toString());
+                    $.post('/api/running_no_sign_in', {
+                        goal: $("#goal-id__get").html().trim()
+                    }, function (response) {
+                        if (response['status'] === 200) {
                             $.toast("操作成功");
                             uploadBtnFinish("免签");
                         }
-                        else{
-                            $.toast("操作失败","cancel");
+                        else {
+                            $.toast("操作失败", "cancel");
                         }
                     });
-			    }
-			});
-		}
-		else{
-			$.toast("免签券不够","cancel");
-		}
-	});
+                }
+            });
+        }
+        else {
+            $.toast("免签券不够", "cancel");
+        }
+    });
 
-	$("#upload-btn").click(function () {
-	    $("#upload-popup").popup();
+    //点击上传任务 签到 弹出窗口
+    $("#upload-btn").click(function () {
+        $("#upload-popup").popup();
         $("body").addClass("popup-open");
     });
+
+    //关闭 签到 弹出
+    $(".weui-popup__overlay").click(function () {
+        console.log("关闭");
+        $("body").removeClass("popup-open");
+    });
+
     function initDateCss() {
         var header = $(".header_date");
-        var width = 1.2 * header.height()+"px";
-        header.css('width',width);
-        header.css('height',width);
-        header.css('line-height', width);
+        var width = $(".row-center_1").width();
+        header.css('width', width / 8);
+        header.css('height', width / 8);
+
+        header.css('lineHeight', width / 8 + "px");
     }
+
     $(document).ready(function () {
         initDateCss();
     });
-    wx.ready(function() {
+
+    wx.ready(function () {
+
     });
+
     var images = {
         localId: [],
         serverId: []
     };
+
     $("#upload-image-panel").click(function () {
+        console.log("上传图片");
         wx.chooseImage({
             count: 1,
             sourceType: ['album'],
             success: function (res) {
                 images.localId = res.localIds;
                 $("#upload-image-panel").html("");
-                $("#upload-image-panel").html("<img src=\""+images.localId[0]+"\">");
+                $("#upload-image-panel").html("<img src=\"" + images.localId[0] + "\">");
             }
         });
     });
@@ -434,16 +462,16 @@
             return;
         }
         {% if goal.goal_type == 0 %}
-        var distance = parseFloat($("#page-input").val());
+            var distance = parseFloat($("#page-input").val());
         {% else %}
-        var distance = parseFloat($("#page-input").html());
+            var distance = parseFloat($("#page-input").html());
         {% endif %}
-        if(isNaN(distance)){
+        if (isNaN(distance)) {
             $.toast("请填写有效的公里数", "cancel");
             return;
         }
         var limit = parseFloat($(".panel__target-text").html());
-        if(distance > limit){
+        if (distance > limit) {
             $.toast("不能超过当日限制", "cancel");
             return;
         }
@@ -476,8 +504,8 @@
                                 "goal": $("#goal-id__get").html()
                             },
                             function (reponse) {
-                            successUpload();
-                        });
+                                successUpload();
+                            });
                     }
                 },
                 fail: function (res) {
@@ -491,31 +519,74 @@
 
     $(".parise-btn").click(function () {
         $(this).addClass("active");
-        $.post('/api/running_praise',{
-            punch:$(this).parents(".news-item").data('punch')
+        var parise_btn = $(this);
+        $.post('/api/running_praise', {
+            punch: $(this).parents(".news-item").data('punch')
+        }, function (response) {
+            parise_btn.find(".news-item__tail-text").css("color", "#B6C1C8");
+            parise_btn.find(".news-item__tail-text").text("已赞");
+            parise_btn.css("border", "1px #B6C1C8 solid");
+            parise_btn.removeClass("report-btn");
+            parise_btn.attr("disabled", "disabled");
         });
     });
 
     $(".report-btn").click(function () {
         var report_btn = $(this);
+        //console.log(report_btn.parents(".news-item").data('punch'));
+
         $.confirm({
-			title: '举报',
-			text: '确认举报该用户打卡记录不属实？举报后将有管理员进行审核',
-			onOK: function () {
-			    $.post('/api/running_report',{
-			        punch:report_btn.parents(".news-item").data('punch')
-                },function (response) {
-			        if(response['status'] === 200){
-			            $.toast("举报成功");
+            title: '举报',
+            text: '确认举报该用户打卡记录不属实？举报后将有管理员进行审核',
+            onOK: function () {
+                $.post('/api/running_report', {
+                    punch: report_btn.parents(".news-item").data('punch')
+                }, function (response) {
+                    if (response['status'] === 200) {
+                        $.toast("举报成功");
+                        report_btn.find(".news-item__tail-text").css("color", "#B6C1C8");
+                        report_btn.find(".news-item__tail-text").text("已举报");
+                        report_btn.css("border", "1px #B6C1C8 solid");
+                        report_btn.removeClass("report-btn");
+                        report_btn.attr("disabled", "disabled");
+
                     }
-                    else{
-			            $.toast("举报失败,<br/>请联系客服","cancel");
+                    else {
+                        $.toast("举报失败,<br/>请联系客服", "cancel");
                     }
                 });
             }
         });
     });
+</script>
+<script>
+        $.ajax({
+            type: "GET",
+            url: "/api/search_deposit",
+            data:{
+            },
+            success: function (res) {
+                $.hideLoading();
+                console.log("成功");
+                console.log(res)
+            },
+            error:function(res){
+                $.hideLoading();
+                console.log("错误");
+                console.log(res)
+            }
+        })
     </script>
+<script>
+    $(function () {
+        var swiper_1 = new Swiper('.swiper-container_1', {
+            autoplay: false,
+            loop: false,
+            initialSlide: 100,
+        });
+    });
+
+</script>
 </body>
 
 </html>

@@ -28,7 +28,9 @@ DEBUG = True
 ALLOWED_HOSTS = [
     '119.29.64.172',
     'localhost',
-    'wechat.onmytarget.cn'
+    'wechat.onmytarget.cn',
+    '127.0.0.1',
+    '183.16.192.177'
 ]
 
 # Application definition
@@ -82,11 +84,11 @@ WSGI_APPLICATION = 'on.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'test',
+        'NAME': 'deploy',
         'USER': 'root',
-        'PASSWORD': 'test1234',
-        'HOST': '',
-        'PORT': '',
+        'PASSWORD': 'wang',
+        'HOST': '119.29.191.32',
+        'PORT': '3306',
     }
 }
 
@@ -111,7 +113,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-Hans'
 
 TIME_ZONE = 'Asia/Shanghai'
 

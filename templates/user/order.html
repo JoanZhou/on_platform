@@ -159,8 +159,16 @@
 			{% endfor %}
 		</ul>
     </div>
+    <!--
+
+    <button class="weui-btn weui-btn_primary" id="gen-btn">
+			生成目标
+    </button>
+
+    -->
 	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
 	<script type="text/javascript" src="/static/js/fastclick.js"></script>
+
 	<script>
 		// fast click binding
 		$(function () {
@@ -168,6 +176,17 @@
 		});
 	</script>
 	<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <!--配置CSRF保护-->
+    <script>
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
+        });
+    </script>
+    <!--注入Config信息-->
+	<script>
+	{{ WechatJSConfig|safe}}
+	</script>
 	<script>
         $("#modify-btn").click(function(){
             var status = $(this).attr("checked");
@@ -219,7 +238,44 @@
 		$(document).ready(function(){
 			$('input[type="text"]').each(resizeInput);
 		});
+
+
 	</script>
+    <script>
+        /*
+        wx.ready(function() {
+            $("#gen-btn").click(function () {
+                wx.getLocation({
+                    type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+                    success: function (res) {
+                    var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+                    var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+                    var speed = res.speed; // 速度，以米/每秒计
+                    var accuracy = res.accuracy; // 位置精度
+                    }
+                });
+            })
+        })
+        */
+    </script>
+<script>
+        $.ajax({
+            type: "GET",
+            url: "/api/search_deposit",
+            data:{
+            },
+            success: function (res) {
+                $.hideLoading();
+                console.log("成功");
+                console.log(res)
+            },
+            error:function(res){
+                $.hideLoading();
+                console.log("错误");
+                console.log(res)
+            }
+        })
+    </script>
 </body>
 
 </html>

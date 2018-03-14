@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
@@ -33,9 +32,10 @@ ALLOWED_HOSTS = [
     'wechat.onmytarget.cn',
     '219.239.227.221',
     '115.159.53.105',
-    '*'
+    '*',
+    '127.0.0.1',
+    '183.16.192.177'
 ]
-
 
 # Application definition
 
@@ -84,7 +84,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'on.wsgi.application'
 
-
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
@@ -103,18 +102,18 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-Hans'
+
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
 USE_L10N = True
 
 USE_TZ = False
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
@@ -143,7 +142,7 @@ LOGGING = {
             'format': '%(levelname)s %(asctime)s %(module)s %(process)s %(message)s',
         },
         'standard': {
-             'format': '%(levelname)s %(asctime)s %(message)s',
+            'format': '%(levelname)s %(asctime)s %(message)s',
         },
     },
     'handlers': {
@@ -151,19 +150,22 @@ LOGGING = {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
             'formatter': 'verbose',
-            'filename': '/home/ubuntu/weblog/error.log',
+            'filename': 'G:\\weblog\\error.log'
+            # 'filename': '/home/ubuntu/weblog/error.log',
         },
         'infohandler': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
             'formatter': 'standard',
-            'filename': '/home/ubuntu/weblog/info.log',
+            'filename': 'G:\\weblog\\info.log'
+            # 'filename': '/home/ubuntu/weblog/info.log',
         },
         'moneyhandler': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
             'formatter': 'standard',
-            'filename': '/home/ubuntu/weblog/money.log',
+            'filename': 'G:\\weblog\\money.log'
+            # 'filename': '/home/ubuntu/weblog/money.log',
         }
     },
     'loggers': {
@@ -177,11 +179,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True
         },
-        'app':{
+        'app': {
             'handlers': ['infohandler'],
             'level': 'INFO'
         },
-        'money':{
+        'money': {
             'handlers': ['moneyhandler'],
             'level': 'DEBUG',
             'propagate': True
