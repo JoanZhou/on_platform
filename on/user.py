@@ -8,8 +8,8 @@ import requests
 from django.conf import settings
 import os
 
-class UserManager(models.Manager):
 
+class UserManager(models.Manager):
     # 提现
     def clear_balance(self, user_id):
         user = self.get(user_id=user_id)
@@ -48,9 +48,9 @@ class UserManager(models.Manager):
         # 获取imgurl,并将其存入static中user的avatar里
         response = requests.get(imgurl)
         # 文件存储的实际路径
-        filePath = os.path.join(settings.AVATAR_DIR, str(user_id)+".jpg")
+        filePath = os.path.join(settings.AVATAR_DIR, str(user_id) + ".jpg")
         # 引用所使用的路径
-        refPath = os.path.join(settings.AVATAR_ROOT, str(user_id)+".jpg")
+        refPath = os.path.join(settings.AVATAR_ROOT, str(user_id) + ".jpg")
         # 写入文件内容
         with open(filePath, 'wb') as f:
             f.write(response.content)
@@ -107,6 +107,7 @@ class UserManager(models.Manager):
 
 
 # 记录用户的信息表，不需要冗余数据
+
 class UserInfo(models.Model):
     """ Extending Django User Model Using a One-To-One Link
         Profile Model, based on WeChat User API
@@ -136,7 +137,10 @@ class UserInfo(models.Model):
     all_profit = models.FloatField(default=0)
     # 今日收益
     today_profit = models.FloatField(default=0)
+    #
     objects = UserManager()
+    def __str__(self):
+        return self.nickname
 
 
 # 交易的管理模型，管理所有的收款，退款与提现
@@ -197,7 +201,7 @@ class UserPayManager(models.Manager):
             goal = sub_model.objects.filter(user_id=user.user_id).filter(goal_id=goal_id)
             if goal:
                 goal = goal.first()
-                amount = int(float(goal.guaranty + goal.down_payment)*100)
+                amount = int(float(goal.guaranty + goal.down_payment) * 100)
                 break
         if settings.DEBUG:
             trade = trade.first()
@@ -232,19 +236,19 @@ class UserTrade(models.Model):
     # 交易类型 : JSAPI，NATIVE，APP，MICROPAY
     trade_type = models.CharField(max_length=255)
     # 交易状态 : SUCCESS / Others
-    trade_state = models.CharField(null=False,max_length=255)
+    trade_state = models.CharField(null=False, max_length=255)
     # 银行标识
-    bank_type = models.CharField(null=True,max_length=255)
+    bank_type = models.CharField(null=True, max_length=255)
     # 以分为单位的订单金额
     total_fee = models.IntegerField(null=False)
     # 根据优惠券计算出的实际支付金额
     cash_fee = models.IntegerField(null=False)
     # 货币类型
-    fee_type = models.CharField(null=True,max_length=255)
+    fee_type = models.CharField(null=True, max_length=255)
     # 微信支付订单号
-    transaction_id = models.CharField(null=False,max_length=255)
+    transaction_id = models.CharField(null=False, max_length=255)
     # 商户订单号
-    out_trade_id = models.CharField(null=False,max_length=255)
+    out_trade_id = models.CharField(null=False, max_length=255)
     # 支付完成的时间
     time_end = models.CharField(null=False, max_length=255)
 
@@ -272,7 +276,7 @@ class UserRefund(models.Model):
     # refund_id 将作为退款订单中的 out_refund_no
     refund_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # transaction_id 将作为退款记录关联的订单号
-    transaction_id = models.CharField(null=False,max_length=255)
+    transaction_id = models.CharField(null=False, max_length=255)
     # 订单总金额，即当时申请订单的总金额数
     total_fee = models.IntegerField(null=False, default=1)
     # 退款总金额，即最终退还给用户的押金数
@@ -310,7 +314,7 @@ class UserRelation(models.Model):
     # 建立关系的时间
     create_time = models.DateTimeField(auto_created=True)
     # 备注, 由于备注存在双向关系
-    remark = models.CharField(null=True,max_length=255)
+    remark = models.CharField(null=True, max_length=255)
 
 
 class UserRecordManager(models.Manager):
@@ -393,6 +397,8 @@ class UserTicketManager(models.Manager):
 """
 用户卡券对应表，不同的目标有不同的券
 """
+
+
 class UserTicket(models.Model):
     goal_id = models.UUIDField(null=False, default=uuid.uuid4)
     TICKET_CHOICES = (
@@ -404,6 +410,7 @@ class UserTicket(models.Model):
     ticket_type = models.CharField(max_length=32, choices=TICKET_CHOICES)
     number = models.IntegerField(default=0)
     objects = UserTicketManager()
+
     @property
     def tic_type(self):
         return self.get_ticket_type_display()
@@ -416,9 +423,12 @@ class UserTicketUseageManager(models.Manager):
     def insert_record(self, goal_id, ticket_type, time):
         self.create(goal_id=goal_id, ticket_type=ticket_type, useage_time=time)
 
+
 """
 用户卡券使用记录表，主要用于查看第二天用户是否要进行延时
 """
+
+
 class UserTicketUseage(models.Model):
     goal_id = models.UUIDField(null=False, default=uuid.uuid4)
     TICKET_CHOICES = (
@@ -432,10 +442,11 @@ class UserTicketUseage(models.Model):
     objects = UserTicketUseageManager()
 
 
-
 """
 收货地址登记表
 """
+
+
 class UserAddress(models.Model):
     user = models.OneToOneField(UserInfo, primary_key=True, null=False)
     phone = models.CharField(null=True, max_length=13)
@@ -475,6 +486,8 @@ class UserOrderManager(models.Manager):
 """
 订单登记表
 """
+
+
 class UserOrder(models.Model):
     order_id = models.UUIDField(primary_key=True, null=False, default=uuid.uuid4)
     # 收货人的姓名

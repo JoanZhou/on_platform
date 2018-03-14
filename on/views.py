@@ -27,11 +27,11 @@ def oauth(method):
     @functools.wraps(method)
     def warpper(request, *args, **kwargs):
         if settings.DEBUG:
-            user_info ={"openid":"o0jd6wk8OK77nbVqPNLKG-2urQxQ",
-                        "nickname": "SivilTaram 乾",
-                        "sex":"1",
-                        "headimgurl": "http://wx.qlogo.cn/mmopen/g3MonUZtNHkdmzicIlibx6iaFqAc56vxLSUfpb6n5WKSYVY0ChQKkiaJSgQ1dZuTOgvLLrhJbERQQ4eMsv84eavHiaiceqxibJxCfHe/46",
-                        }
+            user_info = {"openid": "o0jd6wgPxXAFK9aifqR858FOWDV0",
+                         "nickname": "顺子",
+                         "sex": "1",
+                         "headimgurl": "http://wx.qlogo.cn/mmopen/g3MonUZtNHkdmzicIlibx6iaFqAc56vxLSUfpb6n5WKSYVY0ChQKkiaJSgQ1dZuTOgvLLrhJbERQQ4eMsv84eavHiaiceqxibJxCfHe/46",
+                         }
             wechat_id = user_info["openid"]
             user = UserInfo.objects.check_user(wechat_id)
             if not user:
@@ -79,13 +79,17 @@ def oauth(method):
                     return redirect(redirect_url)
             else:
                 return method(request, *args, **kwargs)
+
     return warpper
 
 
 # 显示主页
 @oauth
 def show_activities(request):
+    user_id = request.session['user']
+
     activities = Activity.objects.all()
+
     # TODO: fake
     activities = fake_data(activities)
     return render(request, 'activity/index.html', {
@@ -109,6 +113,7 @@ def fake_data(activities):
             activity.active_participants += 0
             activity.bonus_all += decimal.Decimal(0)
     return activities
+
 
 # 获取某个模型的所有子模型
 def get_son_models(model):
@@ -138,6 +143,23 @@ def show_specific_activity(request, pk):
                     return HttpResponseRedirect(redirect_url)
                 else:
                     pass
+    else:
+        user = request.session['user']
+        sub_models = get_son_models(Goal)
+        for sub_model_key in sub_models:
+            sub_model = sub_models[sub_model_key]
+            goal = sub_model.objects.filter(user_id=user.user_id).filter(activity_type=activity.activity_type)
+            if goal:
+                goal = goal.first()
+
+                if goal.status != "PENDING":
+                    redirect_url = '/goal/{0}?activity_type={1}'.format(goal.goal_id, activity.activity_type)
+
+                    return HttpResponseRedirect(redirect_url)
+
+                else:
+                    pass
+
     # 专门为读书设立的字段
     readinginfo = {
         'title': '你的生命有什么可能',
@@ -148,14 +170,14 @@ def show_specific_activity(request, pk):
         'guaranty': 30,
         'page': 315
     }
-
     if activity.activity_type == ReadingGoal.get_activity():
         person_goals = ReadingGoal.objects.filter(status="ACTIVE")[:5]
     elif activity.activity_type == SleepingGoal.get_activity():
         person_goals = SleepingGoal.objects.filter(status="ACTIVE")[:5]
     else:
         person_goals = RunningGoal.objects.filter(status="ACTIVE")[:5]
-
+    #bug的原因是userinfo无法查询到数据，也就是person_goal.user_id为空值，暂时无法修改
+    #生成一个persons集合
     persons = set()
     for person_goal in person_goals:
         persons.add(UserInfo.objects.get(user_id=person_goal.user_id))
@@ -175,7 +197,7 @@ def show_user(request):
     user = request.session['user']
     userinfo = UserInfo.objects.get(user_id=user.user_id)
     record = userinfo.record.first()
-    success_rate = 0 if record.join_times == 0 else int(float(record.finish_times)*100/record.join_times)
+    success_rate = 0 if record.join_times == 0 else int(float(record.finish_times) * 100 / record.join_times)
     return render(request, 'user/index.html', {
         'user': userinfo,
         'record': record,
@@ -191,9 +213,9 @@ def update_address(request):
     if request.method == 'POST':
         address_dict = json.loads(request.POST.get("data"))
         UserAddress.objects.update_address(user=user, field_dict=address_dict)
-        return JsonResponse({'status':200})
+        return JsonResponse({'status': 200})
     else:
-        return JsonResponse({'status':403})
+        return JsonResponse({'status': 403})
 
 
 # 获取用户的打卡记录信息
@@ -216,7 +238,7 @@ def show_history(request):
     all_punchs.reverse()
     # TODO: 添加更多活动的 punchs 显示
     record = user.record.first()
-    success_rate = 0 if record.join_times == 0 else int(float(record.finish_times)*100/record.join_times)
+    success_rate = 0 if record.join_times == 0 else int(float(record.finish_times) * 100 / record.join_times)
     return render(request, 'user/history.html', {
         'punchs': all_punchs,
         'punchinform': punch_inform,
@@ -240,7 +262,7 @@ def format_record(punch):
     else:
         target = '暂无'
     bonus = '{0:f}元'.format(punch.bonus)
-    time = punch.record_time.strftime('%Y{0} %m{1} %d{2}').format('年','月','日')
+    time = punch.record_time.strftime('%Y{0} %m{1} %d{2}').format('年', '月', '日')
     return {"type": punch_type, "target": target, "bonus": bonus, "time": time}
 
 
@@ -249,7 +271,7 @@ def format_record(punch):
 def show_cash(request):
     user = request.session['user']
     user_info = UserInfo.objects.get(user_id=user.user_id)
-    return render(request, 'user/cash.html', {'balance':user_info.balance})
+    return render(request, 'user/cash.html', {'balance': user_info.balance})
 
 
 # 展示我的圈子
@@ -266,6 +288,6 @@ def show_order(request):
     address = UserAddress.objects.get_address(user.user_id)
     orders = UserOrder.objects.filter(user_id=user.user_id)
     return render(request, 'user/order.html', {
-        "address":address,
-        "orders":orders
+        "address": address,
+        "orders": orders
     })
