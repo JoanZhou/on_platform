@@ -8,6 +8,7 @@ from on.activities.reading.views import show_reading_goal
 from on.wechatconfig import get_wechat_config
 import logging
 from on.views import oauth
+import uuid
 
 goal_mapping = {
     RunningGoal.get_activity(): show_running_goal,
@@ -106,6 +107,7 @@ def show_goal_finish(request, pk):
 def delete_goal(request):
     try:
         user = request.session['user']
+
         if request.method == "POST":
             # 删除当前的目标活动并退还钱
             activity_type = request.POST['goal_type']
@@ -130,7 +132,8 @@ def delete_goal(request):
                             return JsonResponse({'status': 200})
                         else:
                             return JsonResponse({'status': 403})
-            """
+
+            '''
             if activity_type == RunningGoal.get_activity():
                 # 获取相应的goal,准备退款给用户
                 goal = RunningGoal.objects.get(goal_id=goal_id)
@@ -158,7 +161,7 @@ def delete_goal(request):
                     return JsonResponse({'status': 200})
                 else:
                     return JsonResponse({'status': 403})
-            """
+'''
         else:
             return JsonResponse({'status': 404})
     except Exception:
@@ -180,8 +183,13 @@ def create_goal(request):
         mode = request.POST["mode"]
         goal_day = int(request.POST["goal_day"])
         goal_type = request.POST["goal_type"]
+        avoid = request.POST["avoid"]
         activity_type = Activity.objects.get(activity_id=activity).activity_type
         if activity_type == RunningGoal.get_activity():
+            # # 每创建一个用户，将擂主的金额加上10元
+            # winner = UserInfo.objects.get(user_id='100101')
+            # winner.deposit += 10
+            # winner.save()
             distance = int(request.POST["distance"])
             nosign = request.POST["nosign"]
             goal = RunningGoal.objects.create_goal(user_id=user.user_id,
@@ -227,3 +235,17 @@ def create_goal(request):
             return JsonResponse(response_data)
     else:
         return HttpResponseNotFound
+
+# def create_spec_goal(request):
+#     user = request.session['user']
+#     if request.POST:
+#         guaranty = float(request.POST["guaranty"])
+#         down_payment = float(request.POST["down_payment"])
+#         # 日志记录用户支付的钱数
+#         logger.info("[Money] User {0} Pay {1} To Create A Goal".format(user.user_id, guaranty + down_payment))
+#         activity = request.POST["activity"]
+#         coefficient = float(request.POST["coefficient"])
+#         mode = request.POST["mode"]
+#         goal_day = int(request.POST["goal_day"])
+#         goal_type = request.POST["goal_type"]
+#         activity_type = Activity.objects.get(activity_id=activity).activity_type

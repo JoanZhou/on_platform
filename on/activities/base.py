@@ -83,6 +83,13 @@ class Activity(models.Model):
     # 奖金池中的奖金, 需要频繁访问与修改
     bonus_all = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     description = models.CharField(max_length=16, default='')
+    # 活动名字
+    # activity_name = models.CharField(max_length=16,default="")
+    # 是否开始活动
+    # is_no_start = models.BooleanField(default=False)
+    # 活动图片存储路径
+    # img_url = models.TextField()
+
     objects = ActivityManager()
 
     class Meta:
@@ -119,6 +126,7 @@ class Goal(models.Model):
         (u'S', u'学生'),
         (u'N', u'普通')
     )
+    # 学生或普通模式的选择
     mode = models.CharField(max_length=10, choices=MODE_CHOICES, default="N")
     # 保证金
     guaranty = models.DecimalField(max_digits=12, decimal_places=2, default=0)
@@ -130,6 +138,9 @@ class Goal(models.Model):
     bonus = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     # 已经发生过的未完成天数, 用于计算下一次扣除底金与保证金的金额数
     none_punch_days = models.IntegerField(null=False, default=0)
+
+    # 判断特定活动类型
+    # speci_activate = models.UUIDField(default=uuid.uuid4)
 
     class Meta:
         abstract = True
@@ -164,7 +175,7 @@ class Goal(models.Model):
         earn_pay = 0
         # 如果当前活动开始了且处于进行中状态才能分钱
         if delta > 0 and self.status == 'ACTIVE':
-            earn_pay = math.floor((average_pay * self.coefficient)*100)/100
+            earn_pay = math.floor((average_pay * self.coefficient) * 100) / 100
             self.bonus += decimal.Decimal(earn_pay)
             self.save()
             # 修改用户赚得的总金额
@@ -228,7 +239,7 @@ class Goal(models.Model):
                     self.update_activity_person()
                 # 更新到数据库中
                 self.save()
-                UserInfo.objects.update_deposit(user_id=self.user_id,pay_delta=-pay_out)
+                UserInfo.objects.update_deposit(user_id=self.user_id, pay_delta=-pay_out)
             return pay_out, self.coefficient
         except AssertionError:
             # 如果断言失败,则记录日志，返回两个0
@@ -237,15 +248,16 @@ class Goal(models.Model):
         except Exception as e:
             logger.error(e)
             return 0, 0
+            # 判断是否使用免签卡，暂时修改
 
-    def use_no_sign_in_date(self, daydelta):
-        today = timezone.now().date() + timedelta(daydelta)
-        end = today + timedelta(1)
-        use_history = UserTicketUseage.objects.filter(useage_time__range=(today, end), goal_id=self.goal_id, ticket_type='NS')
-        if use_history:
-            return True
-        else:
-            return False
+    # def use_no_sign_in_date(self, daydelta):
+    #     today = timezone.now().date() + timedelta(daydelta)
+    #     end = today + timedelta(1)
+    #     use_history = UserTicketUseage.objects.filter(useage_time__range=(today, end), goal_id=self.goal_id, ticket_type='NS')
+    #     if use_history:
+    #         return True
+    #     else:
+    #         return False
 
     # 用户触发，如果挑战成功则删除目标，退还押金
     def refund_to_user(self, open_id):
@@ -318,3 +330,34 @@ class Goal(models.Model):
             if time_now < self.start_time.date():
                 detail = "NOSTART"
             return detail
+
+        # class Ticket(models.Model):
+        #     #用户id，
+        #     user_id = models.IntegerField(null=False)
+        #     #免签
+        #     Ticket_id = models.UUIDField(default=uuid.uuid4,primary_key=True)
+        #     # 获取方式,预留字段
+        #     get_way = models.IntegerField(null=True)
+        #     # 有效期
+        #     indate = models.DateTimeField(null=False)
+        #     TICKET_STATUS = (
+        #         (u'0', u'未使用'),
+        #         (u'1', u'已使用')
+        #     )
+        # 使用状态
+        # is_use = models.IntegerField(null=True,choices=TICKET_STATUS,default=0)
+
+# class OnTicket(models.Model):
+#     ticket_id = models.CharField(db_column='Ticket_id', primary_key=True, max_length=32)  # Field name made lowercase.
+#     user_id = models.IntegerField()
+#     get_way = models.IntegerField(blank=True, null=True)
+#     indate = models.DateTimeField()
+#     TICKET_STATUS = (
+#         (u'0', u'未使用'),
+#         (u'1', u'已使用')
+#     )
+#     is_use = models.IntegerField(null=True,choices=TICKET_STATUS,default=0)
+#
+#     class Meta:
+#         managed = False
+#         db_table = 'on_ticket'
