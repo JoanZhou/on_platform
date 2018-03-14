@@ -49,7 +49,7 @@ urlpatterns = [
     url(r'^api/finish_goal', activeview.delete_goal),
     url(r'^api/start_reading', apiviews.reading_start_handler),
     url(r'^api/reading_sign_in', apiviews.reading_record_handler),
-
+    url(r'api/search_deposit', apiviews.search_deposit),
     url(r'^test/profit', test_calculate)
 ]
 
