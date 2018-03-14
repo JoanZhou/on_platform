@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse, HttpResponseNotFound
+from django.shortcuts import render
 from on.wechatconfig import mediaApiClient
 import requests
 from wechatpy.utils import random_string, to_text
@@ -9,6 +10,7 @@ from on.user import UserTicket, UserRecord
 from django.views.decorators.csrf import csrf_protect
 from django.utils import timezone
 from datetime import timedelta
+from on.user import UserInfo
 
 
 # 跑步签到时上传图片
@@ -180,3 +182,13 @@ def reading_record_handler(request):
     else:
         return HttpResponseNotFound
 
+# 查询擂主押金
+def search_deposit(request):
+    if request.GET:
+        winner = UserInfo.objects.get(user_id='100101').deposit
+        if winner:
+            return JsonResponse({'status': 200,"winner":winner})
+        else:
+            return JsonResponse({'status': 403})
+    else:
+        return HttpResponseNotFound
