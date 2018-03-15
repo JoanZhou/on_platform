@@ -10,7 +10,7 @@ class WechatPush(object):
     def getToken(self):
         # 获取用户的accesstoken
         url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' + WECHAT_APPID + "&secret=" + WECHAT_APPSECRET
-        token_str = requests.get(url).content.decode()
+        token_str = requests.post(url).content.decode()
         token_json = json.loads(token_str)
         token = token_json['access_token']
         return token
