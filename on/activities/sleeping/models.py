@@ -31,7 +31,8 @@ class SleepingGoalManager(models.Manager):
                            down_payment=down_payment,
                            coefficient=coefficient,
                            goal_type=1,
-                           getup_time=getuptime_dump)
+                           getup_time=getuptime_dump,
+                           )
         # 更新活动的免签卡券
         nosgin_number = int(nosign)
         delay_number = int(delay)

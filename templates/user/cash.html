@@ -3,11 +3,17 @@
 
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0 minimum-scale=0.5, user-scalable=no" />
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
 	<title>On!主页</title>
 	<link rel="stylesheet" href="/static/css/weui.min.css" />
     <link rel="stylesheet" href="/static/css/bootstrap.min.css"/>
 	<link rel="stylesheet" href="/static/css/jquery-weui.min.css" />
+    <link rel="stylesheet" href="/static/css/public.css">
 	<style type="text/css">
 	.whole-pannel{
 		display:flex;
@@ -54,11 +60,13 @@
 	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
 	<script type="text/javascript" src="/static/js/fastclick.js"></script>
 	<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
+    <script type="text/javascript" src="/static/js/public.js"></script>
 	<script>
 		// fast click binding
 		$(function () {
 			FastClick.attach(document.body);
 		});
+		$("iframe").detach();
 	</script>
 	    <!--配置CSRF保护-->
     <script>
@@ -68,21 +76,58 @@
     </script>
 
 	<script>
-		$("#transfer-btn").click(function () {
+
+		$("#transfer-btn").one("click",function(){
+
+		    /*
+		    $.toast('提现数据审核中！', 'cancel',function () {
+		        window.location.href = "/user/index";
+		        return
+            });
+		    return
+            */
+            var balance="{{ balance }}";
+            balance=Number(balance);
+            if(balance >= 300 ){
+                $.toast('数据异常</br>请联系客服！', 'cancel',function () {
+                    window.location.href = "/user/index";
+                    return
+                });
+                return
+            }
+
+
 		    $.post('/transfer',{
 		        'price':{{ balance }}
 			},function (response) {
+		        //alert(response.status);
+
 		        if(response['status'] == 200){
-		            $.toast('提现成功！');
+		            $.toast('提现成功！',function () {
+                        window.location.href = "/user/index";
+                    });
 				}
 				else if(response['status'] == 201){
-		            $.toast('余额需大于1元', 'cancel');
+		            $.toast('余额需大于1元', 'cancel',function () {
+                        window.location.href = "/user/index";
+                    });
+		            //window.location.href = "/user/index";
 				}
 				else if(response['status'] == 401){
-				    $.toast('提现失败,<br/>请联系客服', 'cancel');
+				    $.toast('提现失败,<br/>请联系客服', 'cancel',function () {
+                        window.location.href = "/user/index";
+                    });
+				    //$.toast('提现成功！');
+				}else if(response['status'] == 403){
+				    $.toast('提现金额与余额不匹配!', 'cancel',function () {
+                        window.location.href = "/user/index";
+                    });
+				    //$.toast('提现成功！');
 				}
 				else{
-				    $.toast('提现金额大于余额!', 'cancel');
+				    $.toast('提现金额大于余额!', 'cancel',function () {
+                        window.location.href = "/user/index";
+                    });
                 }
             });
         });

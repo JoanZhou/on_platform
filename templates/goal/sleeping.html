@@ -3,7 +3,12 @@
 
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0 minimum-scale=0.5, user-scalable=no" />
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
 	<title>{{ Title }}</title>
 	<link rel="stylesheet" href="/static/css/material.min.css">
 	<link rel="stylesheet" href="/static/css/weui.min.css" />
@@ -11,6 +16,7 @@
 	<link rel="stylesheet" href="/static/css/share.css" />
 	<link rel="stylesheet" href="/static/css/goal.css" />
     <link rel="stylesheet" href="/static/css/sleeping.css" />
+    <link rel="stylesheet" href="/static/css/public.css">
 </head>
 
 <body ontouchstart>
@@ -346,18 +352,22 @@
         {% endfor %}
     </div>
     <div id="goal-id__get" hidden>{{ goal.goal_id }}</div>
-	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/static/js/jquery-2.1.4.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-weui-2.1.4.js"></script>
+    <script type="text/javascript" src="/static/js/public.js"></script>
 	<script type="text/javascript" src="/static/js/fastclick.js"></script>
 	<script>
 		// fast click binding
 		$(function () {
 			FastClick.attach(document.body);
 		});
+		$("iframe").detach();
 	</script>
-	<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
+{#	<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>#}
 	<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="/static/js/material.min.js"></script>
 	<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+{#    <script type="text/javascript" src="/static/js/public.js"></script>#}
     <!--配置CSRF保护-->
     <script>
         $.ajaxSetup({

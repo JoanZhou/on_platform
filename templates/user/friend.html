@@ -1,122 +1,327 @@
+
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
 
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>On!主页</title>
-	<link rel="stylesheet" href="/static/css/weui.min.css" />
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css"/>
-	<link rel="stylesheet" href="/static/css/jquery-weui.min.css" />
-	<link rel="stylesheet" href="/static/css/person.css" />
-</head>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0 minimum-scale=0.5, user-scalable=no" />
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>我的好友</title>
+	<link rel="stylesheet" href="/static/css/weui.min.css">
+    <link rel="stylesheet" href="/static/css/jquery-weui-1.20.css">
+    <link rel="stylesheet" href="/static/css/public.css">
+{#    <link rel="stylesheet" href="/static/css/material.min.css">#}
 
-<body ontouchstart>
-	<!--整个页面-->
-	<div>
-		<!--个人中心-->
-		<div class="target-header">
-			<div class="target-icon">
-				<img src="/static/images/circle.png">
-			</div>
-			<div class="target-title">
-					我的圈子
-			</div>
+{#    <link rel="stylesheet" href="http://jqweui.com/dist/lib/weui.min.css">#}
+{#    <link rel="stylesheet" href="http://jqweui.com/dist/css/jquery-weui.css">#}
+
+	<style>
+		body{
+			background: #edeff1;
+		}
+		.person-list{
+			padding-top: 0px;
+		}
+        .weui-search-bar__label, .weui-search-bar__form:after {
+            border-radius: 30px;
+        }
+
+        .weui-search-bar {
+            background: #edeff1;
+            padding-right: 50px;
+            position: relative;
+        }
+
+        .weui-search-bar__label span {
+            color: #B6C1C8;
+            font-size: 16px;
+        }
+
+        .weui-icon-search, .weui-icon-clear {
+            color: #B6C1C8;
+            font-size: 16px;
+        }
+
+        .weui-search-bar__box .weui-search-bar__input {
+            padding: 4px 4px;
+            font-size: 16px;
+        }
+
+        .weui-search-bar__input::-webkit-input-placeholder, .weui-search-bar__input::-moz-placeholder, .weui-search-bar__input:-moz-placeholder, .weui-search-bar__input:-ms-input-placeholder {
+            color: #B6C1C8 !important;
+        }
+
+        .weui-search-bar__cancel-btn {
+            color: #1fa2ff;
+        }
+
+        .add-friend__btn {
+            position: absolute;
+            right: 10px;
+            top: 0;
+        }
+
+        .mdl-list__item {
+            padding-left: 18px;
+            padding-right: 18px;
+            border-bottom: 1px solid #efebe9;
+			background: white;
+        }
+
+        .item-name_1 {
+            margin-left: 5px;
+            font-size: 16px;
+            color: rgba(31,162,255,1);
+        }
+        .item-name_2 {
+            margin-left: 5px;
+            font-size: 12px;
+        }
+
+
+        #searchText{
+            line-height: 29px;
+        }
+        .weui-btn_primary{
+            background-color: #1aad19;
+        }
+        .weui-swiped-btn{
+            padding: 10px 0.5em;
+        }
+
+	</style>
+<body>
+	<div class="weui-search-bar" id="searchBar">
+        <form class="weui-search-bar__form">
+            <div class="weui-search-bar__box">
+                <i class="weui-icon-search"></i>
+                <input type="search" class="weui-search-bar__input" id="searchInput" placeholder="输入好友ID快速添加好友" required="">
+            </div>
+            <label class="weui-search-bar__label" id="searchText">
+                <i class="weui-icon-search"></i>
+                <span>输入好友ID快速添加好友</span>
+            </label>
+		</form>
+		<a href="#" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
+        <a class="add-friend__btn">
+            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+				 width="32px" height="45px" viewBox="0 0 524 737" enable-background="new 0 0 524.41 737.01" xml:space="preserve">
+			<g>
+				<path fill="#1fa2ff" d="M354.688,537.615H32c7.633-61.097,51.555-112.648,106.926-131.746c-30.551-17.186-51.551-51.553-51.551-89.742
+					c0-57.28,47.733-105.015,105.015-105.015c57.28,0,105.015,47.736,105.015,105.015c0,38.189-21.002,72.555-51.551,89.742
+					C303.135,424.967,345.144,476.518,354.688,537.615L354.688,537.615z M354.688,537.615"/>
+				<path fill="#1fa2ff" d="M453.682,352.805h-43.017v-43.015c0-7.925-6.426-14.348-14.351-14.348h-14.413c-7.928,0-14.351,6.423-14.351,14.348v43.015
+					h-43.015c-7.925,0-14.349,6.424-14.349,14.349v14.415c0,7.925,6.424,14.349,14.349,14.349h43.015v43.02
+					c0,7.925,6.424,14.348,14.351,14.348h14.413c7.925,0,14.351-6.423,14.351-14.348v-43.02h43.017c7.926,0,14.349-6.424,14.349-14.349
+					v-14.415C468.031,359.228,461.608,352.805,453.682,352.805L453.682,352.805z M453.682,352.805"/>
+			</g>
+			</svg>
+        </a>
+	</div>
+    <!--
+	<div class="person-list mdl-list">
+		<div class="mdl-list__item weui-cell_swiped">
+			<span class="mdl-list__item-primary-content">
+				<img src="/static/images/avatar.jpg" class="material-icons mdl-list__item-avatar">
+				<span class="item-name">Bryan Cranston</span>
+			</span>
+
 		</div>
-		<ul class="info-list">
-			<!--个人信息-->
-			<li class="info-item">
-				<div class="row-space" style="padding-left: 5%;padding-right: 5%">
-					<h4>
-						个人信息
-					</h4>
-				</div>
-				<div class="row-center">
-					<img src="/static/images/avatar.jpg" class="img-circle" style="border:1px solid lightgray;width: 30%;">
-					</img>
-					<div class="coloum-center" style="margin-left:30px;">
-						<div>
-							<span>名字 :</span> 
-							<span>刘乾</span>
-						</div>
-						<div>
-							<span>年龄 :</span> 
-							<span>99</span>
-						</div>
-						<div>
-							<span>性别 :</span> 
-							<span>男</span>
-						</div>
-						<div>
-							<span>账号 :</span> 
-							<span>Lq372899855</span>
-						</div>
-					</div>
-				</div>
-			</li>
-			<!--个人信息-->
-			<li class="info-item">
-				<div class="row-space" style="padding-left: 5%;padding-right: 5%">
-					<h4>
-						历史记录
-					</h4>
-				</div>
-				<div class="row-center">
-					<div class="coloum-center">
-						<span>完成/参与次数: 4/5</span>
-						<span>总系数: 70</span>
-					</div>
-					<div class="coloum-center">
-						<span>成功率: 80%</span>
-						<span>完成天数: 90</span>
-					</div>
-				</div>
-			</li>
-            <!--他的拼图-->
-			<li class="info-item">
-				<div class="row-space" style="padding-left: 5%;padding-right: 5%">
-					<h4>
-						他的拼图
-					</h4>
-				</div>
-                <div class="sudoku-panel">
-                    <div class="weui-flex">
-                        <div class="weui-flex__item">weui</div>
-                        <div class="weui-flex__item">weui</div>
-                        <div class="weui-flex__item">weui</div>
-                        <div class="weui-flex__item">weui</div>
-                    </div>
-                    <a class="weui-btn weui-btn_mini weui-btn_default">请求</a>
-                </div>
-			</li>
-            <li class="info-item">
-				<div class="row-space" style="padding-left: 5%;padding-right: 5%">
-					<h4>
-						我的拼图
-					</h4>
-				</div>
-                <div class="sudoku-panel">
-                    <div class="weui-flex">
-                        <div class="weui-flex__item">weui</div>
-                        <div class="weui-flex__item">weui</div>
-                        <div class="weui-flex__item">weui</div>
-                        <div class="weui-flex__item">weui</div>
-                    </div>
-                    <a class="weui-btn weui-btn_mini weui-btn_default">赠送</a>
-                </div>
-			</li>
+		<div class="mdl-list__item weui-cell_swiped weui-cell_swiped">
+			<span class="mdl-list__item-primary-content">
+				<img src="/static/images/avatar.jpg" class="material-icons mdl-list__item-avatar">
+				<span class="item-name">乾</span>
+			</span>
 
-		</ul>
-		<script type="text/javascript" src="/static/js/jquery.min.js"></script>
-		<script type="text/javascript" src="/static/js/fastclick.js"></script>
-		<script>
-			// fast click binding
-			$(function () {
-				FastClick.attach(document.body);
-			});
-		</script>
-		<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
-		<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+		</div>
+		<div class="mdl-list__item weui-cell_swiped weui-cell_swiped">
+			<span class="mdl-list__item-primary-content">
+				<img src="/static/images/avatar.jpg" class="material-icons mdl-list__item-avatar">
+				<span class="item-name">Bob Odenkirk</span>
+			</span>
+
+		</div>
+	</div>
+
+    <div class="weui-panel weui-panel_access">
+        <div class="weui-panel__bd">
+            <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg weui-cell_swiped">
+                <div class="weui-media-box__hd">
+                    <img class="weui-media-box__thumb" src="/static/images/avatar.jpg">
+                </div>
+                <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">标题一</h4>
+                    <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>
+                </div>
+            </a>
+
+            <a href="javascript:void(0);" class="weui-media-box weui-media-box_appmsg weui-cell_swiped">
+                <div class="weui-media-box__hd">
+                    <img class="weui-media-box__thumb" src="/static/images/avatar.jpg">
+                </div>
+                <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">标题二</h4>
+                    <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>
+                </div>
+                <div class="weui-cell__ft">
+                    <a class="weui-swiped-btn weui-swiped-btn_warn delete-swipeout" href="javascript:">删除</a>
+                    <a class="weui-swiped-btn weui-swiped-btn_default close-swipeout" href="javascript:">关闭</a>
+                </div>
+            </a>
+        </div>
+    </div>
+-->
+    <div class="bd">
+        <div class="page__bd">
+            <div class="weui-cells" style="margin: 0;">
+                <div class="weui-cell weui-cell_swiped" id="">
+                    <div class="weui-cell__bd">
+                        <div class="weui-cell">
+                            <div class="weui-cell__hd">
+                                <img src="/static/images/avatar.jpg" class="" style="width: 60px;height: 60px;">
+                            </div>
+                            <div class="weui-cell__bd">
+                                <p class="item-name_1">新的朋友</p>
+                                <p class="item-name_2">小明请求添加</p>
+                            </div>
+
+                            <div class="weui-cell__ft"></div>
+                        </div>
+                    </div>
+                    <div class="weui-cell__ft">
+                        <a class="weui-swiped-btn weui-swiped-btn_warn delete-swipeout" style="line-height: 60px;" href="javascript:">删除</a>
+                        <a class="weui-btn_primary weui-swiped-btn weui-swiped-btn_default  close-swipeout" style="line-height: 60px;" href="javascript:">添加好友</a>
+                    </div>
+                </div>
+
+                <div class="weui-cell weui-cell_swiped" id="">
+                    <div class="weui-cell__bd">
+                        <div class="weui-cell">
+                            <div class="weui-cell__hd">
+                                <img src="/static/images/avatar.jpg" class="" style="width: 60px;height: 60px;">
+                            </div>
+                            <div class="weui-cell__bd">
+                                <p class="item-name_1">新的朋友</p>
+                                <p class="item-name_2">小明请求添加</p>
+                            </div>
+
+                            <div class="weui-cell__ft"></div>
+                        </div>
+                    </div>
+                    <div class="weui-cell__ft">
+                        <a class="weui-swiped-btn weui-swiped-btn_warn delete-swipeout" style="line-height: 60px;" href="javascript:">删除</a>
+                        <a class="weui-btn_primary weui-swiped-btn weui-swiped-btn_default  close-swipeout" style="line-height: 60px;" href="javascript:">添加好友</a>
+                    </div>
+                </div>
+
+                <div class="weui-cell weui-cell_swiped" id="">
+                    <div class="weui-cell__bd">
+                        <div class="weui-cell">
+                            <div class="weui-cell__hd">
+                                <img src="/static/images/avatar.jpg" class="" style="width: 60px;height: 60px;">
+                            </div>
+                            <div class="weui-cell__bd">
+                                <p class="item-name_1">新的朋友</p>
+                                <p class="item-name_2">小明请求添加</p>
+                            </div>
+
+                            <div class="weui-cell__ft"></div>
+                        </div>
+                    </div>
+                    <div class="weui-cell__ft">
+                        <a class="weui-swiped-btn weui-swiped-btn_warn delete-swipeout" style="line-height: 60px;" href="javascript:">删除</a>
+                        <a class="weui-btn_primary weui-swiped-btn weui-swiped-btn_default  close-swipeout" style="line-height: 60px;" href="javascript:">添加好友</a>
+                    </div>
+                </div>
+
+                <div class="weui-cell weui-cell_swiped" id="">
+                    <div class="weui-cell__bd">
+                        <div class="weui-cell">
+                            <div class="weui-cell__hd">
+                                <img src="/static/images/avatar.jpg" class="" style="width: 60px;height: 60px;">
+                            </div>
+                            <div class="weui-cell__bd">
+                                <p class="item-name_1">新的朋友</p>
+                                <p class="item-name_2">小明请求添加</p>
+                            </div>
+
+                            <div class="weui-cell__ft"></div>
+                        </div>
+                    </div>
+                    <div class="weui-cell__ft">
+                        <a class="weui-swiped-btn weui-swiped-btn_warn delete-swipeout" style="line-height: 60px;" href="javascript:">删除</a>
+                        <a class="weui-btn_primary weui-swiped-btn weui-swiped-btn_default  close-swipeout" style="line-height: 60px;" href="javascript:">添加好友</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{#    <script type="text/javascript" src="http://jqweui.com/dist/lib/jquery-2.1.4.js"></script>#}
+{#    <script type="text/javascript" src="http://jqweui.com/dist/lib/fastclick.js"></script>#}
+{#    <script type="text/javascript" src="http://jqweui.com/dist/js/jquery-weui.js"></script>#}
+    <script type="text/javascript" src="/static/js/jquery-2.1.4.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-weui-2.1.4.js"></script>
+    <script type="text/javascript" src="/static/js/fastclick.js"></script>
+    <script type="text/javascript" src="/static/js/public.js"></script>
+    <script>
+		// fast click binding
+		$(function () {
+			FastClick.attach(document.body);
+		});
+	</script>
+
+
+
+
+
+
+{#	<script type="text/javascript" src="/static/js/jquery.min.js"></script>#}
+{#	<script type="text/javascript" src="/static/js/fastclick.js"></script>#}
+{#	<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>#}
+{#    <script type="text/javascript" src="/static/js/jquery-weui-2.1.4.js"></script>#}
+{#	<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>#}
+{#	<script type="text/javascript" src="/static/js/material.min.js"></script>#}
+	<script>
+
+      $('.delete-swipeout').click(function () {
+        $(this).parents('.weui-cell').remove()
+      });
+      $('.close-swipeout').click(function () {
+        $(this).parents('.weui-cell').swipeout('close')
+      });
+
+
+
+
+
+		//监听Input变化,供搜索使用
+		$("#searchInput").bind('input propertychange', function(){
+		    console.log($(this).val());
+			var searchCont = $(this).val();
+			var $spanArr = $(".person-list").find(".item-name").toArray();
+			for(var i=0;i<$spanArr.length;i++){
+				var spanItem = $spanArr[i];
+				if(spanItem.innerText.search(searchCont) === -1){
+					$(spanItem).parents(".mdl-list__item").hide();
+				}
+				else{
+					$(spanItem).parents(".mdl-list__item").show();
+				}
+			}
+		});
+		//点击取消,恢复所有
+		$("#searchCancel").click(function(){
+			$(".person-list").find(".mdl-list__item").show();
+		});
+        $(".friend-detail").click(function(){
+            window.location.href = "/person/friend";
+        });
+	</script>
 </body>
 
 </html>

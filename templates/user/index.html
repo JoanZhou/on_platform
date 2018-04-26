@@ -3,41 +3,164 @@
 
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
-	<title>On!主页</title>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0 minimum-scale=0.5, user-scalable=no" />
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>个人中心</title>
 	<link rel="stylesheet" href="/static/css/weui.min.css" />
 	<link rel="stylesheet" href="/static/css/bootstrap.min.css"/>
 	<link rel="stylesheet" href="/static/css/share.css"/>
 	<link rel="stylesheet" href="/static/css/person.css" />
+    <link rel="stylesheet" href="/static/css/jquery-weui.min.css"/>
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_591099_obuxdf4g71d1jor.css"/>
+    <link rel="stylesheet" href="/static/css/public.css">
+    <style>
+        .icon-user,.icon-mubiao,.icon-huodongzhongxin{
+            font-weight: 500;
+        }
+        .iconfont_on{
+            color:rgba(31,162,255,1) !important;
+        }
+        .coloum-center{
+            padding: 10px;
+        }
+        .weui-tabbar__item.weui-bar__item_on .weui-tabbar__icon, .weui-tabbar__item.weui-bar__item_on .weui-tabbar__icon > i, .weui-tabbar__item.weui-bar__item_on .weui-tabbar__label{
+            color: #999999;
+        }
+        .weui-tabbar__label{
+            color: #999999;
+        }
+        .weui-tabbar a:visited {
+            color: #999999;
+        }
+        .weui-tabbar__item.weui-bar__item--on .weui-tabbar__label{
+            color:rgba(31,162,255,1);
+        }
+        .weui-tabbar__label{
+            line-height: 25px;
+        }
+        .wallet-card{
+            font-size: 14px;
+        }
+        a:hover{
+            color: initial;
+            text-decoration:none;
+        }
+    </style>
+    <!-- 弹窗 -->
+    <style>
+        .mask_on,.mask_on_1{
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            background: rgba(0,0,0,.6);
+        }
+        .hide_box{
+            display: none;
+            position: fixed;
+            z-index: 5000;
+            width: 80%;
+            max-width: 300px;
+            top: 50%;
+            left: 50%;
+            -webkit-transform: translate(-50%,-50%);
+            transform: translate(-50%,-50%);
+            text-align: left;
+            overflow: hidden;
+            padding: 25px;
+            font-size: 10px;
+            border-radius: 10px;
+            color:rgba(0,0,0,0.5)
+        }
+        .weui-prompt-input{
+            height: 3em;
+        }
+        .p_overflow{
+            text-overflow:ellipsis;
+            overflow:hidden;
+            white-space:nowrap;
+        }
+        .info-list{
+            margin-top: 0;
+        }
+
+    </style>
 </head>
 
-<body ontouchstart>
+<body ontouchstart >
 	<!--整个页面-->
 	<div class="top-pannel">
 		<!--个人中心-->
-		<ul class="info-list">
+		<ul class="info-list fadeInLeft_1">
 			<!--个人信息-->
 			<li class="info-item">
-				<!--<div class="row-space" style="padding-left: 5%;padding-right: 5%">
+				<!--
+                <div class="row-space" style="padding-left: 5%;padding-right: 5%">
                     <h4>
                         个人信息
                     </h4>
                     <a class="btn btn-danger" id="setting-btn">
                         设置
                     </a>
-                </div>-->
-				<div class="row-center left user-header__panel">
+                </div>
+                -->
+				<div class="row-center left user-header__panel" style="">
 					<!--
 					<img src="{{ user.headimgurl }}" class="img-circle" style="border:1px solid lightgray;width: 30%;">
 					</img>
 					-->
-					<img src="{{ user.headimgurl }}" class="img-circle"
-						 style="border:1px solid #efebe9;width: 20%;">
-					<div class="user-header__text">
-						<div style="font-size:1.2em;font-weight: 600;">{{ user.nickname }}</div>
+
+
+                    <div class="img_circle_box" style="display: inline-block;position: relative;width: 30%;">
+                        <img src="{{ user.headimgurl }}" class="img-circle pictureEnlarge"
+						 style="border:1px solid #efebe9;width:80%;margin: auto;display: block;margin-left: 10%">
+
+                    <!--
+                        {% if fools == 1 and status == 0 %}
+
+                            {%if user.user_id == 100849 %}
+                                <img src="/static/images/aprilFool/aprilFool_0_3@2x.png" id="1_fools_1" style="position: absolute;right: 0;opacity:1;height: 45px;bottom: 0;">
+                            {% else %}
+                                <img src="/static/images/aprilFool/aprilFool_0_0@2x.png" id="_fools_" style="position: absolute;width: 100%;bottom: -50px;opacity:0;height: 45px">
+                            {% endif %}
+                        {% elif fools == 1 and status == 1 %}
+                            <img src="/static/images/aprilFool/1155@2x.png" id="_fools_1" style="position: absolute;width: 100%;opacity:0;height: 120%;">
+                        {% endif %}
+                    -->
+
+                    </div>
+
+
+					<div class="user-header__text" style="max-width: 50%;overflow: hidden;">
+                        <div style="overflow: hidden;">
+                            <div style="font-size:1.1em;font-weight: 600;display:block;max-width: 70%;overflow: hidden;float: left;" >
+                                <span id="setting-nickname" class="">{{ user.nickname }}</span>
+                            </div>
+                            <div style="font-size:1.1em;font-weight: 600;display: block;width:26px;float: left;margin-left: 10px;" >
+                                <span class="setting-nickname_1" style="font-size:12px;margin-left:1px;color:  #03BC49; ">修改</span>
+                            </div>
+                        </div>
 						<div style="margin-top: 8px;color: #B6C1C8;">账号: {{ user.user_id }}</div>
 					</div>
+                    <div style="position: absolute;right:25px;top: 40px;width: 30px;">
+                        <a href="/user/share/go?user_id={{ user.user_id }}" style="display: block;">
+                            <img src="/static/images/user/share@2x.png" style="width: 100%;">
+                        </a>
+
+                    </div>
+                    <div style="position: absolute;right:25px;top: 75px;width: 60px;text-align: right;">
+                        <a href="/user/share/go?user_id={{ user.user_id }}" style="display: block;">
+                            邀请
+                        </a>
+                    </div>
 				</div>
+
 			</li>
 			<!--个人信息-->
 			<li class="info-item">
@@ -47,28 +170,56 @@
 							我的钱包
 						</h4>
 						<span class="wallet-card__entry">活动押金 :
-							<span class="wallet-card__num">{{ user.deposit }}</span>
+							<span class="wallet-card__num">{{ user.deposit }}&nbsp;元</span>
 						</span>
-						<span class="wallet-card__entry">今日收益 :
+                        <span class="wallet-card__entry">我的收益 :
+                            <span class="wallet-card__num"><span id="extra_money_add_money">{{ user.add_money|add:user.extra_money }}</span>&nbsp;元</span>
+						</span>
+
+						<span class="wallet-card__entry" style="display: none">今日收益 :
 							<span class="wallet-card__num">{{ user.today_profit }}</span>
 						</span>
-						<span class="wallet-card__entry">累计收益 :
-							<span class="wallet-card__num">{{ user.all_profit }}</span>
-						</span>
+
+                         <span class="wallet-card__entry aprilFool_" style="font-weight: bold">余&#12288;&#12288;额 :
+							<span class="wallet-card__num">{{ user.balance }}&nbsp;元</span>
+                         </span>
 					</div>
+
 					<div class="coloum-center">
-						<a class="cash-link" href="/user/cash">
-							提现
-						</a>
-						<span class="wallet-card__entry">积分 :
+
+                        <h4 style="display: block;height: auto;width: 100%;text-align: right;">
+							<a class="cash-link aprilFool_" id="aprilFool_" href="/user/cash" style="border: 1px solid #03BC49;border-radius: 5px;padding: 5px 10px;font-size: 14px;">
+                                提现
+                            </a>
+
+						</h4>
+                        <span class="wallet-card__entry">
+							&nbsp;
+						</span>
+                        <span class="wallet-card__entry">
+							&nbsp;
+						</span>
+                        <span class="wallet-card__entry">
+							&nbsp;
+						</span>
+
+                        <span class="wallet-card__entry" style="display: none">额外收益 :
+{#                            <span class="wallet-card__num">{{ extra_earn }}</span>#}
+                            <span class="wallet-card__num">{{ user.extra_money|default:'0.00' }}</span>
+						</span>
+						<span class="wallet-card__entry" style="display: none;">积分 :
 							<span class="wallet-card__num">{{ user.points }} </span>
 						</span>
-						<span class="wallet-card__entry">图币 :
+						<span class="wallet-card__entry" style="display: none;">图币 :
 							<span class="wallet-card__num">{{ user.virtual_balance }}</span>
 						</span>
-						<span class="wallet-card__entry">余额 :
+
+
+                         <span class="wallet-card__entry aprilFool_" style="display: none">余&#12288;额 :
 							<span class="wallet-card__num">{{ user.balance }}</span>
-						</span>
+                         </span>
+
+
 					</div>
 				</div>
 			</li>
@@ -77,7 +228,7 @@
 				<div class="wallet-card">
 					<h4 >历史记录</h4>
 					<div class="row-space">
-						<div class="coloum-center">
+						<div class="coloum-center" style="flex: 0.55;">
 							<span class="wallet-card__entry">完成/参与次数:
 								<span class="wallet-card__num">{{ record.finish_times }}/{{ record.join_times }}
 								</span>
@@ -85,6 +236,9 @@
 							<span class="wallet-card__entry">总系数:
 								<span class="wallet-card__num">{{ record.all_coefficient }}</span>
 							</span>
+                            <span class="wallet-card__entry">历史收益 :
+                                <span class="wallet-card__num">{{ user.all_profit }}&nbsp;元</span>
+                            </span>
 						</div>
 						<div class="coloum-center">
 							<a class="cash-link" href="/user/history" hidden>更多</a>
@@ -93,97 +247,137 @@
 								</span>
 							</span>
 							<span class="wallet-card__entry">
-								完成天数: <span class="wallet-card__num">{{ record.finish_days }}
+								完成天数: <span class="wallet-card__num">{{ record.finish_days }}</span>
 							</span>
-							</span>
+                            <span class="wallet-card__entry">
+                                &#12288;
+                            </span>
 						</div>
 					</div>
 				</div>
 			</li>
+            <div class="weui-cells" style="margin-top: 15px" >
+                <a class="weui-cell weui-cell_access" href="/user/order" style="padding: 10px 20px 10px 25px;">
+                    <div class="weui-cell__bd">
+                        <h4>我的订单</h4>
+                    </div>
+                    <div class="weui-cell__ft">
+
+                    </div>
+                </a>
+            </div>
+
 		</ul>
+
+
+        <!--
+        <div id="test-btn" class="weui-btn weui-btn_primary">
+            测试
+        </div>
+        -->
+
 		<!--导航栏, 使用微信风格-->
     	<div class="weui-tabbar">
-        <a href="/activity/index" class="weui-tabbar__item">
-            <div class="weui-tabbar__icon">
-                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                     width="56px" height="56px" viewBox="0 0 56 56" enable-background="new 0 0 56 56" xml:space="preserve">
-                <g>
-                    <path d="M47.991,16.991h-28c-2.209,0-4-1.791-4-4s1.791-4,4-4h28c2.209,0,4,1.791,4,4S50.2,16.991,47.991,16.991z"/>
-                </g>
-                <g>
-                    <path d="M35.991,30.991h-16c-2.209,0-4-1.791-4-4s1.791-4,4-4h16c2.209,0,4,1.791,4,4S38.2,30.991,35.991,30.991z"/>
-                </g>
-                <g>
-                    <path d="M41.991,44.991h-22c-2.209,0-4-1.791-4-4s1.791-4,4-4h22c2.209,0,4,1.791,4,4S44.2,44.991,41.991,44.991z"/>
-                </g>
-                <circle cx="7.991" cy="12.991" r="4"/>
-                <circle cx="7.991" cy="26.991" r="4"/>
-                <circle cx="7.991" cy="40.991" r="4"/>
-                </svg>
-            </div>
-            <p class="weui-tabbar__label">微众活动</p>
-        </a>
-        <a href="/goal/index" class="weui-tabbar__item">
-            <div class="weui-tabbar__icon">
-                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                     width="56px" height="56px" viewBox="0 0 56 56" enable-background="new 0 0 56 56" xml:space="preserve">
-                <g>
-                    <path d="M45.117,27.688c-0.463,0.078-1.52,0.416-3.171,1.013c-1.651,0.598-3.212,1.119-4.682,1.563
-                        c-1.47,0.444-2.404,0.608-2.8,0.492c-0.264-0.078-0.454-0.28-0.569-0.608c-0.115-0.327-0.19-0.665-0.223-1.013
-                        c-0.034-0.348-0.241-0.667-0.62-0.955c-0.379-0.289-0.965-0.433-1.758-0.433c-2.94,0-5.796,0.579-8.571,1.737
-                        c-0.033,0.038-0.09,0.067-0.173,0.087c-0.083,0.02-0.157,0.039-0.224,0.057c-0.067,0.019-0.149,0.028-0.247,0.03
-                        c-0.098,0.001-0.189-0.018-0.273-0.057c-0.084-0.04-0.166-0.097-0.247-0.174c-0.081-0.076-0.148-0.192-0.198-0.348
-                        c-0.051-0.156-0.1-0.349-0.149-0.58c-0.048-0.231-0.073-0.481-0.075-0.752V15.942c0-0.772,0.165-1.456,0.496-2.054
-                        c0.331-0.598,0.678-1.012,1.04-1.245l0.496-0.289c0.231-0.154,0.562-0.328,0.991-0.52c0.429-0.193,1.345-0.463,2.749-0.811
-                        c1.404-0.348,2.882-0.522,4.435-0.52c0.727,0,1.272,0.135,1.634,0.406c0.363,0.27,0.561,0.579,0.595,0.926
-                        c0.034,0.347,0.108,0.685,0.224,1.013c0.115,0.328,0.338,0.531,0.669,0.608c0.463,0.154,1.504,0.029,3.122-0.376
-                        c1.618-0.405,3.121-0.858,4.509-1.359l2.082-0.694c0.793-0.232,1.404-0.271,1.833-0.117c0.429,0.154,0.71,0.453,0.842,0.896
-                        c0.132,0.443,0.284,1.225,0.284,2.345v10.302c0,0.501-0.111,0.926-0.16,1.274c-0.05,0.348-0.232,0.724-0.545,1.128
-                        c-0.314,0.404-0.751,0.683-1.313,0.839L45.117,27.688z M45.117,27.688"/>
-                </g>
-                <g>
-                    <path d="M16,48c-1.657,0-3-1.343-3-3V13c0-1.657,1.343-3,3-3s3,1.343,3,3v32C19,46.657,17.657,48,16,48z"/>
-                </g>
-                </svg>
-            </div>
-            <p class="weui-tabbar__label">我的目标</p>
-        </a>
-        <a href="/user/index" class="weui-tabbar__item weui-bar__item--on">
-            <div class="weui-tabbar__icon">
-                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                     width="56px" height="56px" viewBox="0 0 56 56" enable-background="new 0 0 56 56" xml:space="preserve">
-                <g>
-                    <path fill="#050505" d="M27.997,2.986C15.3,2.986,5,13.281,5,25.984c0,12.703,10.3,23.003,22.997,23.003
-                        C40.7,48.986,51,38.686,51,25.984C51,13.281,40.704,2.986,27.997,2.986L27.997,2.986z M27.997,9.862
-                        c4.203,0,7.611,3.41,7.611,7.607c0,4.203-3.408,7.606-7.611,7.606c-4.198,0-7.602-3.403-7.602-7.606
-                        C20.395,13.272,23.8,9.862,27.997,9.862L27.997,9.862z M27.992,42.973c-4.188,0-8.03-1.529-10.99-4.055
-                        c-0.72-0.616-1.135-1.514-1.135-2.466c0-4.257,3.449-7.665,7.706-7.665h8.855c4.262,0,7.694,3.408,7.694,7.665
-                        c0,0.952-0.414,1.85-1.134,2.466C36.028,41.443,32.185,42.973,27.992,42.973L27.992,42.973z M27.992,42.973"/>
-                </g>
-                </svg>
-            </div>
-            <p class="weui-tabbar__label">个人中心</p>
-        </a>
-    </div>
+            <a href="/activity/index" class="weui-tabbar__item">
+                <div class="weui-tabbar__icon">
+                   <i class="iconfont icon-huodongzhongxin"></i>
+                </div>
+                <p class="weui-tabbar__label">微众活动</p>
+            </a>
+            <a href="/goal/index" class="weui-tabbar__item">
+                <div class="weui-tabbar__icon">
+                    <i class="iconfont icon-mubiao"></i>
+                </div>
+                <p class="weui-tabbar__label">我的目标</p>
+            </a>
+            <a href="/user/index" class="weui-tabbar__item weui-bar__item--on">
+                <div class="weui-tabbar__icon">
+                    <i class="iconfont icon-user iconfont_on"></i>
+                </div>
+                <p class="weui-tabbar__label">个人中心</p>
+            </a>
+        </div>
 	</div>
-	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+
+    <!--  弹窗  -->
+    <div class="hide_content">
+        <div class="mask_on" style="display: none"></div>
+        <div class="mask_on_1" style="display: none"></div>
+
+        <!--  点击提现 弹窗
+        <div class="hide_box" id="aprilFool_0_box">
+            <div>
+                <img src="/static/images/aprilFool/aprilFool_0_1@2x.png" style="width: 100%">
+            </div>
+            <div>
+                <img src="/static/images/aprilFool/aprilFool_0_2@2x.png"  style="width: 60%;display: block;margin:20px auto">
+            </div>
+        </div>
+
+        -->
+
+        <!--  点击余额 弹窗
+        <div class="hide_box" id="aprilFool_1_box">
+            <div>
+                <img src="/static/images/aprilFool/aprilFool_1_1@2x.png" style="width: 100%">
+            </div>
+            <div>
+                <img src="/static/images/aprilFool/aprilFool_1_2@2x.png"  style="width: 60%;display: block;margin:20px 0 0 25px;">
+            </div>
+        </div>
+
+
+
+        <div class="hide_box" id="aprilFool_2_box">
+            <div>
+                <img src="/static/images/aprilFool/aprilFool_2_1@2x.png" style="width: 100%">
+            </div>
+            <div>
+                <img src="/static/images/aprilFool/aprilFool_2_2@2x.png"  style="width: 60%;display: block;margin:20px auto">
+            </div>
+        </div>
+
+        -->
+        
+    </div>
+
+
+	<script type="text/javascript" src="/static/js/jquery-2.1.4.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-weui-2.1.4.js"></script>
+    <script type="text/javascript" src="/static/js/public.js"></script>
 	<script type="text/javascript" src="/static/js/fastclick.js"></script>
 	<script>
 		// fast click binding
 		$(function () {
 			FastClick.attach(document.body);
 		});
+
+        var extra_money='{{ user.add_money|floatformat:2 }}';
+        var add_money ='{{ user.extra_money|floatformat:2 }}'; //底金
+        $("#extra_money_add_money").text(parseFloat(Number(extra_money)+Number(add_money)));
+
 	</script>
-	<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
+{#	<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>#}
 	<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="/static/js/index.js"></script>
 	<script type='text/javascript' src='/static/js/swiper.min.js' charset='utf-8'></script>
+
+
 	<script>
+        var colHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        var colWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        var img_w=(colWidth-20)*0.3*0.8;
+
+        $(".user-header__text").width(colWidth-colWidth*0.3-100);
+
+        $(".img_circle_box").height(img_w);
+
 		$(document).ready(function(){
 			function resizeInput(){
 				$(this).attr('size', $(this).val().length);
 			}
 			$('input[type="text"]').each(resizeInput);
+
 		});
 		$("#usersex").change(function () {
 			var val = $(this).val().trim();
@@ -228,7 +422,235 @@
 				$.post('/api/update_user',{"data":data});
 			}
 		});
+		
+		$("#setting-nickname,.setting-nickname_1").click(function () {
+            console.log("修改姓名");
+            $.confirm("确定要修改姓名吗？", function() {
+            //点击确认后的回调函数
+                revise()
+            }, function() {
+            //点击取消后的回调函数
+            });
+        });
+		function revise() {
+		    var _name_ =$("#setting-nickname").text();
+            $.prompt({
+                title: '',
+                text: '修改昵称！',
+                input: _name_,
+                empty: false, // 是否允许为空
+                onOK: function (input) {
+                    console.log(input);
+                    //点击确认
+
+                    if (input.length > 10) {
+                        $.toptip('输入的昵称不能超过10个字符！', 'warning');
+                        $.toast("修改失败", "cancel",function () {
+
+                        });
+                        return
+                    }
+
+                    $.ajax({
+                        type: "GET",
+                        url: "/user/change_name",
+                        data:{
+                           "name":input
+                        },
+                        success: function (res) {
+                            //alert(res);
+                            if(res.status=="403"){
+                                $.toast("修改失败", "cancel");
+                                return
+                            }
+                            $("#setting-nickname").text(input);
+                            $.toast("修改成功");
+                        }
+                    });
+                },
+                onCancel: function () {
+                //点击取消
+
+                }
+            });
+        }
 	</script>
+
+    <!--  图片放大
+    <script>
+        //图片放大
+        $("body").on("click", ".pictureEnlarge", function () {
+            var src_img = $(this).attr("sta_url");
+            if(src_img==undefined || src_img=="" || src_img==null){
+                //console.log("console.log(src_img);");
+                //console.log(src_img);
+                src_img = $(this).attr("src");
+            }
+            var ImageData_ = $.photoBrowser({
+                items: [
+                    {
+                        image: src_img,
+                        caption: ""
+                    }
+                ]
+            });
+            ImageData_.open();
+        });
+
+    </script>
+
+  -->
+    <!--
+<script>
+
+    $("#test-btn").click(function(){
+        alert("点击");
+        $.ajax({
+            type: "POST",
+            url: "/user/invite",
+            data:{
+            },
+            success: function (res) {
+                alert(res.num);
+            }
+         });
+    })
+</script>
+
+
+<script>
+
+    console.log("---------------fools: {{ fools }}------------------");
+    console.log("---------------status:{{ status }}------------------");
+
+
+
+    {% if fools == 1 %}
+
+
+    {% else %}
+
+        function aprilFoolActivation(type_) {
+            console.log("req:"+type_);
+
+            $.ajax({
+                type: "POST",
+                url: "/api/foolsday/create_active",
+                data:{
+                   "req":type_
+                },
+                success: function (res) {
+                    //alert(res);
+                    console.log(res);
+                    if(type_== 0){
+                        $(".mask_on_1").show();
+                        $("#aprilFool_0_box").show();
+                    }else if(type_ == 1){
+                        $(".mask_on_1").show();
+                        $("#aprilFool_1_box").show();
+                    }
+                }
+            });
+        }
+
+        //提现 0
+        $("#aprilFool_0").click(function () {
+            //alert("点击提现");
+            aprilFoolActivation(0);
+        });
+
+        //余额 1
+        $("#aprilFool_1").click(function () {
+            //alert("点击余额");
+            aprilFoolActivation(1);
+        });
+
+        //获得4.1 并且刷新
+        $("#aprilFool_2_box").click(function () {
+            //alert("1")
+            window.location.reload();
+        });
+
+        //获取日期
+        var date_=getNowFormatDate();
+        function getNowFormatDate() {
+            var date = new Date();
+            var month = String(date.getMonth() + 1);
+            var strDate = String(date.getDate());
+            var currentdate = month+"-"+strDate;
+            if(currentdate=="4-1"){
+                return true
+            }else{
+                return false
+            }
+        }
+        console.log(date_);
+        if(date_){
+            console.log("是4月1号");
+            $(".aprilFool_").hide();
+            $("#aprilFool_0").show();
+            $("#aprilFool_1").show();
+        }else{
+            console.log("不是4月1号");
+            $("#aprilFool_0").hide();
+            $("#aprilFool_1").hide();
+        }
+
+        //关闭弹窗
+        $(".mask_on").click(function () {
+            $(".hide_box").hide();
+            $(this).hide();
+            window.location.reload();
+        });
+
+        $(".mask_on_1,#aprilFool_1_box,#aprilFool_0_box").click(function () {
+            ccc()
+        });
+
+
+        //公用
+        function ccc() {
+            $("#aprilFool_0_box").hide();
+            $("#aprilFool_1_box").hide();
+            $(".mask_on_1").hide();
+            $("#aprilFool_2_box").show();
+            $(".mask_on").show()
+        }
+
+        //提现
+        function aprilFool_0() {
+
+        }
+
+        //余额
+        function aprilFool_1() {
+
+        }
+
+    {% endif %}
+
+
+
+    {% if fools == 1 and status == 0 %}
+        var _fools_H=$("#_fools_").height()*5/6;
+        $("#_fools_").css("bottom",-_fools_H);
+        $("#_fools_").css("opacity",1);
+
+    {% elif fools == 1 and status == 1 %}
+        var _fools_H=$("#_fools_1").height()*5/24;
+        $("#_fools_1").css("top",-_fools_H);
+        $("#_fools_1").css("left",_fools_H*2/13);
+        $("#_fools_1").css("opacity",1);
+    {% else %}
+        $("#_fools_").css("opacity",0);
+        $("#_fools_1").css("opacity",0);
+    {% endif %}
+
+
+</script>
+
+
+ -->
 </body>
 
 </html>

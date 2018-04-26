@@ -2,18 +2,73 @@
 <html lang="en" style="height:100%;width:100%;">
 <head>
     <meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0 minimum-scale=0.5, user-scalable=no" />
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
 	<title>目标完成页面</title>
 	<link rel="stylesheet" href="/static/css/weui.min.css">
 	<link rel="stylesheet" href="/static/css/jquery-weui.min.css">
+    <link rel="stylesheet" href="/static/css/public.css">
 </head>
 <body ontouchstart style="height:100%;width:100%;">
-    <div style="margin:auto;text-align:center;display:absolute;padding-top:50px;padding-bottom:30px;">
+    {% if goal.status == "SUCCESS" %}
+        <div class="box_content" style="background: url('/static/images/running/finish/success_bg@2x.png') no-repeat;background-size: cover;">
+            <div class="head_img_box" style="height: 24%;display: block;
+            background: url('/static/images/running/finish/success_head_img@2x.png') no-repeat;
+            background-size: cover;border-radius: 50%;margin:auto">
+                <img src="{{ headimg }}" style="width: 86%;border-radius: 50%;margin-top:7%;margin-left: 7%;">
+            </div>
+
+            <div style="margin-top:20px;color: #999999;padding:20px;text-align: center;">
+                <p>累计收益 ：{{ goal.bonus }}元</p>
+{#                <p>剩余押金 ：{{ goal.guaranty |add:goal.down_payment }}</p>#}
+                {% if goal_type == "2" %}
+                    <p>剩余押金 ：{{ goal.guaranty |default:0 }}元</p>
+                {% else %}
+                    <p>剩余押金 ：{{ goal.guaranty |default:0 }}元+ {{ goal.down_payment|default:0 }}元</p>
+                {% endif %}
+{#                <p>剩余押金 ：{{ goal.guaranty |default:0 }}元+ {{ goal.down_payment|default:0 }}元</p>#}
+            </div>
+
+            <div style="height:max-content;">
+                <a class="weui-btn weui-btn_plain-primary" style="width:40%;top:10%;border:rgba(62,128,204,1) solid 1px;color:rgba(62,128,204,1);line-height:2em" activities_type="{{ goal_type }}" id="finish-goal-btn">结束</a>
+            </div>
+
+        </div>
+    {% else %}
+        <div class="box_content" style="background: url('/static/images/running/finish/fail_bg@2x.png') no-repeat;background-size: cover;">
+            <div class="head_img_box" style="height: 24%;display: block;
+            background: url('/static/images/running/finish/fail_head_img@2x.png') no-repeat;
+            background-size: cover;border-radius: 50%;margin:auto">
+                <img src="{{ headimg }}" style="width: 86%;border-radius: 50%;margin-top:7%;margin-left: 7%;">
+            </div>
+
+            <div style="margin-top:20px;color: #999999;padding:20px;text-align: center;">
+                <p>累计收益 ：{{ goal.bonus }}元</p>
+                {% if goal_type == "2" %}
+                    <p>剩余押金 ：{{ goal.guaranty |default:0 }}元</p>
+                {% else %}
+                    <p>剩余押金 ：{{ goal.guaranty |default:0 }}元+ {{ goal.down_payment|default:0 }}元</p>
+                {% endif %}
+
+            </div>
+
+            <div style="height:max-content;">
+                <a class="weui-btn weui-btn_plain-primary" style="width:40%;top:10%;border:rgba(62,128,204,1) solid 1px;color:rgba(62,128,204,1);line-height:2em" activities_type="{{ goal_type }}" id="finish-goal-btn">结束</a>
+            </div>
+
+        </div>
+    {% endif %}
+    <!---
+    <div style="margin:auto;text-align:center;display:block;padding-top:50px;padding-bottom:30px;">
         {% if goal.status == "SUCCESS" %}
         <img src="/static/images/target_on.png" style="width:4rem;display:inline;">
-                    {% else %}
+        {% else %}
         <img src="/static/images/target_off.png" style="width:2rem;display:inline;">
-                    {% endif %}
+        {% endif %}
 
         <p style="font-weight:600;margin-top: 20px;">
             {% if goal.status == "SUCCESS" %}
@@ -40,15 +95,21 @@
     <div style="height:max-content;display:absolute;">
         <a class="weui-btn weui-btn_plain-primary" style="width:40%;display:absolute;top:10%;" id="finish-goal-btn">结束</a>
     </div>
+
+    -->
+
     <div id="goal-id__get" hidden>{{ goal.goal_id }}</div>
     <div id="goal-type__get" hidden>{{ goal_type }}</div>
-    <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-2.1.4.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-weui-2.1.4.js"></script>
+    <script type="text/javascript" src="/static/js/public.js"></script>
 	<script type="text/javascript" src="/static/js/fastclick.js"></script>
 	<script>
     // fast click binding
     $(function () {
         FastClick.attach(document.body);
     });
+    $("iframe").detach();
     </script>
         <!--配置CSRF保护-->
     <script>
@@ -56,32 +117,154 @@
             data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
         });
     </script>
-    <script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
+{#    <script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>#}
     <script>
-        $(".weui-textarea").bind('input propertychange','textarea',function(){
-            var curLength=$(this).val().trim().length;
-            if(curLength > 199)
-            {
-                var num=$(this).val().trim().substr(0,199);
-                $(this).val(num);
-                //alert("超过字数限制，多出的字将被截断！" );
-            }
-            $("#exist-text").text(curLength);
-         });
-        $("#finish-goal-btn").click(function () {
-            $.post('/api/finish_goal', {
-                goal:$("#goal-id__get").html().trim(),
-                goal_type:$("#goal-type__get").html().trim()
-            },function (response) {
-                if(response['status'] === 403){
-                    $.toast("退还失败,<br/>请联系客服", 'cancel');
+        $(function () {
+            var colHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+            var colWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+            $(".head_img_box").width(colHeight*0.24);
+            $(".head_img_box").css("marginTop",colHeight*0.30);
+
+
+            
+            $(".weui-textarea").bind('input propertychange','textarea',function(){
+                var curLength=$(this).val().trim().length;
+                if(curLength > 199)
+                {
+                    var num=$(this).val().trim().substr(0,199);
+                    $(this).val(num);
+                    //alert("超过字数限制，多出的字将被截断！" );
                 }
-                else if(response['status'] === 200){
-                    $.toast("结算成功!");
-                    setTimeout('window.location.href = \'/activity/index\';', 2000)
-                }
+                $("#exist-text").text(curLength);
             });
-        });
+
+            //点击结算按钮
+            $("#finish-goal-btn").one("click",function(){
+                $.showLoading();
+                $(".weui-toast_content").text("结算中...");
+            {#$("#finish-goal-btn").click(function () {#}
+                var activities_type =$(this).attr("activities_type");
+                console.log(activities_type);
+                //alert(activities_type);
+
+
+
+            /*
+                $.hideLoading();
+                $.toast("结束维护中，<br/>请今天后重试", 'cancel');
+                return
+
+
+                */
+                if(activities_type=="2"){
+                    //alert(activities_type);
+
+                    /*
+
+                    $.hideLoading();
+                    $.toast("结算维护中<br/>请今天后重试", 'cancel');
+                    return
+                    */
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/delete_read_goal",
+                        data:{
+                            goal:$("#goal-id__get").html().trim(),
+                            goal_type:$("#goal-type__get").html().trim()
+                        },
+                        success: function (response) {
+                            if(response['status'] === 403){
+                                $.hideLoading();
+                                $.toast("结算失败<br/>请联系客服", 'cancel');
+                                setTimeout('window.location.href = \'/activity/index\';', 2000)
+                            }
+                            else if(response['status'] === 200){
+                                $.hideLoading();
+                                $.toast("结算成功!");
+                                setTimeout('window.location.href = \'/activity/index\';', 2000)
+                            }
+                        },
+                        error:function(response){
+                            $.hideLoading();
+                            $.toast("结算失败<br/>请联系客服", 'cancel');
+                            setTimeout('window.location.href = \'/activity/index\';', 2000)
+                        }
+                    });
+
+                    /*
+                    $.post('/api/delete_read_goal', {
+                        goal:$("#goal-id__get").html().trim(),
+                        goal_type:$("#goal-type__get").html().trim()
+                    },function (response) {
+                        if(response['status'] === 403){
+                            $.toast("结算失败,<br/>请联系客服", 'cancel');
+                            setTimeout('window.location.href = \'/activity/index\';', 2000)
+                        }
+                        else if(response['status'] === 200){
+                            $.toast("结算成功!");
+                            setTimeout('window.location.href = \'/activity/index\';', 2000)
+                        }
+                    });
+                    */
+
+                }else if(activities_type=="1"){
+
+                    /*
+                    $.toast("结算维护中<br/>请今天后重试", 'cancel');
+                    return
+                    */
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/delete_run_goal",
+                        data:{
+                            goal:$("#goal-id__get").html().trim(),
+                            goal_type:$("#goal-type__get").html().trim()
+                        },
+                        success: function (response) {
+                            if(response['status'] === 403){
+                                $.hideLoading();
+                                $.toast("结算失败<br/>请联系客服", 'cancel');
+                                setTimeout('window.location.href = \'/activity/index\';', 2000)
+                            }
+                            else if(response['status'] === 200){
+                                $.hideLoading();
+                                $.toast("结算成功!");
+                                setTimeout('window.location.href = \'/activity/index\';', 2000)
+                            }
+                        },
+                        error:function(response){
+                            $.hideLoading();
+                            $.toast("结算失败<br/>请联系客服", 'cancel');
+                            setTimeout('window.location.href = \'/activity/index\';', 2000)
+                        }
+                    });
+                    /*
+
+                    $.post('/api/delete_run_goal', {
+                        goal:$("#goal-id__get").html().trim(),
+                        goal_type:$("#goal-type__get").html().trim()
+                    },function (response) {
+                        if(response['status'] === 403){
+                            $.toast("结算失败,<br/>请联系客服", 'cancel');
+                            setTimeout('window.location.href = \'/activity/index\';', 2000)
+                        }
+                        else if(response['status'] === 200){
+                            $.toast("结算成功!");
+                            setTimeout('window.location.href = \'/activity/index\';', 2000)
+                        }
+                    });
+
+                    */
+                }
+
+
+            });
+
+        })
+
+
+
     </script>
 </body>
 </html>

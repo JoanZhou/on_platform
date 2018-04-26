@@ -2,10 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0 minimum-scale=0.5, user-scalable=no" />
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <title>On!</title>
 </head>
 <link rel="stylesheet" href="/static/css/buttons.min.css">
+<link rel="stylesheet" href="/static/css/public.css">
+<link rel="stylesheet" href="/static/css/jquery-weui.min.css">
+<link rel="stylesheet" href="/static/css/weui.min.css">
 <style>
     html, body{
         width: 100%;
@@ -48,41 +56,85 @@
         <p style="margin-bottom: 5px;color:#1fa2ff;font-size: 1.5rem;font-weight: 400;">
             目标生成成功!
         </p>
-        <p style="margin-top:5px; color: #000;font-size: 1rem;font-weight: 600;">{{ goal_intro }}</p>
+        <p style="margin-top:5px; color: #000;font-size:0.8rem;font-weight: 600;">{{ goal_intro }}</p>
     </div>
-    <div class="target-bottom__layer">
+    <div class="target-bottom__layer" style="overflow: hidden">
         <p style="margin-bottom: 10px;color: #B6C1C8;font-size: 0.8rem;font-weight: 600;">识别二维码进入活动群参与更多活动</p>
         {% if activity == "0" %}
-        <img src="/static/images/on_share_sleep.jpg">
+        <img src="/static/images/on_share/on_share_sleep.jpg">
         {% elif activity == "1" %}
-        <img src="/static/images/on_share_run.jpg">
+        <div class="qqGroupCode_box" style="opacity:1;display: block;height:initial;width: 90%;margin: 0 auto;overflow: hidden">
+            <div class="swiper-container_on_share_run" style="display: block;">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide" data-link="#">
+                        <img src="/static/images/on_share/on_share_run_1.jpg" style="margin: 0 auto 25px;display: block;width: 60%" >
+                    </div>
+                    <div class="swiper-slide" data-link="#">
+                        <img src="/static/images/on_share/on_share_run_2.jpg" style="margin: 0 auto 25px;display: block;;width: 60%" >
+                    </div>
+                </div>
+            </div>
+        </div>
         {% else %}
-        <img src="/static/images/on_share_reading.jpg">
+        <img src="/static/images/on_share/on_share_read_1.jpg">
         {% endif %}
-        <p style="margin-top:0;margin-bottom: 20px;color: #B6C1C8;font-size: 1rem;font-weight: 600;">快点击右上角分享给好友们吧！</p>
-        <a href="#" id="close-btn" class="button button-primary button-pill">完成</a>
+{#        <p style="margin-top:0;margin-bottom: 20px;color: #B6C1C8;font-size: 1rem;font-weight: 600;">快点击右上角分享给好友们吧！</p>#}
+
+    </div>
+    <div style="width: 60%;display: block;margin: auto;">
+        <a href="#" id="close-btn" class="button button-primary button-pill" style="display: block;margin: auto;width: 80%">完成</a>
     </div>
 </body>
-<script type="text/javascript" src="/static/js/jquery.min.js"></script>
-<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
-<script>
-    {{ WechatJSConfig|safe}}
-</script>
-<script>
-    wx.ready(function() {
-        wx.onMenuShareTimeline({
-            title: '2018年到了，敢不敢和我一起立个Flag?', // 分享标题
-            link: 'https://mp.weixin.qq.com/s?__biz=MzI2Mjc4OTU4Ng==&mid=2247483757&idx=1&sn=bad525c9dfd25e2afc74608058c2210d&chksm=ea4481d0dd3308c670620a8c9ada954888e37a618710ff0dbe41942fc2555f495a980ece56e3#rd', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-            imgUrl: 'http://wechat.onmytarget.cn/static/images/on_logo.jpeg', // 分享图标
-            success: function () {
-                // 用户确认分享后执行的回调函数
-            },
-            cancel: function () {
-            }
+    <script type="text/javascript" src="/static/js/jquery-2.1.4.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-weui-2.1.4.js"></script>
+    <script type="text/javascript" src="/static/js/public.js"></script>
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <script type='text/javascript' src='/static/js/swiper.min.js' charset='utf-8'></script>
+    <script>
+        var swiper_on_share = new Swiper('.swiper-container_on_share_run', {
+            //autoplay: true,
+            loop:true,
         });
-    });
-    $("#close-btn").click(function () {
-        window.location.href = "/activity/index";
-    });
-</script>
+    </script>
+
+    <script>
+        $("iframe").detach();
+        {{ WechatJSConfig|safe}}
+    </script>
+    <script>
+         wx.ready(function() {
+            wx.showMenuItems({
+                menuList: [
+                    'menuItem:share:appMessage', // 阅读模式
+                    'menuItem:share:timeline', // 分享到朋友圈
+                    "menuItem:copyUrl",
+                    "menuItem:favorite",
+                    "menuItem:profile"
+              ],
+            });
+            wx.onMenuShareTimeline({
+                title: '2018年到了，敢不敢和我一起立个Flag?', // 分享标题
+                link: 'https://mp.weixin.qq.com/s?__biz=MzI2Mjc4OTU4Ng==&mid=2247483757&idx=1&sn=bad525c9dfd25e2afc74608058c2210d&chksm=ea4481d0dd3308c670620a8c9ada954888e37a618710ff0dbe41942fc2555f495a980ece56e3#rd', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                imgUrl: 'http://wechat.onmytarget.cn/static/images/on_logo.jpeg', // 分享图标
+                success: function () {
+                    // 用户确认分享后执行的回调函数
+                },
+                cancel: function () {
+                }
+            });
+            wx.onMenuShareAppMessage({
+                title: '2018年到了，敢不敢和我一起立个Flag?', // 分享标题
+                link: 'https://mp.weixin.qq.com/s?__biz=MzI2Mjc4OTU4Ng==&mid=2247483757&idx=1&sn=bad525c9dfd25e2afc74608058c2210d&chksm=ea4481d0dd3308c670620a8c9ada954888e37a618710ff0dbe41942fc2555f495a980ece56e3#rd', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                imgUrl: 'http://wechat.onmytarget.cn/static/images/on_logo.jpeg', // 分享图标
+                success: function () {
+                    // 用户确认分享后执行的回调函数
+                },
+                cancel: function () {
+                }
+            });
+        });
+        $("#close-btn").click(function () {
+            window.location.href = "/activity/index";
+        });
+    </script>
 </html>

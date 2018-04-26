@@ -7,28 +7,74 @@ import decimal
 import requests
 from django.conf import settings
 import os
+from .QR_invite import user_qrcode, save_qrcode
+from logging import getLogger
+
+# from on.activities.running.models import RunningGoal
+
+
+logger = getLogger("address")
+
 
 class UserManager(models.Manager):
-
     # 提现
     def clear_balance(self, user_id):
         user = self.get(user_id=user_id)
         user.balance = decimal.Decimal(0)
         user.save()
 
+    # 使用余额
+    def use_balance(self, user_id, pay_delay):
+        user = self.get(user_id=user_id)
+        user.balance += decimal.Decimal(pay_delay)
+        user.save()
+
     # 新进账的钱, 要同时增加累计收益与余额
     def update_balance(self, user_id, pay_delta):
         user = self.get(user_id=user_id)
-        user.balance += decimal.Decimal(pay_delta)
-        user.all_profit += pay_delta
-        user.today_profit += pay_delta
+        # 累计收益
+        user.add_money += decimal.Decimal(pay_delta)
+        # 所有收益
+        user.all_profit += decimal.Decimal(pay_delta)
+        # 今日收益
+        user.today_profit += decimal.Decimal(pay_delta)
+        user.save()
+
+    # 增加用户的额外收益
+    def updata_extra(self, user_id, pay_delta):
+        user = self.get(user_id=user_id)
+        user.extra_money += decimal.Decimal(pay_delta)
         user.save()
 
     # 更新用户的押金，是由微信支付后得到的
     def update_deposit(self, user_id, pay_delta):
         user = self.get(user_id=user_id)
         user.deposit += decimal.Decimal(pay_delta)
+        if user.deposit<0:
+            user.deposit=0
         user.save()
+
+    # 当用户结束活动之后，将获取到的金额存储到余额中
+    def save_balance(self, user_id, price, bonus):
+        user = self.get(user_id=user_id)
+        user.balance += decimal.Decimal(price)
+        # 活动结束之后，将用户的累计收益改为0
+        print("开始修改累计收益{}".format(price))
+        user.add_money -= bonus
+        print("将用户的累计收益改为0")
+        user.extra_money = 0
+        print("将用户的额外收益改成0")
+        print("修改累计收益成功{}".format(user.add_money))
+        user.save()
+
+    # 活动结束之后处理用户的其他收益
+    def read_handle(self, user_id, bonus):
+        user = self.get(user_id=user_id)
+        user.balance += decimal.Decimal(bonus)
+        user.add_money -= decimal.Decimal(bonus)
+        user.save()
+
+    # 额外收益处理
 
     def get_next_id(self):
         return self.count()
@@ -48,9 +94,10 @@ class UserManager(models.Manager):
         # 获取imgurl,并将其存入static中user的avatar里
         response = requests.get(imgurl)
         # 文件存储的实际路径
-        filePath = os.path.join(settings.AVATAR_DIR, str(user_id)+".jpg")
+        filePath = os.path.join(settings.AVATAR_DIR, str(user_id) + ".jpg")
         # 引用所使用的路径
-        refPath = os.path.join(settings.AVATAR_ROOT, str(user_id)+".jpg")
+        refPath = os.path.join(settings.AVATAR_ROOT, str(user_id) + ".jpg")
+        nickname = nickname
         # 写入文件内容
         with open(filePath, 'wb') as f:
             f.write(response.content)
@@ -58,10 +105,18 @@ class UserManager(models.Manager):
         user = self.create(user_id=user_id,
                            sex=sex,
                            wechat_id=openid,
-                           nickname=nickname,
+                           # nickname="{}".format(nickname.encode()),
+                           nickname=user_id,
                            headimgurl=refPath)
         # 创建用户历史记录数据表
         UserRecord.objects.create_record(user=user)
+        try:
+            save_qrcode(user.user_id)
+        except Exception as e:
+            print("生成用户的二维码失败", e)
+
+        # 创建用户邀请数量表
+        # Invitenum.objects.create(user_id=user_id,invite_num=0,earn_more=0)
         return user
 
     # 通过openid获取用户
@@ -74,6 +129,7 @@ class UserManager(models.Manager):
 
     # 获取用户的收货地址
     def get_address(self, user_id):
+        # get_or_create方法会根据其参数，从数据库中查询符合条件的记录，如果没有符合条件的记录，则会依据参数创建一条新纪录。
         address, is_create = self.get_or_create(user_id=user_id)
         if not is_create:
             return address
@@ -82,17 +138,20 @@ class UserManager(models.Manager):
 
     # 修改用户的收货地址
     def update_address(self, user, field_dict):
+        # 将手机号单独取出来
         try:
             number = int(field_dict['phone'])
         except Exception:
             number = None
+        # 将手机号从字典数据中弹出,此时那个字典里面没有手机号
         field_dict.pop('phone')
+        # **是将字典里面的数据变成键=值的状态
         self.filter(user=user).update(phone=number, **field_dict)
         user_address = self.filter(user=user)[0]
         # 只要修改收货地址，即更新尚未发货的订单的收货地址
-        UserOrder.objects.filter(user_id=user.user_id).filter(delivery_time=None).update(owner_name=user_address.name,
-                                                                                         address=user_address.address,
-                                                                                         owner_phone=user_address.phone)
+        # UserOrder.objects.filter(user_id=user.user_id).filter(delivery_time=None).update(owner_name=user_address.name,
+        #                                                                                  address=user_address.address,
+        #                                                                                  owner_phone=user_address.phone)
 
     # 检查用户的收货地址是否完整，用于决定是否要发送提醒
     def address_is_complete(self, user):
@@ -107,6 +166,7 @@ class UserManager(models.Manager):
 
 
 # 记录用户的信息表，不需要冗余数据
+
 class UserInfo(models.Model):
     """ Extending Django User Model Using a One-To-One Link
         Profile Model, based on WeChat User API
@@ -132,11 +192,17 @@ class UserInfo(models.Model):
     balance = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     # 图币
     virtual_balance = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    # 累计收益
-    all_profit = models.FloatField(default=0)
+    # 所有收益
+    all_profit = models.DecimalField(default=0, max_digits=12, decimal_places=2)
     # 今日收益
-    today_profit = models.FloatField(default=0)
+    today_profit = models.DecimalField(default=0, max_digits=12, decimal_places=2)
+    # 额外收益
+    extra_money = models.DecimalField(default=0, max_digits=12, decimal_places=2)
+    # 累计收益
+    add_money = models.DecimalField(default=0, max_digits=12, decimal_places=2)
     objects = UserManager()
+    # def __str__(self):
+    #     return self.nickname
 
 
 # 交易的管理模型，管理所有的收款，退款与提现
@@ -174,11 +240,12 @@ class UserPayManager(models.Manager):
                     time_end=trade_data['time_end'])
 
     # 增加用户提现记录
-    def create_withdraw(self, openid, amount, trade_data):
+    def create_withdraw(self, openid, amount, trade_data, user_id):
         self.create(openid=openid,
                     payment_no=trade_data['payment_no'],
                     partner_trade_no=trade_data['partner_trade_no'],
-                    amount=amount)
+                    amount=amount,
+                    user_id=user_id)
 
     # 获取用户退款记录
     def create_refund(self, openid, goal_id):
@@ -197,7 +264,7 @@ class UserPayManager(models.Manager):
             goal = sub_model.objects.filter(user_id=user.user_id).filter(goal_id=goal_id)
             if goal:
                 goal = goal.first()
-                amount = int(float(goal.guaranty + goal.down_payment)*100)
+                amount = int(float(goal.guaranty + goal.down_payment) * 100)
                 break
         if settings.DEBUG:
             trade = trade.first()
@@ -232,25 +299,26 @@ class UserTrade(models.Model):
     # 交易类型 : JSAPI，NATIVE，APP，MICROPAY
     trade_type = models.CharField(max_length=255)
     # 交易状态 : SUCCESS / Others
-    trade_state = models.CharField(null=False,max_length=255)
+    trade_state = models.CharField(null=False, max_length=255)
     # 银行标识
-    bank_type = models.CharField(null=True,max_length=255)
+    bank_type = models.CharField(null=True, max_length=255)
     # 以分为单位的订单金额
     total_fee = models.IntegerField(null=False)
     # 根据优惠券计算出的实际支付金额
     cash_fee = models.IntegerField(null=False)
     # 货币类型
-    fee_type = models.CharField(null=True,max_length=255)
+    fee_type = models.CharField(null=True, max_length=255)
     # 微信支付订单号
-    transaction_id = models.CharField(null=False,max_length=255)
+    transaction_id = models.CharField(null=False, max_length=255)
     # 商户订单号
-    out_trade_id = models.CharField(null=False,max_length=255)
+    out_trade_id = models.CharField(null=False, max_length=255)
     # 支付完成的时间
     time_end = models.CharField(null=False, max_length=255)
 
     objects = UserPayManager()
 
 
+# TODO增加用户的id字段
 # 用户提现记录
 class UserWithdraw(models.Model):
     trade_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -264,7 +332,23 @@ class UserWithdraw(models.Model):
     payment_no = models.CharField(null=True, max_length=255)
     # 提现时间
     finish_time = models.DateTimeField(null=False, default=timezone.now)
+    # 用户的user_id
+    user_id = models.IntegerField(default=0)
     objects = UserPayManager()
+
+
+class newUserWithdraw(models.Model):
+    withdraw_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user_id = models.IntegerField(null=False)
+    openid = models.CharField(null=False, max_length=255)
+    amount = models.DecimalField(default=0, max_digits=12, decimal_places=2)
+    partner_trade_no = models.CharField(null=True, max_length=255)
+    # 微信支付订单号
+    payment_no = models.CharField(null=True, max_length=255)
+    create_time = models.DateTimeField(null=False, default=timezone.now)
+
+    class Meta:
+        db_table = "on_newwithdraw"
 
 
 # 活动结束用户退款记录
@@ -272,7 +356,7 @@ class UserRefund(models.Model):
     # refund_id 将作为退款订单中的 out_refund_no
     refund_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # transaction_id 将作为退款记录关联的订单号
-    transaction_id = models.CharField(null=False,max_length=255)
+    transaction_id = models.CharField(null=False, max_length=255)
     # 订单总金额，即当时申请订单的总金额数
     total_fee = models.IntegerField(null=False, default=1)
     # 退款总金额，即最终退还给用户的押金数
@@ -300,6 +384,7 @@ class UserSettlement(models.Model):
 
 
 class UserRelation(models.Model):
+    # 这个是关系id，每一个用户对应一个关系，id值是唯一的
     relation_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # 用户的ID
     user_id = models.UUIDField(null=False)
@@ -310,7 +395,59 @@ class UserRelation(models.Model):
     # 建立关系的时间
     create_time = models.DateTimeField(auto_created=True)
     # 备注, 由于备注存在双向关系
-    remark = models.CharField(null=True,max_length=255)
+    remark = models.CharField(null=True, max_length=255)
+
+
+class UserInvite(models.Model):
+    # 这个是关系id，每一个用户对应一个关系，id值是唯一的
+    relation_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    #
+    user_id = models.IntegerField(default=0)
+    # 被邀请人的openid
+    invite = models.CharField(null=False, max_length=225)
+    # 建立关系的时间
+    create_time = models.DateTimeField(auto_created=True)
+    # 是否参与愚人节活动
+    fools_day = models.IntegerField(null=False, default=0)
+
+    class Meta:
+        db_table = "on_userinvite"
+
+
+# 建立一个临时的用户邀请数量记录表，记录每个用户邀请了多少人
+class InvitenumManager(models.Manager):
+    # 更新邀请人的数量
+    def undate_num(self, user_id):
+        user = self.get(user_id=user_id)
+        user.invite_num += 1
+        user.save()
+
+    # 更新用户的收益
+    def earning(self, user_id):
+        user = self.get(user_id=user_id)
+        user.earn_more += 0.5
+        user.save()
+
+    # 统计用户邀请数量
+    def count_num(self, user_id):
+        user = self.get(user_id=user_id)
+        num = user.invite_num
+        return num
+
+
+class Invitenum(models.Model):
+    # 主键
+    id = models.IntegerField(primary_key=True, default=0)
+    # 用户
+    user_id = models.IntegerField(default=0)
+    # 邀请用户的数量
+    invite_num = models.IntegerField(default=0)
+    # 增加用户收益
+    earn_more = models.FloatField(default=0)
+    objects = InvitenumManager()
+
+    class Meta:
+        db_table = "on_invitenum"
 
 
 class UserRecordManager(models.Manager):
@@ -337,18 +474,23 @@ class UserRecordManager(models.Manager):
     def create_record(self, user):
         self.create(user=user)
 
+    # #用户结算之后，将用户的打卡天数重置为0
+    # def clear_record(self,user_id):
+    #     record = self.get(user_id=user_id)
+    #     record.
+
 
 class UserRecord(models.Model):
     # 记录对应的用户
     user = models.ForeignKey(UserInfo, on_delete=models.PROTECT, related_name="record")
     # 完成的次数
-    finish_times = models.IntegerField(null=False, default=0)
+    finish_times = models.IntegerField(null=True, default=0)
     # 参加的次数
-    join_times = models.IntegerField(null=False, default=0)
+    join_times = models.IntegerField(null=True, default=0)
     # 完成的天数
-    finish_days = models.IntegerField(null=False, default=0)
+    finish_days = models.IntegerField(null=True, default=0)
     # 总系数
-    all_coefficient = models.FloatField(null=False, default=0)
+    all_coefficient = models.FloatField(null=True, default=0)
 
     objects = UserRecordManager()
 
@@ -366,6 +508,10 @@ class UserTicketManager(models.Manager):
         # 有主键约束
         try:
             exist_ticket = self.get(goal_id=goal_id, ticket_type=ticket_type)
+            # goal = RunningGoal.objects.get(goal_id=goal_id)
+            # if goal.is_day_now():
+            #     return
+            # else:
             if exist_ticket and exist_ticket.number > 0:
                 # 更新数据库里票券的数量
                 exist_ticket.number = exist_ticket.number - 1
@@ -393,6 +539,8 @@ class UserTicketManager(models.Manager):
 """
 用户卡券对应表，不同的目标有不同的券
 """
+
+
 class UserTicket(models.Model):
     goal_id = models.UUIDField(null=False, default=uuid.uuid4)
     TICKET_CHOICES = (
@@ -404,6 +552,7 @@ class UserTicket(models.Model):
     ticket_type = models.CharField(max_length=32, choices=TICKET_CHOICES)
     number = models.IntegerField(default=0)
     objects = UserTicketManager()
+
     @property
     def tic_type(self):
         return self.get_ticket_type_display()
@@ -416,9 +565,12 @@ class UserTicketUseageManager(models.Manager):
     def insert_record(self, goal_id, ticket_type, time):
         self.create(goal_id=goal_id, ticket_type=ticket_type, useage_time=time)
 
+
 """
 用户卡券使用记录表，主要用于查看第二天用户是否要进行延时
 """
+
+
 class UserTicketUseage(models.Model):
     goal_id = models.UUIDField(null=False, default=uuid.uuid4)
     TICKET_CHOICES = (
@@ -432,15 +584,17 @@ class UserTicketUseage(models.Model):
     objects = UserTicketUseageManager()
 
 
-
 """
 收货地址登记表
 """
+
+
 class UserAddress(models.Model):
     user = models.OneToOneField(UserInfo, primary_key=True, null=False)
     phone = models.CharField(null=True, max_length=13)
     address = models.CharField(null=True, max_length=255)
     name = models.CharField(null=True, max_length=32)
+    area = models.CharField(null=True, max_length=255)
     objects = UserManager()
 
 
@@ -453,28 +607,34 @@ STATUS_CHOICES = (
 
 class UserOrderManager(models.Manager):
     # 为阅读活动创立一个订单，如果返回None则说明信息填写不完整，不为空则说明信息填写完整
-    def create_reading_goal_order(self, user_id, order_name, order_money, order_image):
+    def create_reading_goal_order(self, user_id, order_name, order_money, order_image, goal_id):
         user = UserInfo.objects.get(user_id=user_id)
         address_list = UserAddress.objects.filter(user=user)
         if not address_list:
             address_obj = UserAddress.objects.get_address(user_id=user_id)
         else:
             address_obj = address_list.first()
+        activity_type = 2
         # 这里无需判断收货地址是否齐全
-        order = self.create(owner_name=address_obj.name,
-                            owner_phone=address_obj.phone,
+        order = self.create(owner_name="",
+                            owner_phone="",
                             user_id=user_id,
-                            address=address_obj.address,
+                            address="",
                             order_money=order_money,
                             order_name=order_name,
                             order_image=order_image,
-                            order_count=1)
+                            order_count=1,
+                            area="",
+                            goal_id=goal_id,
+                            activity_type=activity_type)
         return order
 
 
 """
 订单登记表
 """
+
+
 class UserOrder(models.Model):
     order_id = models.UUIDField(primary_key=True, null=False, default=uuid.uuid4)
     # 收货人的姓名
@@ -506,7 +666,19 @@ class UserOrder(models.Model):
     # 物品数量
     order_count = models.IntegerField(null=False, default=1)
     # 备注信息，比如可以备注其关联的目标id等
-    remarks = models.CharField(null=False, max_length=255)
+    remarks = models.CharField(null=True, max_length=255)
+    area = models.CharField(null=True, max_length=255)
+    # 确认订单
+    is_no_confirm = models.IntegerField(null=False, default=0)
+    goal_id = models.UUIDField(null=True, default=uuid.uuid4)
+    ACTIVITY_CHOICES = (
+        (u'0', u'作息'),
+        (u'1', u'跑步'),
+        (u'2', u'购书阅读1期'),
+        # (u'2', u'购书阅读2期')
+    )
+    # 活动类型
+    activity_type = models.CharField(max_length=16, choices=ACTIVITY_CHOICES)
 
     objects = UserOrderManager()
 
@@ -517,3 +689,92 @@ def get_son_models(model):
     for sub_model in model.__subclasses__():
         all_sub_models[sub_model.__name__] = sub_model
     return all_sub_models
+
+
+class FoolsDayManager(models.Manager):
+    # 微信用户user是否存在
+    def check_user(self, user_id):
+        users = self.filter(user_id=user_id)
+        if users:
+            return users[0]
+        else:
+            return None
+
+    # 用户增加积分
+    def add_points(self, user_id):
+        user = self.get(user_id=user_id)
+        print("开始增加")
+        user.add_point += 3
+        print("增加成功")
+        user.save()
+
+    # 用户减少积分
+    def reduce_points(self, user_id):
+        user = self.get(user_id=user_id)
+        print("开始减少")
+        user.reduce_point -= 1
+        print("减少成功")
+        user.save()
+
+    # 更新用户积分
+    def update_point(self, user_id):
+        user = self.get(user_id=user_id)
+        user.point_all = user.add_point + user.reduce_point
+        user.save()
+
+    # 用户参加活动
+    def join_act(self, user_id):
+        user = self.get(user_id=user_id)
+        user.is_no_join = 1
+        user.save()
+
+    # 判断用户是否参加了愚人节活动
+    def join_in_fools(self, user_id):
+        # 先判断用户是否激活了活动
+        user = self.filter(user_id=user_id)
+        if len(user) > 0:
+            if user[0].is_no_join:
+                return True
+            else:
+                return False
+        else:
+            return False
+
+
+class FoolsDay(models.Model):
+    # 用户的活动id
+    goal_id = models.UUIDField(primary_key=True, null=False, default=uuid.uuid4)
+    # 用户id
+    user_id = models.IntegerField(default=0)
+    # 用户的加积分
+    add_point = models.IntegerField(null=False, default=0)
+    # 用户减去的积分
+    reduce_point = models.IntegerField(null=False, default=0)
+    # 用户的总积分
+    point_all = models.IntegerField(null=False, default=0)
+    # 用户状态
+    status = models.IntegerField(null=False, default=0)
+    # 用户的参加状态
+    is_no_join = models.IntegerField(null=False, default=0)
+    objects = FoolsDayManager()
+
+    class Meta:
+        db_table = "on_foolsday"
+
+
+class TutorialManager(models.Manager):
+    pass
+
+
+class Tutorial(models.Model):
+    user_id = models.IntegerField(primary_key=True, default=0, null=False)
+    times_in_homepage = models.IntegerField(default=0, null=True)
+    times_in_running = models.IntegerField(default=0, null=True)
+    times_in_read = models.IntegerField(default=0, null=True)
+    times_in_sleep = models.IntegerField(default=0, null=True)
+    objects = TutorialManager()
+
+    class Meta:
+        db_table = "on_tutorial"
+
+

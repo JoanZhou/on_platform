@@ -9,6 +9,8 @@ from django.template import Template, Context
 from wechatpy.utils import random_string, to_text
 import time
 import os
+import requests
+import json
 from django.conf import settings
 
 AppSecret = "23f0462bee8c56e09a2ac99321ed9952"
@@ -23,7 +25,36 @@ wx.config({
     timestamp: {{timestamp}},
     nonceStr: \'{{nonceStr}}\',
     signature: \'{{signature}}\',
-    jsApiList:[\'chooseImage\',\'previewImage\',\'uploadImage\',\'downloadImage\',\'onMenuShareTimeline\',\'chooseWXPay\']
+    jsApiList:[
+    \'chooseImage\',
+    \'previewImage\',
+    \'uploadImage\',
+    \'downloadImage\',
+    \'onMenuShareTimeline\',
+    \'chooseWXPay\',
+    \'onMenuShareAppMessage\',
+    \'checkJsApi\',
+    \'translateVoice\',
+    \'startRecord\',
+    \'stopRecord\',
+    \'onVoiceRecordEnd\',
+    \'playVoice\',
+    \'onVoicePlayEnd\',
+    \'pauseVoice\',
+    \'stopVoice\',
+    \'uploadVoice\',
+    \'downloadVoice\',
+    \'getNetworkType\',
+    \'openLocation\',
+    \'getLocation\',
+    \'hideOptionMenu\',
+    \'showOptionMenu\',
+    \'closeWindow\',
+    \'hideMenuItems\',
+    \'showMenuItems\',
+    \'hideAllNonBaseMenuItem\',
+    \'showAllNonBaseMenuItem\',
+    ]
 });
 '''
 ApiKey = "Kp1b4lH5z3n0DqGxu2IcQsV6F7PUWvmZ"

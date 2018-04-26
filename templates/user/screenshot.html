@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0 minimum-scale=0.5, user-scalable=no" />
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title></title>
+    <link rel="stylesheet" href="/static/css/weui.min.css"/>
+{#    <link rel="stylesheet" href="/static/css/bootstrap.min.css"/>#}
+    <link rel="stylesheet" href="/static/css/jquery-weui.min.css"/>
+{#    <link rel="stylesheet" href="/static/css/index.css"/>#}
+{#    <link rel="stylesheet" href="/static/css/share.css"/>#}
+{#    <link rel="stylesheet" href="//at.alicdn.com/t/font_591099_cj3jntyolxxenrk9.css"/>#}
+    <link rel="stylesheet" href="/static/css/public.css">
+{#    <link rel="stylesheet" href="/static/css/material.min.css">#}
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .container{
+            width: 92%;
+            display: block;
+            margin: 10px auto;
+            box-shadow: 2px 4px 10px #666666;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .box_content{
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            right: 0;
+        }
+        .nickname{
+            color: #fff;
+            text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5), 0 2px 0 rgba(0, 0, 0, 0.5), 0 2px 0 rgba(0, 0, 0, 0.5), 0 2px 0 rgba(0, 0, 0, 0.5), 0 2px 0 rgba(0, 0, 0, 0.5),
+            0 2px 2px rgba(0, 0, 0, 0.5), 0 0 2px rgba(0, 0, 0, 0.5),
+             0 2px 2px rgba(0, 0, 0, 0.5), 0 2px 2px rgba(0, 0, 0, 0.5), 0 2px 2px rgba(0, 0, 0, 0.5), 0 2px 2px rgba(0, 0, 0, 0.2), 0 10px 10px rgba(0, 0, 0, 0.15);
+            -webkit-transition: .2s all linear;
+            text-align: center;
+            font-weight: bold;
+            font-size:1rem;
+            width: 300%;
+            position: absolute;
+            margin: auto;
+            display:block;
+            right: -100%;
+            margin-top: 20px;
+        }
+        p{
+            margin: 0;
+        }
+        body{
+            background-color: white;
+        }
+    </style>
+
+
+</head>
+<body>
+<div style="width: 100%;height: 100%">
+    <div style="display: block; position: relative">
+        <img id="goal_img" src="/static/images/goal/0@2x.png" style="width: 100%;opacity: 0;">
+        <div class="box_content"  style="width: 22%;position: absolute;margin-top: 30px;">
+            <img  src="{{ headimgurl }}" style="width: 100%;border-radius: 50%">
+            <p class="nickname" style="opacity: 0">{{ nickname }}</p>
+        </div>
+        <div style="position: absolute;bottom: 30px;right: 10px;width: 100px">
+            <img src="/static/images/goal/5732@2x.png" style="width: 100%;">
+        </div>
+        <div style="position: absolute;bottom: 50px;right: 10px;width: 100px;text-align: center;color: white;">
+            <p class="now_d">28</p>
+            <p class="now_m">28</p>
+        </div>
+        <div style="position: absolute;bottom: 15px;right: 10px;width: 100px;text-align: center;color: white;">
+            <p class="now_y">2018</p>
+        </div>
+
+    </div>
+
+    <div style="opacity: 0;background: url('/static/images/goal/572@2x.png') no-repeat center;background-size: contain;width: 150px;height: 40px;line-height: 40px;display: block;margin: auto;">
+        <p style="text-align: center;height: 40px;line-height: 40px;font-size: 16px;">第 {{ punch_day|add:1 }} 天</p>
+    </div>
+
+
+    <div style="display: block;width: 25%;margin: 5px auto;">
+        <img style="width: 100%" src="{{ ticket }}">
+    </div>
+
+    <div style="text-align: center;opacity: 0">
+        <p style="font-size: 10px;line-height: 20px;">{{ active_participants|default:0 }}正在参与</p>
+        <p style="font-size: 10px;line-height: 20px;">「跑步活动」</p>
+    </div>
+
+    <div style="display: block;width: 20%;margin: 10px auto 10px;">
+        <img id="share_1" src="/static/images/share/789@2x.png" style="width: 100%">
+    </div>
+</div>
+
+
+    <script type="text/javascript" src="/static/js/jquery-2.1.4.js"></script>
+{#    <script type="text/javascript" src="/static/js/jquery-weui-2.1.4.js"></script>#}
+    <script type="text/javascript" src="/static/js/fastclick.js"></script>
+    <script type="text/javascript" src="/static/js/public.js"></script>
+    <script>
+        function checkNum(){
+            var random = getRandom(1, 31);
+            console.log(random);
+            return random;
+        }
+
+        function getRandom(min, max){
+            var r = Math.random() * (max - min);
+            var re = Math.round(r + min);
+            re = Math.max(Math.min(re, max), min);
+            return re;
+        }
+        $(function () {
+            var c= {{ img_random|default:0 }};
+
+            if(c==0){
+                c = checkNum();
+            }else{
+
+            }
+
+            console.log(c);
+            $("#goal_img").attr("src", "/static/images/goal/" + c + "@2x.png");
+            $("#goal_img").css("opacity", 1);
+            var da__ = new Date ();
+            var now_d = da__.getDate();
+            var now_y=da__.getFullYear();
+            var now_m=da__.getMonth();
+            var now_m_y=new Array("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Spt","Oct","Nov","Dec");
+            now_m=now_m_y[now_m];
+            //now_m =(now_m<10 ? "0"+now_m:now_m);
+            $(".now_d").text(now_d);
+            $(".now_m").text(now_m);
+            $(".now_y").text(now_y);
+        })
+    </script>
+
+{#    <script type='text/javascript' src='/static/js/swiper.min.js' charset='utf-8'></script>#}
+
+{#    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>#}
+</body>
+</html>

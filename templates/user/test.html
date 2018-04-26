@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>API测试</title>
+    <link rel="stylesheet" href="/static/css/weui.min.css"/>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/static/css/jquery-weui.min.css"/>
+    <link rel="stylesheet" href="/static/css/index.css"/>
+    <link rel="stylesheet" href="/static/css/share.css"/>
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_591099_cj3jntyolxxenrk9.css"/>
+    <link rel="stylesheet" href="/static/css/public.css">
+    <link rel="stylesheet" href="/static/css/material.min.css">
+</head>
+<body>
+    <div class="main_content ">
+        <div>
+            {{ comm_list }}
+        </div>
+
+        <button class="font_color_1 btn_test">测试</button>
+    </div>
+    <div class="hide_content">
+
+    </div>
+
+    <script type="text/javascript" src="/static/js/jquery-2.1.4.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-weui-2.1.4.js"></script>
+    <script type="text/javascript" src="/static/js/fastclick.js"></script>
+    <script type="text/javascript" src="/static/js/public.js"></script>
+
+    <script type='text/javascript' src='/static/js/swiper.min.js' charset='utf-8'></script>
+
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <script>
+        var colHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        var colWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    </script>
+
+    <script>
+        $(".btn_test").click(function () {
+            console.log("API 测试");
+            $.showLoading();
+            $(".weui-toast_content").text("API 测试中...");
+            $.ajax({
+                type: "POST",
+                url: "/api/load_comments",
+                data:{
+                    "c_num":1
+                },
+                success: function (res) {
+                    //alert(res);
+                    $.hideLoading();
+                    console.log(res);
+                    setTimeout(function () {
+                        if(res.status=="403"){
+                            $.toast("失败", "cancel");
+                            return
+                        }
+                        $.toast("成功");
+                    }, 500);
+                },
+                error:function(res){
+                    console.log(res);
+                    $.hideLoading();
+                    setTimeout(function () {
+                        $.toast("错误", "cancel");
+                    }, 500);
+                },
+                complete: function(XMLHttpRequest, textStatus) {
+                    console.log("ajax 公用");
+                }
+            });
+            
+        });
+    </script>
+</body>
+
+</html>

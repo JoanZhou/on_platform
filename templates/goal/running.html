@@ -3,23 +3,352 @@
 
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0 minimum-scale=0.5, user-scalable=no" />
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
 	<title>跑步</title>
+
+    <link rel="stylesheet" href="/static/css/weui.min.css">
+{#    <link rel="stylesheet" href="/static/css/jquery-weui-1.20.css">#}
 	<link rel="stylesheet" href="/static/css/material.min.css">
-	<link rel="stylesheet" href="/static/css/weui.min.css" />
+
 	<link rel="stylesheet" href="/static/css/jquery-weui.min.css">
 	<link rel="stylesheet" href="/static/css/share.css" />
-	<link rel="stylesheet" href="/static/css/running.css" />
-	<link rel="stylesheet" href="/static/css/goal.css" />
+    <link rel="stylesheet" href="/static/css/goal.css" />
+	<link rel="stylesheet" href="/static/css/running_1.css" />
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_591099_79n9fc0ihtfn7b9.css" />
+    <link rel="stylesheet" href="/static/css/public.css">
+
+
+    <style>
+        /*  去除广告  */
+        #_embed_v3_dc {
+            display: none;
+        }
+        iframe {
+            display: none;
+        }
+        /*  */
+        .weui-photo-browser-modal{
+            z-index: 10;
+        }
+        p{
+            margin: 0;
+            padding: 0;
+        }
+        .mdl-card{
+            min-height: 0;
+            max-height: 300px;
+            height: 190px;
+        }
+
+        .header-mask{
+            height: 90px;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            bottom: 0;
+            {#background-color: rgba(0,0,0,1);#}
+            background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,1));
+        }
+
+        .after-finish ,.after-stop ,.today,.firstDay{
+            color: #000000;
+        }
+        #upload-popup__distance-panel{
+            border-bottom:0.5px solid   #ededed;
+            margin:0 10%;
+        }
+        #upload-popup__distance-text{
+            max-width: 60px;
+        }
+        #upload-image-panel{
+            margin-top: 20px;
+            border: none;
+        }
+        #reading-confirm-btn{
+            background-color: #ffffff;
+            color:rgba(31,162,255,1) ;
+            border-top: 1px solid rgba(31,162,255,1);
+        }
+
+        .icon-icontjzp{
+            font-size: 70px;
+            color: #999999;
+        }
+
+        .mdl-textfield{
+            padding: 0;
+        }
+        #avoid-btn{
+            margin-bottom: 10px;
+            display: block;
+            overflow: hidden;
+            width: 25%;
+            border: 1px solid #FFAB18;
+            height: 32px;
+            line-height: 30px;
+        }
+        .header_date-text{
+            margin-bottom:0;
+        }
+        .box_content{
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            right: 0;
+        }
+
+        .box_left{
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+
+        }
+        .icon-icontjzp{
+            line-height:120px;
+        }
+        .news-item__content{
+
+            margin-left: 32px;
+            margin-bottom: 10px;
+            max-height: 150px;
+            height: 150px;
+            overflow: hidden;
+        }
+        .news-item__content .weui-flex__item{
+            position: relative;
+            max-height: 150px;
+            height: 150px;
+            overflow: hidden;
+        }
+        .news-item__content-img{
+            max-width:95%;
+            {#max-height:95%;#}
+            width: 40%;
+        }
+
+        .challenger_deposit{
+            font-family:"Microsoft YaHei";
+            background-color: white;
+            width: 15px;
+            text-align: center;
+            color: black;
+            border: 1px solid rgba(0,0,0,0.4);
+            display: inline-block;
+            font-size: 19px;
+            position: relative;
+            overflow: hidden;
+
+        }
+
+        .challenger_deposit_{
+            font-family:"Microsoft YaHei";
+            width: 15px;
+            text-align: center;
+            color: white;
+            display: inline-block;
+            font-size: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        .challenger_deposit__{
+            position: absolute;
+            color: white;
+            width: 15px;
+            {#font-weight:bold;#}
+            left: 0;
+            right: 0;
+            bottom: 0;
+            top: 0;
+            line-height: 23px;
+            height: 25px;
+            font-size: 8px;
+            {#display: none;#}
+        }
+        .mask_on{
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            background: rgba(0,0,0,.6);
+        }
+        .qqGroupCode_box,.activityDescription_box,.detailed_box_text{
+            position: fixed;
+            z-index: 5000;
+            width: 80%;
+            max-width: 300px;
+            top: 50%;
+            left: 50%;
+            -webkit-transform: translate(-50%,-50%);
+            transform: translate(-50%,-50%);
+            background-color: #fff;
+            text-align: left;
+            overflow: hidden;
+            padding: 25px;
+            font-size: 10px;
+            border-radius: 10px;
+            color:rgba(0,0,0,0.5)
+        }
+
+
+        #upload-image-panel img{
+            border-radius: 0;
+        }
+        #upload-panel{
+            height: auto!important;
+        }
+
+        .weui-btn::after{
+            border: none;
+        }
+        .header_avatar-text{
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        #date-panel {
+            padding: 0px 5px 10px 5px;
+        }
+        #date-panel:after{
+            border: none;
+        }
+
+
+        .header_date{
+            margin-bottom: 0;
+        }
+        .header_date.active>span  {
+            border-bottom: 2px solid  #1fa2ff;
+        }
+        .icon-weixiaozhuanhuan-{
+            opacity: 0;
+            color: #1fa2ff;
+            display: block;
+            line-height: 10px;
+            font-size: 24px;
+        }
+        .header_date.active>i  {
+            opacity: 0;
+        }
+        .header_date.active{
+            color: #000000;
+            {#background: #1fa2ff;#}
+            background: inherit;
+
+        }
+        /*  完成 */
+        .after-finish  >i{
+            opacity: 1;
+        }
+        /*  没有完成 */
+        .after-stop >i{
+            opacity: 0;
+        }
+        .notouch >i{
+            opacity: 0;
+        }
+        .header_date::after{
+            width:0;
+            height: 0;
+        }
+
+        .coloum-space{
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+        .mask_on{
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            background: rgba(0,0,0,.6);
+        }
+
+        .mask_on_1{
+            position: fixed;
+            z-index: 99999;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            background: rgba(0,0,0,.1);
+        }
+        .mask_on__1{
+            position: fixed;
+            z-index: 9990;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            background: rgba(0,0,0,.0);
+        }
+        .weui-popup__container.weui-popup__container--visible{
+            display: block !important;
+        }
+
+        #upload-popup .two{
+            background: rgba(250,255,250,1);
+            backface-visibility: hidden;
+            margin: auto;
+            top: 0;
+            bottom:20%;
+            left: 0;
+            right: 0;
+            width: 80%;
+            height:initial;
+            {#z-index: 9999!important;#}
+            overflow: hidden;
+            border-radius: 15px;
+            opacity: 0;
+            display: none;
+        }
+
+        #upload-popup .one{
+            backface-visibility: hidden;
+            {#z-index: 107;#}
+        }
+        #upload-popup .weui-popup__overlay{
+            background-color: rgba(0,0,0,.0);
+            {#z-index:9;#}
+        }
+
+        #upload-popup .container{
+            position: relative;
+            transition:0.5s;
+            transform-style: preserve-3d;
+            height: inherit;
+            z-index: 10;
+            background-color: rgba(0,0,0,.0);
+        }
+        .mask_on__container{
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            background: rgba(0,0,0,.6);
+            display: none;
+        }
+
+    </style>
+
 </head>
 
 <body ontouchstart>
 	<div class="image-header mdl-card mdl-shadow--2dp">
-        {% if goal.goal_type == 0 %}
-		<div class="header-title">自由模式</div>
-        {% else %}
-        <div class="header-title">日常模式</div>
-        {% endif %}
 		<div class="header-mask"></div>
 		<div class="header-desc mdl-card__supporting-text">
 			<!--跑步页首-->
@@ -30,13 +359,14 @@
                     </div>
                     <div class="header__avatars">
                         {% for person in persons %}
-                        <img class="img-circle" src="{{ person.headimgurl }}">
+                            <img class="img-circle" src="{{ person.headimgurl }}">
                         {% endfor %}
-                        <img class="img-circle" src="/static/fake/running_1.jpg">
-                        <img class="img-circle" src="/static/fake/running_2.jpg">
-                        <img class="img-circle" src="/static/fake/running_3.jpg">
-                        <img class="img-circle" src="/static/fake/running_4.jpg">
-                        <img class="img-circle" src="/static/fake/running_5.jpg">
+{#                        <img class="img-circle" src="/static/fake/running_1.jpg">#}
+{#                        <img class="img-circle" src="/static/fake/running_2.jpg">#}
+{#                        <img class="img-circle" src="/static/fake/running_3.jpg">#}
+{#                        <img class="img-circle" src="/static/fake/running_4.jpg">#}
+{#                        <img class="img-circle" src="/static/fake/running_5.jpg">#}
+
 				    </div>
                 </div>
 				<div class="coloum-space" style="position: absolute;left: 50%;transform: translate(-50%,0%);">
@@ -48,32 +378,71 @@
 				<div class="coloum-space">
                     <div class="header_avatar-text center">奖金池</div>
                     <div class="header__text">
-                        <span style="color: #ff931f; font-weight: 500;">{{ app.bonus_all|floatformat:"0" }}</span>
+                        <span style="color: #ff931f; font-weight: 500;" id="app_bonus_all">{{ app.bonus_all|floatformat:"0" }}</span>
                         <span>元</span>
                     </div>
 				</div>
 			</div>
 		</div>
-        <!-- 左上角的后退按钮 -->
-		<div class="mdl-card__menu">
-			<button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect" id="backup-btn">
-                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
-                     width="36px" height="36px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
-                <g>
-                    <path d="M24.001,33.52c-0.539,0-1.076-0.217-1.471-0.644l-12-13c-0.707-0.766-0.707-1.947,0-2.713l12-13
-                        c0.749-0.811,2.014-0.862,2.826-0.113c0.812,0.75,0.862,2.015,0.113,2.826L14.722,18.52L25.47,30.163
-                        c0.749,0.812,0.698,2.077-0.113,2.826C24.972,33.344,24.485,33.52,24.001,33.52z"/>
-                </g>
-                </svg>
-			</button>
-		</div>
+
+        <div style="position: absolute;right: 20px;color: white;top:10px;font-size: 16px;height: 20px;line-height: 20px;display: none">
+
+            <div class="challenger_deposit_" style="width: auto;">
+                <span class="" style="width: 60px">擂主押金</span>
+            </div>
+            <div class="challenger_deposit">
+                <span class="challenger_deposit_0" style="">1</span>
+                <span class="challenger_deposit__">一</span>
+            </div>
+            <div class="challenger_deposit">
+                <span class="challenger_deposit_1" style="">1</span>
+                <span class="challenger_deposit__">一</span>
+            </div>
+            <div class="challenger_deposit">
+                <span class="challenger_deposit_2" style="">1</span>
+                <span class="challenger_deposit__">一</span>
+            </div>
+            <div class="challenger_deposit">
+                <span  class="challenger_deposit_3"  style="">1</span>
+                <span class="challenger_deposit__">一</span>
+            </div>
+            <div class="challenger_deposit">
+                <span class="challenger_deposit_4" style="">1</span>
+                <span class="challenger_deposit__">一</span>
+            </div>
+            <div class="challenger_deposit">
+                <span class="challenger_deposit_5" style="">1</span>
+                <span class="challenger_deposit__">一</span>
+            </div>
+            <div class="challenger_deposit">
+                <span class="challenger_deposit_6" style="">1</span>
+                <span class="challenger_deposit__">一</span>
+            </div>
+
+        </div>
+
+        <div id="qqGroupCode" style="position: absolute;right:20px;top: 20px;width: 30px;">
+           <img src="/static/images/user/share@2x.png" style="width: 100%;">
+        </div>
+
+
+        <div id="activityDescription_but" style="position: absolute;right:20px;top: 55px;width: 30px;">
+            <img src="/static/images/user/doubt@2x.png" style="width: 100%;">
+        </div>
+
+        <div style="position: absolute;left:23px;bottom: 75px;color: white">
+            {% if goal.goal_type == 0 %}自由模式{% else %}日常模式{% endif %}
+        </div>
+
 	</div>
-	<div class="block-panel" id="profit-panel">
+
+
+	<div class="block-panel" id="profit-panel" style="padding: 5px 5px 0px 5px;">
 		<div class="row-center">
-			<div class="coloum-space">
+			<div class="coloum-space" id="detailed_box_text_but">
 				<div class="header_avatar-text goal-header-block">我的押金</div>
 				<div class="header__text">
-					<span style="color: #565c66; font-weight: 600;">{{ goal.guaranty|add:goal.down_payment }}</span>
+					<span id="guaranty_down_payment" style="color: #565c66; font-weight: 600;"></span>
 				</div>
 			</div>
 			<div class="coloum-space">
@@ -86,253 +455,738 @@
 				<div class="header_avatar-text" style="color: #B6C1C8; font-size: 0.8rem;">累计收益</div>
 				<div class="header__text">
 					<span style="color: #565c66;  font-weight: 600;">{{ goal.bonus }}</span>
+                    <div style="display: inline-block;margin-left: 5px">
+                        <p id="invite_num_plus_1" style="font-size: 0.4rem;color: #B6C1C8;line-height: 0.4rem;"></p>
+                        <p id="invite_num_plus_2" style="font-size: 0.4rem;color: #B6C1C8;line-height: 0.4rem;display: none"></p>
+                    </div>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div class="block-panel" id="date-panel">
-		<div class="row-center">
-            {% for day in datesinform %}
-			<div class="coloum-space">
-				<div class="header_date-text">{{ day.weekday }}</div>
-				<div class="header_date {% if forloop.counter == 4 %}active{% elif day.dayindex > 0 %}{% if forloop.counter < 4 and day.isfinish %}after-finish{% elif forloop.counter < 4 %}after-stop{% endif %}{% else %}notouch{% endif %}">
-					{{ day.date }}
-				</div>
-			</div>
-			{% endfor %}
-		</div>
-	</div>
-    {% for date in datesinform %}
-        {% if date.dayindex > 0 %}
-        <div class="day-index" id="dayindex{{ date.date }}" {% if forloop.counter != 4 %}style="display: none;"{% endif %}>第{{ date.dayindex }}天</div>
-        {% endif %}
-    {% endfor %}
-	<div id="upload-panel">
-        {% for date in datesinform %}
-        <div class="datespanel" id="datespanel{{ date.date }}" {% if forloop.counter != 4 %}style="display:none;" {% endif %}>
-            <div class="panel__body">
-                <div class="upload-sidebar left"></div>
-                <!--当天，还未打卡-->
-                {% if forloop.counter == 4 and not date.isfinish and date.dayindex > 0 %}
-                    <!--如果处于自由模式-->
-                    {% if goal.goal_type == 0 %}
-                    <div class="upload-card row-center center">
-                        <div class="coloum-space center">
-                            <p class="panel__title">今日上限</p>
-                            <div class="row-center center">
-                                <div>
-                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                                         width="28px" height="28px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
-                                    <g>
-                                        <path fill="#1fa2ff" d="M25.723,14c0-3.86-3.141-7-7-7s-7,3.14-7,7s3.141,7,7,7S25.723,17.86,25.723,14z M13.723,14c0-2.757,2.243-5,5-5
-                                            s5,2.243,5,5s-2.243,5-5,5S13.723,16.757,13.723,14z"/>
-                                        <path fill="#1fa2ff" d="M29,32h-9l8.818-10.02c1.876-2.307,2.907-5.213,2.904-8.183c0-5.755-3.698-10.751-9.202-12.433
-                                            c-1.234-0.376-2.512-0.568-3.797-0.568c-4.331,0-8.361,2.145-10.782,5.737c-3.216,4.773-2.94,10.983,0.712,15.484L17.445,32H9v-2H7
-                                            v4h24v-4h-2V32z M9.6,7.652c2.049-3.04,5.459-4.855,9.124-4.855c1.087,0,2.168,0.162,3.213,0.481
-                                            c4.657,1.422,7.786,5.65,7.786,10.521c0.003,2.512-0.869,4.97-2.431,6.89l-8.569,9.736l-8.543-9.697
-                                            C7.112,16.945,6.879,11.691,9.6,7.652z"/>
-                                    </g>
-                                    </svg>
-                                </div>
-                                <span class="panel__target-text">{{ goal.kilos_day }}</span>
-                                <span class="panel__target-text__side">km</span>
-                            </div>
-                        </div>
-                        <div class="panel__split"></div>
-                        <div class="coloum-space center">
-                            <p class="panel__title">剩余距离</p>
-                            <div class="row-center center">
-                                <div>
-                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                                         width="28px" height="28px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
-                                        <g>
-                                            <path fill="#ff9947" d="M25.723,14c0-3.86-3.141-7-7-7s-7,3.14-7,7s3.141,7,7,7S25.723,17.86,25.723,14z M13.723,14c0-2.757,2.243-5,5-5
-                                                s5,2.243,5,5s-2.243,5-5,5S13.723,16.757,13.723,14z"/>
-                                            <path fill="#ff9947" d="M29,32h-9l8.818-10.02c1.876-2.307,2.907-5.213,2.904-8.183c0-5.755-3.698-10.751-9.202-12.433
-                                                c-1.234-0.376-2.512-0.568-3.797-0.568c-4.331,0-8.361,2.145-10.782,5.737c-3.216,4.773-2.94,10.983,0.712,15.484L17.445,32H9v-2H7
-                                                v4h24v-4h-2V32z M9.6,7.652c2.049-3.04,5.459-4.855,9.124-4.855c1.087,0,2.168,0.162,3.213,0.481
-                                                c4.657,1.422,7.786,5.65,7.786,10.521c0.003,2.512-0.869,4.97-2.431,6.89l-8.569,9.736l-8.543-9.697
-                                                C7.112,16.945,6.879,11.691,9.6,7.652z"/>
-                                        </g>
-                                    </svg>
-                                </div>
-                                <span class="panel__target-text" style="color: #ff931f;">{{ goal.left_distance }}</span>
-                                <span class="panel__target-text__side">km</span>
-                            </div>
-                        </div>
-                        <div class="running__upload-notice small-font">
-                            目标：在<span style="color: #1fa2ff;">&nbsp;{{ goal.goal_day }}&nbsp;</span>天内跑步累计<span style="color: #1fa2ff;">&nbsp;{{ goal.goal_distance }}&nbsp;</span>km
-                        </div>
-                    </div>
-                    {% else %}
-                    <div class="upload-card row-center center">
-                        <div class="coloum-space center">
-                            <p class="panel__title">剩余天数</p>
-                            <div class="row-center center">
-                                <div>
-                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
-                                         width="28px" height="28px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
-                                    <path fill="#bc6eff" d="M27.692,5H25V4.494c0-0.552-0.447-1-1-1s-1,0.448-1,1V5H13V4.494c0-0.552-0.447-1-1-1s-1,0.448-1,1V5H8.308
-                                        C5.381,5,3,7.9,3,10.857V26.13C3,29.087,5.381,31,8.308,31h19.385C30.619,31,33,29.087,33,26.13V10.857C33,7.9,30.619,5,27.692,5z
-                                         M8.308,7H11v1.494c0,0.552,0.447,1,1,1s1-0.448,1-1V7h10v1.494c0,0.552,0.447,1,1,1s1-0.448,1-1V7h2.692
-                                        C29.517,7,31,9.002,31,10.857v0.789C30.851,11.558,30.686,11,30.5,11h-25c-0.186,0-0.351,0.558-0.5,0.647v-0.789
-                                        C5,9.002,6.483,7,8.308,7z M27.692,29H8.308C6.483,29,5,27.985,5,26.13V13.34C5.149,13.429,5.314,13,5.5,13h25
-                                        c0.186,0,0.351,0.429,0.5,0.34v12.79C31,27.985,29.517,29,27.692,29z"/>
-                                    </svg>
-                                </div>
-                                <span class="panel__target-text" style="margin-left: 20px;margin-right: 20px;font-weight: 600;">{{ goal.left_day }}</span>
-                                <span style="color: #B6C1C8;">天</span>
-                            </div>
-                        </div>
-                        <div class="running__upload-notice small-font">
-                            目标：在<span style="color: #1fa2ff;">&nbsp;{{ goal.goal_day }}&nbsp;</span>天内每日跑步<span style="color: #1fa2ff;">&nbsp;{{ goal.kilos_day }}&nbsp;</span>km
-                        </div>
-                    </div>
-                    {% endif %}
-                <!--非本日，已完成-->
-                {% elif forloop.counter <= 4 and date.isfinish %}
-                <div class="upload-card row-center center nopadding">
-                    <div class="coloum-space center">
-                        <span style="color: #B6C1C8;">完成任务</span>
-                        <div>
-                            <span style="color: #1fa2ff; font-size: 1.5rem;font-weight: 500;">{{ date.punch.distance }}</span>
-                            <span style="color: #B6C1C8;">km</span>
-                        </div>
-                    </div>
-                    <img src="{{ date.punch.voucher_ref }}">
-                </div>
-                <!--非本日，未完成-->
-                {% elif forloop.counter < 4 and not date.isfinish and date.isnosignin %}
-                <div class="upload-card row-center center nopadding">
-                    <div class="coloum-space center">
-                        <span style="color: #B6C1C8;">已使用免签券抵消</span>
-                    </div>
-                </div>
-                {% elif forloop.counter < 4 and not date.isfinish %}
-                <div class="upload-card row-center center nopadding">
-                    <div class="coloum-space center">
-                        <span style="color: #B6C1C8;">未完成任务</span>
-                    </div>
-                </div>
-                {% else %}
-                <div class="upload-card row-center center nopadding">
-                    <div class="coloum-space center">
-                        <span style="color: #B6C1C8;">别着急，任务还没开始呢！</span>
-                    </div>
-                </div>
-                {% endif %}
-                <div class="upload-sidebar right"></div>
+	<div class="block-panel" id="date-panel" style="margin-bottom: 0;padding-bottom: 0;">
+		<div class="row-center  row-center_1">
+
+            <div class="coloum-space">
+                <div class="header_date-text">一</div>
             </div>
-            {% if forloop.counter == 4 and not date.isfinish and not date.isnosignin and date.dayindex > 0 %}
-            <button class="weui-btn weui-btn_primary upload-btn__style" id="upload-btn">
-                上传任务
-            </button>
-            {% elif forloop.counter <= 4 and date.isfinish %}
-            <button class="weui-btn weui-btn_primary upload-btn__style" disabled>
-                已成功打卡
-            </button>
-            {% elif forloop.counter <= 4 and date.isnosignin %}
-            <button class="weui-btn weui-btn_primary upload-btn__style" disabled>
-                免签
-            </button>
-            {% elif forloop.counter < 4 and not date.isfinish %}
-            <button class="weui-btn weui-btn_primary upload-btn__style" disabled>
-                未打卡
-            </button>
-            {% else %}
-            <button class="weui-btn weui-btn_primary upload-btn__style" disabled>
-                尚未开始
-            </button>
-            {% endif %}
-            {% if forloop.counter == 4 and not date.isfinish and not date.isnosignin and goal.goal_type and date.dayindex > 0 %}
-            <button class="weui-btn weui-btn_primary" id="avoid-btn">
-                <span>免签</span>
-                x
-                <span id="avoid-count">{{ nosign }}</span>
-            </button>
-            {% endif %}
+            <div class="coloum-space">
+                <div class="header_date-text">二</div>
+            </div>
+            <div class="coloum-space">
+                <div class="header_date-text">三</div>
+            </div>
+            <div class="coloum-space">
+                <div class="header_date-text">四</div>
+            </div>
+            <div class="coloum-space">
+                <div class="header_date-text">五</div>
+            </div>
+            <div class="coloum-space">
+                <div class="header_date-text">六</div>
+            </div>
+            <div class="coloum-space">
+                <div class="header_date-text">日</div>
+            </div>
         </div>
-        {% endfor %}
-    </div>
-    <!--上传任务弹出框-->
-    <div id="upload-popup" class="weui-popup__container popup-bottom">
-		<div class="weui-popup__overlay"></div>
-		<div class="weui-popup__modal">
-			<div class="modal-content">
-                <div class="row-center center" id="upload-popup__distance-panel">
-                    {% if goal.goal_type == 0 %}
-                    <span style="font-size: 1rem;font-weight: 600;">公里数</span>
-                    </span>
-                    <div class="row-center center">
-                        <div class="mdl-textfield mdl-js-textfield" id="upload-popup__distance-text">
-                            <input class="mdl-textfield__input" type="text" id="page-input">
-                            <label class="mdl-textfield__label" for="upload-popup__distance-input"></label>
+
+        <div class="swiper-container_1">
+            <div class="swiper-wrapper">
+                {% for day in datesinform %}
+                    <div class="swiper-slide">
+                        <div class="row-center" >
+                            {% for dates in day %}
+                            <div class="coloum-space">
+                                <div num ="{{ dates.dayindex }}" class="header_date
+                               {% if  dates.is_day_now|yesno:"1,0" == "1" %}
+                               active today
+                                    {% if dates.isnosignin|yesno:"1,0" == "1" or dates.isfinish|yesno:"1,0" == "1" %}
+                                    after-finish
+                                    {% else %}
+                                    {% endif %}
+
+                               {% else %}
+                                   {% if dates.dayindex == "-1" %}
+                                   notouch
+                                   {% elif dates.dayindex == 1 %}
+                                   firstDay
+                                        {% if first_day_record == 1 %}
+                                            after-finish
+                                        {% else %}
+                                        {% endif %}
+                                   {% elif dates.isnosignin|yesno:"1,0" == "1" or dates.isfinish|yesno:"1,0" == "1" %}
+                                        after-finish
+                                   {% else %}
+                                        after-stop
+                                   {% endif %}
+                               {% endif %} ">
+
+                                    {% if dates.date == "0" %}
+
+                                    {% else %}
+                                        <span style="padding-bottom:5px;">{{ dates.date }}</span>
+                                    {% endif %}
+
+
+                                <i class="iconfont icon-weixiaozhuanhuan-" style=""></i>
+
+                                </div>
+                            </div>
+                           {% endfor %}
+
                         </div>
-                        <span class="panel__target-text__side">km</span>
                     </div>
-                    {% else %}
-                    <span style="font-size: 1rem;font-weight: 600;">公里数</span>
-                    </span>
-                    <div class="row-center center">
-                        <span id="page-input" style="margin-right: 10px;">{{ goal.kilos_day }}</span>
-                        <span class="panel__target-text__side">km</span>
-                    </div>
-                    {% endif %}
-                </div>
-                <div id="upload-image-panel">
-                    <p>+ 点击上传照片</p>
-                </div>
-				<button class="weui-btn weui-btn_primary" id="reading-confirm-btn">
-                    确认
-				</button>
-			</div>
-		</div>
+                {% endfor %}
+
+            </div>
+        </div>
+
 	</div>
-    <!--跑步记录朋友圈-->
-	<ul class="news-list">
-        {% for new in news %}
-        <li class="news-item" data-punch="{{ new.punch_id }}">
-            <div class="new-item__content">
-                <div>
-                    <img src="{{ new.headimage }}" class="news-item__header-img">
-                    <span class="news-item__header-text">{{ new.name }}</span>
-                    <span style="margin-left: 10px;color: #B6C1C8;">完成</span>
-                    <span style="margin-left: 2px;">{{ new.distance }}</span>
-                    <span style="margin-left: 2px; color: #B6C1C8;">km</span>
+{#    <div>#}
+{#        {{ datesinform }}#}
+{#    </div>#}
+
+
+
+    <div id="upload-panel">
+    {% for day in datesinform %}
+        {% for dates in day %}
+            {% if dates.dayindex > 0 %}
+
+                <div class="day-index dayindex_{{ dates.dayindex }}" {% if dates.date == "0" %}style="display: none;" {% else %} {% if dates.is_day_now|yesno:"1,0" == "1" %}{% else %}style="display: none;"{% endif %}{% endif %} >
+
+                    {% if first_day_record == 1 %}
+                        第{{ dates.dayindex }}天
+{#                    {% elif dates.dayindex == 1 and not dates.isfinish %}#}
+{#                        第{{ dates.dayindex|add:-1 }}天#}
+                    {% else %}
+                        第{{ dates.dayindex|add:-1 }}天
+                    {% endif %}
+
+                    <div class="panel__body">
+                        <div class="upload-sidebar left"></div>
+
+                            {% if dates.isfinish %}
+                                <!--  完成任务-->
+                                <div class="upload-card row-center center nopadding">
+                                    <div class="weui-flex" style="height: 100%;width: 100%;padding: 5px">
+                                        <div class="weui-flex__item">
+                                            <div class="coloum-space center">
+                                                <p style="color: #B6C1C8;margin-bottom: 1px;padding: 5px;font-size: 14px;">今日完成 <br><span style="color: #1fa2ff;font-weight: 500;font-size: 20px">{{ dates.punch.distance }}</span>&nbsp;km</p>
+
+                                                <div>
+                                                    {% if goal.goal_type == 0 and dates.is_day_now|yesno:"1,0" == "1" %}
+                                                        <!-- 自由 -->
+                                                        <p style="color: #B6C1C8;font-size: 12px">累计距离：{{ dates.add_distance }}&nbsp;km</p>
+                                                    {% elif goal.goal_type == 1 and dates.is_day_now|yesno:"1,0" == "1" %}
+                                                        <!-- 日常 -->
+                                                        <p class="panel__title">剩余天数 <span style="color: #B6C1C8;">{{ goal.left_day }}&nbsp;天</span></p>
+                                                    {% endif %}
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+
+                                        <div class="weui-flex__item" style="position:relative;overflow:hidden;padding:0 10px;
+                                        {#background: url({{ dates.punch.voucher_ref }}) no-repeat center center;#}
+                                        {#background-size:cover;#}
+                                        {#        background-position-x:center;#}
+                                        {#        background-position-y:center;#}
+                                                ">
+                                            <img class="pictureEnlarge" src="{{ dates.punch.voucher_ref }}" style="width: 65%;top: 0;left: 0;bottom: 0;right: 0;margin: auto;opacity: 1;max-width: 95%;max-height: 95%">
+                                        </div>
+
+                                        <!-- 当天 -->
+                                        {% if goal.goal_type == 0 %}
+                                            <!-- 自由 -->
+                                            <div class="running__upload-notice small-font">
+                                                目标：在<span style="color: #1fa2ff;">&nbsp;{{ goal.goal_day }}&nbsp;</span>天内跑步累计<span style="color: #1fa2ff;">&nbsp;{{ goal.goal_distance }}&nbsp;</span>km &nbsp;
+{#                                                    {% if goal.left_distance <= 0 %}#}
+{#                                                        <span style="color: #1fa2ff;">已经完成</span>#}
+{#                                                    {% else %}#}
+{#                                                        剩余距离 <span style="color: #1fa2ff;">{{ goal.left_distance }}</span>km#}
+{#                                                    {% endif %}#}
+                                            </div>
+                                        {% else %}
+                                            <!-- 日常 -->
+                                            <div class="running__upload-notice small-font">
+                                                目标：在<span style="color: #1fa2ff;">&nbsp;{{ goal.goal_day }}&nbsp;</span>天内每日跑步<span style="color: #1fa2ff;">&nbsp;{{ goal.kilos_day }}&nbsp;</span>km
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% elif not dates.isfinish and dates.isnosignin %}
+                                <div class="upload-card row-center center nopadding">
+                                    <div class="coloum-space center">
+                                        <span style="color: #B6C1C8;">已使用免签券抵消</span>
+                                    </div>
+                                </div>
+                            {% elif not dates.isfinish %}
+
+                                {% if dates.dayindex == 1 %}
+                                    <!-- 第一天准备中 -->
+
+                                        {% if goal.goal_type == 0 and dates.is_day_now|yesno:"1,0" == "1" %}
+                                            <!-- 自由 -->
+                                            <div class="upload-card row-center center" >
+{#                                                <div class="coloum-space center" style="color: #B6C1C8;">#}
+{#                                                        第一天准备中#}
+{#                                                </div>#}
+{#                                                <div class="panel__split"></div>#}
+                                                <div class="coloum-space center">
+
+                                                    <p style="font-size: 16px">首日准备中，次日开始</p>
+                                                    <p>（小贴士：首日打卡可直接开始）</p>
+                                                    <!---
+
+                                                    {% if goal.left_distance <= 0 %}
+                                                        <span style="color: #B6C1C8;">已经完成</span>
+                                                    {% else %}
+                                                        <p class="panel__title">剩余距离</p>
+                                                            <div class="row-center center">
+                                                                <div>
+                                                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                                                         width="28px" height="28px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                                                                        <g>
+                                                                            <path fill="#ff9947" d="M25.723,14c0-3.86-3.141-7-7-7s-7,3.14-7,7s3.141,7,7,7S25.723,17.86,25.723,14z M13.723,14c0-2.757,2.243-5,5-5
+                                                                                s5,2.243,5,5s-2.243,5-5,5S13.723,16.757,13.723,14z"/>
+                                                                            <path fill="#ff9947" d="M29,32h-9l8.818-10.02c1.876-2.307,2.907-5.213,2.904-8.183c0-5.755-3.698-10.751-9.202-12.433
+                                                                                c-1.234-0.376-2.512-0.568-3.797-0.568c-4.331,0-8.361,2.145-10.782,5.737c-3.216,4.773-2.94,10.983,0.712,15.484L17.445,32H9v-2H7
+                                                                                v4h24v-4h-2V32z M9.6,7.652c2.049-3.04,5.459-4.855,9.124-4.855c1.087,0,2.168,0.162,3.213,0.481
+                                                                                v4h24v-4h-2V32z M9.6,7.652c2.049-3.04,5.459-4.855,9.124-4.855c1.087,0,2.168,0.162,3.213,0.481
+                                                                                c4.657,1.422,7.786,5.65,7.786,10.521c0.003,2.512-0.869,4.97-2.431,6.89l-8.569,9.736l-8.543-9.697
+                                                                                C7.112,16.945,6.879,11.691,9.6,7.652z"/>
+                                                                        </g>
+                                                                    </svg>
+                                                                </div>
+                                                                <span class="panel__target-text" style="color: #ff931f;">{{ goal.left_distance }}</span>
+                                                                <span class="panel__target-text__side">km</span>
+                                                            </div>
+                                                    {% endif %}
+
+                                                -->
+
+
+                                                </div>
+                                                <div class="running__upload-notice small-font">
+                                                    目标：在<span style="color: #1fa2ff;">&nbsp;{{ goal.goal_day }}&nbsp;</span>天内跑步累计<span style="color: #1fa2ff;">&nbsp;{{ goal.goal_distance }}&nbsp;</span>km
+                                                </div>
+                                            </div>
+
+                                        {% elif goal.goal_type == 1 and dates.is_day_now|yesno:"1,0" == "1" %}
+
+                                            <!-- 日常 -->
+                                            <div class="upload-card row-center center nopadding">
+                                                <div class="coloum-space center">
+
+                                                    <p style="font-size: 16px">首日准备中，次日开始</p>
+                                                    <p>（小贴士：首日打卡可直接开始）</p>
+
+
+                                                    <!---
+                                                    <p class="panel__title">剩余天数</p>
+                                                    <div class="row-center center">
+                                                        <div>
+                                                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                                                                 width="28px" height="28px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                                                            <path fill="#bc6eff" d="M27.692,5H25V4.494c0-0.552-0.447-1-1-1s-1,0.448-1,1V5H13V4.494c0-0.552-0.447-1-1-1s-1,0.448-1,1V5H8.308
+                                                                C5.381,5,3,7.9,3,10.857V26.13C3,29.087,5.381,31,8.308,31h19.385C30.619,31,33,29.087,33,26.13V10.857C33,7.9,30.619,5,27.692,5z
+                                                                 M8.308,7H11v1.494c0,0.552,0.447,1,1,1s1-0.448,1-1V7h10v1.494c0,0.552,0.447,1,1,1s1-0.448,1-1V7h2.692
+                                                                C29.517,7,31,9.002,31,10.857v0.789C30.851,11.558,30.686,11,30.5,11h-25c-0.186,0-0.351,0.558-0.5,0.647v-0.789
+                                                                C5,9.002,6.483,7,8.308,7z M27.692,29H8.308C6.483,29,5,27.985,5,26.13V13.34C5.149,13.429,5.314,13,5.5,13h25
+                                                                c0.186,0,0.351,0.429,0.5,0.34v12.79C31,27.985,29.517,29,27.692,29z"/>
+                                                            </svg>
+                                                        </div>
+                                                        <span class="panel__target-text" style="margin-left: 20px;margin-right: 20px;font-weight: 600;">{{ goal.left_day }}</span>
+                                                        <span style="color: #B6C1C8;">天</span>
+                                                    </div>
+
+                                                    -->
+
+                                                </div>
+                                                <div class="running__upload-notice small-font">
+                                                    目标：在<span style="color: #1fa2ff;">&nbsp;{{ goal.goal_day }}&nbsp;</span>天内每日跑步<span style="color: #1fa2ff;">&nbsp;{{ goal.kilos_day }}&nbsp;</span>km
+                                                </div>
+                                            </div>
+
+                                        {% else %}
+                                            <div class="upload-card row-center center nopadding">
+                                                <div class="coloum-space center">
+                                                    <span style="color: #B6C1C8;" id="unfinishedTask_1"></span>
+                                                    <p style="font-size: 16px">首日准备中，次日开始</p>
+                                                    <p>（小贴士：首日打卡可直接开始）</p>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                {% else %}
+                                    <!-- 未完成任务  -->
+                                    {% if goal.goal_type == 0 and dates.is_day_now|yesno:"1,0" == "1" %}
+                                        <!-- 自由 -->
+                                        <div class="upload-card row-center center nopadding">
+
+                                            <div class="coloum-space center" style="color: #B6C1C8;">
+                                                    未打卡
+                                                <p style="margin: 10px">
+                                                    <span style="color: #B6C1C8;">剩余</span>
+                                                    <span class="panel__target-text" style="margin-left: 5px;margin-right:5px;font-weight: 600;">
+{#                                                        {% if first_day_record == 1 %}#}
+{#                                                            {% if goal.left_day == 0%}#}
+{#                                                                {{ goal.left_day }}#}
+{#                                                            {% else %}#}
+{#                                                                {{ goal.left_day|add:-1 }}#}
+{#                                                            {% endif %}#}
+{#                                                        {% else %}#}
+{#                                                            {{ goal.left_day }}#}
+{#                                                        {% endif %}#}
+                                                    {{ goal.left_day }}
+
+                                                    </span>
+                                                    <span style="color: #B6C1C8;">天</span>
+                                                </p>
+                                            </div>
+
+                                            <div class="panel__split"></div>
+                                            <div class="coloum-space center">
+                                                {% if goal.left_distance <= 0 %}
+                                                    <span style="color: #B6C1C8;">已经完成</span>
+                                                {% else %}
+                                                    <p class="panel__title">剩余距离</p>
+                                                        <div class="row-center center">
+                                                            <div>
+                                                                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                                                     width="28px" height="28px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                                                                    <g>
+                                                                        <path fill="#ff9947" d="M25.723,14c0-3.86-3.141-7-7-7s-7,3.14-7,7s3.141,7,7,7S25.723,17.86,25.723,14z M13.723,14c0-2.757,2.243-5,5-5
+                                                                            s5,2.243,5,5s-2.243,5-5,5S13.723,16.757,13.723,14z"/>
+                                                                        <path fill="#ff9947" d="M29,32h-9l8.818-10.02c1.876-2.307,2.907-5.213,2.904-8.183c0-5.755-3.698-10.751-9.202-12.433
+                                                                            c-1.234-0.376-2.512-0.568-3.797-0.568c-4.331,0-8.361,2.145-10.782,5.737c-3.216,4.773-2.94,10.983,0.712,15.484L17.445,32H9v-2H7
+                                                                            v4h24v-4h-2V32z M9.6,7.652c2.049-3.04,5.459-4.855,9.124-4.855c1.087,0,2.168,0.162,3.213,0.481
+                                                                            c4.657,1.422,7.786,5.65,7.786,10.521c0.003,2.512-0.869,4.97-2.431,6.89l-8.569,9.736l-8.543-9.697
+                                                                            C7.112,16.945,6.879,11.691,9.6,7.652z"/>
+                                                                    </g>
+                                                                </svg>
+                                                            </div>
+                                                            <span class="panel__target-text" style="color: #ff931f;">{{ goal.left_distance }}</span>
+                                                            <span class="panel__target-text__side">km</span>
+                                                        </div>
+
+                                                {% endif %}
+                                            </div>
+                                            <div class="running__upload-notice small-font">
+                                                目标：在<span style="color: #1fa2ff;">&nbsp;{{ goal.goal_day }}&nbsp;</span>天内跑步累计<span style="color: #1fa2ff;">&nbsp;{{ goal.goal_distance }}&nbsp;</span>km
+                                            </div>
+                                        </div>
+                                        {% elif goal.goal_type == 1 and dates.is_day_now|yesno:"1,0" == "1" %}
+                                        <!-- 日常 -->
+                                        <div class="upload-card row-center center nopadding">
+
+                                            <div class="coloum-space center">
+                                                <p class="panel__title">剩余天数</p>
+                                                <div class="row-center center">
+                                                    <div>
+                                                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                                                             width="28px" height="28px" viewBox="0 0 36 36" enable-background="new 0 0 36 36" xml:space="preserve">
+                                                        <path fill="#bc6eff" d="M27.692,5H25V4.494c0-0.552-0.447-1-1-1s-1,0.448-1,1V5H13V4.494c0-0.552-0.447-1-1-1s-1,0.448-1,1V5H8.308
+                                                            C5.381,5,3,7.9,3,10.857V26.13C3,29.087,5.381,31,8.308,31h19.385C30.619,31,33,29.087,33,26.13V10.857C33,7.9,30.619,5,27.692,5z
+                                                             M8.308,7H11v1.494c0,0.552,0.447,1,1,1s1-0.448,1-1V7h10v1.494c0,0.552,0.447,1,1,1s1-0.448,1-1V7h2.692
+                                                            C29.517,7,31,9.002,31,10.857v0.789C30.851,11.558,30.686,11,30.5,11h-25c-0.186,0-0.351,0.558-0.5,0.647v-0.789
+                                                            C5,9.002,6.483,7,8.308,7z M27.692,29H8.308C6.483,29,5,27.985,5,26.13V13.34C5.149,13.429,5.314,13,5.5,13h25
+                                                            c0.186,0,0.351,0.429,0.5,0.34v12.79C31,27.985,29.517,29,27.692,29z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <span class="panel__target-text" style="margin-left: 20px;margin-right: 20px;font-weight: 600;">
+
+                                                    <!--
+{#                                                        {% if first_day_record == 1 %}#}
+{#                                                            {% if goal.left_day == 0%}#}
+{#                                                                {{ goal.left_day }}#}
+{#                                                            {% else %}#}
+{#                                                                {{ goal.left_day|add:-1 }}#}
+{#                                                            {% endif %}#}
+{#                                                        {% else %}#}
+{#                                                            {{ goal.left_day }}#}
+{#                                                        {% endif %}#}
+                                                    -->
+                                                    {{ goal.left_day }}
+
+                                                    </span>
+                                                    <span style="color: #B6C1C8;">天</span>
+                                                </div>
+                                            </div>
+                                            <div class="running__upload-notice small-font">
+                                                目标：在<span style="color: #1fa2ff;">&nbsp;{{ goal.goal_day }}&nbsp;</span>天内每日跑步<span style="color: #1fa2ff;">&nbsp;{{ goal.kilos_day }}&nbsp;</span>km
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="upload-card row-center center nopadding">
+                                            <div class="coloum-space center">
+                                                <span style="color: #B6C1C8;" id="unfinishedTask_{{ dates.dayindex }}">未完成任务</span>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+
+                            {% else %}
+                                <div class="upload-card row-center center nopadding">
+                                    <div class="coloum-space center">
+                                        <span style="color: #B6C1C8;">别着急，任务还没开始呢！</span>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            <div class="upload-sidebar right"></div>
+                    </div>
+
+
+                    {% if dates.is_day_now|yesno:"1,0" == "1" and not dates.isfinish %}
+                        <input id="datesdayindex" type="hidden" value="{{ dates.dayindex }}">
+                        {% if dates.isnosignin %}
+                            <button class="weui-btn weui-btn_primary upload-btn__style" style="background: #BDBDBD;" disabled>
+                                已免签
+                            </button>
+                        {% else %}
+                            <button class="bg_color_1_ weui-btn weui-btn_primary upload-btn__style" id="upload-btn"  reload="{{ dates.punch.reload }}" Num="1">
+                                上传任务
+                            </button>
+                            {% if goal.goal_type == 0 %}
+
+                            {% else %}
+                                {% if dates.dayindex == 1 %}
+
+                                {% else %}
+                                    <button class="weui-btn weui-btn_primary" id="avoid-btn">
+                                        <span>免签</span>x<span id="avoid-count">{{ nosign }}</span>
+                                    </button>
+                                {% endif %}
+
+                            {% endif %}
+
+                        {% endif %}
+                    {% elif dates.is_day_now|yesno:"1,0" == "1" and dates.isfinish %}
+                        <button class="bg_color_1_ weui-btn weui-btn_primary upload-btn__style"  reload="{{ dates.punch.reload }}"  punch_id ='{{ dates.punch.punch_id }}'  id="upload-btn"  Num="2" >
+                            重新上传
+                        </button>
+{#                        {% if dates.punch.reload > 3 %} disabled {% else %} {% endif %}#}
+
+                    {% elif dates.is_day_now|yesno:"1,0" == "0" and not dates.isfinish %}
+                        {% if dates.dayindex == 1 %}
+
+                        {% else %}
+                            <button class="weui-btn weui-btn_primary upload-btn__style" style="background: #BDBDBD;" disabled>
+                                未打卡
+                            </button>
+                        {% endif %}
+                    {% elif dates.is_day_now|yesno:"1,0" == "0" and dates.isfinish %}
+                        <button class="weui-btn weui-btn_primary upload-btn__style" style="background: #BDBDBD;" disabled>
+                            已成功打卡
+                        </button>
+                    {% elif dates.is_day_now|yesno:"1,0" == "0" and dates.isnosignin %}
+                        <button class="weui-btn weui-btn_primary upload-btn__style" style="background: #BDBDBD;" disabled>
+                            已免签
+                        </button>
+                    {% else %}
+                         <button class="weui-btn weui-btn_primary upload-btn__style" style="background: #BDBDBD;" disabled>
+                            尚未开始
+                        </button>
+
+                    {% endif %}
+
                 </div>
-                <img class="news-item__content-img" src="{{ new.voucher_ref }}">
-            </div>
-            <div class="news-item__horzon"></div>
-            <div class="weui-flex news-item__bottom">
-                <div class="weui-flex__item" style="padding-left: 50px;">
-                    <span style="color: #B6C1C8;">{{ new.date }}</span>
-                </div>
-                <div class="weui-flex__item weui-flex">
-                    <a href="javascript:;" class="news-item__tail-btn weui-flex__item parise-btn">
-                        <span class="news-item__tail-img__parise"></span>
-                        <span class="news-item__tail-text">赞</span>
-                    </a>
-                    <a href="javascript:;" class="news-item__tail-btn weui-flex__item report-btn" style="margin-left: 5px;">
-                        <span class="news-item__tail-text">举报</span>
-                    </a>
-                </div>
-            </div>
-        </li>
+
+            {% endif %}
         {% endfor %}
-	</ul>
+    {% endfor %}
+    </div>
+
+    <!--跑步记录朋友圈-->
+
+    <div style="margin-top: 5px;">
+        <ul class="news-list">
+            {% for new in news %}
+{#                {{ new.test }}------{{ new.test1 }}-----{{ new.test2 }}#}
+            <li class="news-item" data-punch="{{ new.punch_id }}">
+                <div class="new-item__content">
+                    <div>
+                        <img src="{{ new.headimage }}" class="news-item__header-img pictureEnlarge">
+                        <span class="news-item__header-text">{{ new.name }}</span>
+                        <span style="margin-left: 10px;color: #B6C1C8;">完成</span>
+                        <span style="margin-left: 2px;">{{ new.distance }}</span>
+                        <span style="margin-left: 2px; color: #B6C1C8;">km</span>
+                    </div>
+                    <div>
+                        <p style="text-indent:2em;margin-left: 32px;">{{ new.document|default:"" }}</p>
+                    </div>
+                    <div class="news-item__content weui-flex" style="">
+
+                        {% for foo in new.voucher_ref %}
+                            <div class="weui-flex__item" style="">
+                                <img class="news-item__content-img box_left pictureEnlarge" src="{{ foo }}">
+                            </div>
+                        {% endfor %}
+
+
+                    <!--
+
+                        <div class="weui-flex__item"  style="">
+                            <img class="news-item__content-img box_content pictureEnlarge" src="http://img.zcool.cn/community/01080755c1edaf32f87528a18e9840.jpg@900w_1l_2o_100sh.jpg">
+                        </div>
+
+                        <div class="weui-flex__item"  style="">
+                            <img class="news-item__content-img box_content pictureEnlarge" src="http://img3.redocn.com/tupian/20150323/jingmeizhengshubiankuangsucai_4044012.jpg">
+                        </div>
+
+
+                        -->
+
+                    </div>
+
+                </div>
+                <div class="news-item__horzon"></div>
+                <div class="weui-flex news-item__bottom">
+                    <div class="weui-flex__item" style="padding-left: 50px;">
+                        <span style="color: #B6C1C8;">{{ new.date }}</span>
+                    </div>
+                    <div class="weui-flex__item weui-flex">
+                        {% if new.is_no_praise == 1 %}
+                            <button href="javascript:;" class="news-item__tail-btn weui-flex__item parise-btn active weui-flex__item_1_2"
+                                    style="color: rgb(182, 193, 200); border: 1px solid rgb(182, 193, 200);" disabled="disabled">
+                                <i class="iconfont icon-dianzan"></i>
+                                <span class="news-item__tail-text" style="color: rgb(182, 193, 200);">已赞 <span class="praise">
+                                    {% if new.praise == 0 %}
+                                    {% else %}
+                                        {{ new.praise }}
+                                    {% endif %}</span>
+                                </span>
+                            </button>
+                        {% else %}
+                            <button href="javascript:;" class="news-item__tail-btn weui-flex__item parise-btn" punch_id="{{ new.punch_id }}" sta="{{ new.praise }}" style="color: rgba(31,162,255,1);">
+                                <i class="iconfont icon-dianzan"></i>
+                                <span class="news-item__tail-text" >赞 <span class="praise">
+                                        {% if new.praise == 0 %}
+                                        {% else %}
+                                            {{ new.praise }}
+                                        {% endif %}
+                                    </span>
+                                </span>
+                            </button>
+                        {% endif %}
+
+
+                        {% if new.is_no_report == 1 %}
+                            <button href="javascript:;" class="news-item__tail-btn weui-flex__item"
+                                    style="margin-left: 5px; border: 1px solid rgb(182, 193, 200);" disabled="disabled">
+                                <span class="news-item__tail-text" style="color: rgb(182, 193, 200);">已举报</span>
+
+                            </button>
+                        {% else %}
+                            <button href="javascript:;" class="news-item__tail-btn weui-flex__item report-btn" punch_id="{{ new.punch_id }}" style="margin-left: 5px;">
+                                <span class="news-item__tail-text">举报</span>
+                            </button>
+                        {% endif %}
+
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+
+        </ul>
+    </div>
+
+    <!--上传任务弹出框-->
+    <!--  上传1 张 图片-->
+
+        <div id="upload-popup" class="weui-popup__container popup-bottom">
+            <div class="weui-popup__overlay"></div>
+
+            <div class="container">
+                <div class="weui-popup__modal one">
+                    <div class="modal-content">
+                        <div class="row-center center" id="upload-popup__distance-panel" style="height: 50px;justify-content:inherit;overflow: hidden;z-index: 99999999999999999;">
+                            {% if goal.goal_type == 0 %}
+                            <span style="font-size: 0.8rem;font-weight: 600;display: inline-block;width: 100px;line-height: 50px;height: 50px;overflow: hidden">公里数</span>
+
+                            <div class="row-center center" style="height: 50px;line-height: 50px;overflow: hidden;z-index: 99999999999999999;">
+                                <div class="mdl-textfield mdl-js-textfield" id="upload-popup__distance-text">
+                                    <input class="mdl-textfield__input" type="number" id="page-input" max="100" style="text-align: center;z-index: 99999">
+                                    <label class="mdl-textfield__label" for="upload-popup__distance-input"></label>
+                                </div>
+                                <span class="panel__target-text__side">km</span>
+                            </div>
+                            {% else %}
+                            <span style="font-size: 0.8rem;font-weight: 600;display: inline-block;width: 100px;line-height: 50px;height: 50px;overflow: hidden">公里数</span>
+
+                            <div class="row-center center" style="height: 50px;line-height: 50px;overflow: hidden">
+        {#                        <input class="mdl-textfield__input" type="number" id="page-input" max="100" value="{{ goal.kilos_day }}"  style="text-align: center;max-width: 80px;">#}
+                                <span id="page-input" style="margin-right: 10px;text-align: center">{{ goal.kilos_day }}</span>
+                                <span class="panel__target-text__side">km</span>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div style="overflow: hidden;border-bottom: 1px solid  #ededed;width: 80%;margin: 0 auto;height: 70px;">
+                            <textarea class="weui-textarea" id="document_text" placeholder="写下此刻的感想与收获吧..." rows="3" style="margin: 10px auto;font-size: 13px;z-index: 99999"></textarea>
+                        </div>
+                        <div id="upload-image-panel" style="height: 200px;overflow: hidden;">
+                            <img src="" id="upload_img_file" style="position: absolute;width: auto;height: 200px;z-index: 501;opacity: 0;" >
+                            <!--
+                            <p id="upload_img_file_p">+ 点击上传照片</p>
+                            <input type="file" accept="image/*" multiple style="background-color: red;position: absolute;width: 1000px;height: 500px;opacity: 0;z-index: 5000;top: 0;left: 0;right: 0;bottom: 0;margin: auto;" >
+                            -->
+                            <div class="weui-uploader__input-box" id="upload_img_file_p" style="z-index: 99999999999999999999999;opacity: 1;width: 101%;border: none;height: 200px;">
+                                <input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*" >
+                            </div>
+                        </div>
+                        <div style="height: 40px;">
+
+                        </div>
+                        <button class="weui-btn weui-btn_primary" id="reading-confirm-btn" style="    position: absolute;bottom: 0;height: 40px;line-height: 40px;overflow: hidden">
+                            确认
+                        </button>
+                    </div>
+                </div>
+
+                <div class="weui-popup__modal two" style="height: 60%;width: 60%;">
+                    <div style="position: relative;">
+                        <img id="goal_img" src="/static/images/goal/1@2x.jpg" style="width: 100%">
+                        <div style="position: absolute;bottom: 30px;right: 10px;width: 100px">
+                            <img src="/static/images/goal/5732@2x.png" style="width: 100%;">
+                        </div>
+                        <div style="position: absolute;bottom: 40px;right: 10px;width: 100px;text-align: center;color: white;">
+                            <p class="now_d">28</p>
+                            <p class="now_m">28</p>
+                        </div>
+                        <div style="position: absolute;bottom: 10px;right: 10px;width: 100px;text-align: center;color: white;">
+                            <p class="now_y">2018</p>
+                        </div>
+                    </div>
+
+                    <div style="background: url('/static/images/goal/572@2x.png') no-repeat center;background-size: contain;width: 150px;height: 40px;line-height: 40px;display: block;margin: auto;">
+                        <p style="text-align: center;height: 40px;line-height: 40px;font-size: 16px;">第 {{ punch_day|add:1 }} 天</p>
+                    </div>
+
+                    <div style="text-align: center;">
+                        <p style="font-size: 10px;line-height: 20px;">{{ app.active_participants|default:0 }}正在参与</p>
+                        <p style="font-size: 10px;line-height: 20px;">「跑步活动」</p>
+                    </div>
+                    <div style="display: block;width: 20%;margin: 10px auto 0px;">
+                        <img id="share_1" src="/static/images/share/789@2x.png" style="width: 100%">
+                    </div>
+
+                </div>
+            </div>
+
+            <div sta="0" class="click_col"  style="width: 30px;display: block;margin: auto;position: absolute;bottom:50px;left: 0;right: 0;z-index: 999999999999999;">
+                <img src="/static/images/goal/col.png" style="width: 100%;display: block;margin: auto;">
+            </div>
+
+        </div>
+
+
+
+
+
+
+    <!-- 弹窗-->
+    <div class="">
+
+
+        <div class="mask_on" style="display: none"></div>
+        <div class="mask_on_1" style="display: none"></div>
+        <div class="mask_on__1" ></div>
+        <div class="mask_on__container"></div>
+
+        <div class="qqGroupCode_box" style="opacity: 0;display: block;width: 70%;">
+            <div class="swiper-container_on_share_run">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide" data-link="#">
+                        <img src="/static/images/on_share/on_share_run_1.jpg" style="width: 100%;" >
+                    </div>
+                    <div class="swiper-slide" data-link="#">
+                        <img src="/static/images/on_share/on_share_run_2.jpg" style="width: 100%;" >
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activityDescription_box" style="display: none">
+            <div>
+                <h4 style="text-align: center;margin: 5px auto 10px;">#跑步说明#</h4>
+                <p style="font-size: 12px;line-height:18px;"><strong>自由模式：</strong><br>
+                    用户需要在目标天数内跑步累计目标距离，并可分为一次或多次完成累计。（最后一日结算）
+                </p>
+
+                <p style="font-size: 12px;line-height:18px;"><strong>日常模式：</strong><br>
+                    用户需要在目标天数内每日完成目标距离，在活动中会有一次或多次免签机会。（每日根据打卡结算）
+                </p>
+
+                <p style="font-size: 12px;line-height:18px;">
+                    每次记录都需上传一张图片作打卡记录，图片必须包含距离、速度、日期等基本信息。（跑步软件截图、跑步机照片均可。）跑步配速应在<u>2’02’’~12’00’’</u>之间，每次记录不得少于<u>1km</u>。每日<u>23:45</u>前需上传<u>当日</u>跑步记录，逾期不可补交。
+                </p>
+                <p style="font-size: 12px;line-height:18px;">
+                    注：跑步机照片需添加时间水印，以免被举报或盗图。另外由于本活动或受天雨影响，因此用户也可在每日<u>18:00</u>前向客服申报获取免签等机会。（仅限<u>日常模式</u>，或收取一定费用。）（举报：当举报审核通过，或当日直接计为未完成。）
+                </p>
+            </div>
+        </div>
+
+
+        <!-- 押金 -->
+        <div class="detailed_box_text"  style="display: none;width: 60%;">
+            <p style="text-align: center;font-size: 16px">押金 <a href="https://mp.weixin.qq.com/s/e7LQzUe6DjaN9Zc9rjafFQ" style="color:rgba(31, 162, 255, 0.8);font-size: 12px;">（了解更多）</a></p>
+            <div class="detailed_box__1">
+                <div class="weui-flex">
+                    <div class="weui-flex__item" style="padding-left: 10px;">
+                        <p>&#12288;</p>
+                        <p style="text-align: center">保证金</p>
+                        <p style="text-align: center">底&#12288;金</p>
+                    </div>
+                    <div class="weui-flex__item">
+                        <p  class="font_color_1">&#12288;</p>
+                        <p><span class="">{{ goal.guaranty|floatformat:2 }}</span>元</p>
+                        <p><span class="">{{ goal.down_payment|floatformat:2 }} </span>元</p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
     <div id="goal-id__get" hidden>{{ goal.goal_id }}</div>
-	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
-	<script type="text/javascript" src="/static/js/fastclick.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-2.1.4.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-weui-2.1.4.js"></script>
+    <script type="text/javascript" src="/static/js/fastclick.js"></script>
+    <script type="text/javascript" src="/static/js/public.js"></script>
+{#	<script type="text/javascript" src="/static/js/jquery.min.js"></script>#}
+{#	<script type="text/javascript" src="/static/js/fastclick.js"></script>#}
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+
 	<script>
 		// fast click binding
 		$(function () {
 			FastClick.attach(document.body);
+			$(".mask_on__1").hide();
+			$(".qqGroupCode_box").hide();
+			$(".qqGroupCode_box").css("opacity","1");
+
 		});
+		//去除广告
+        $("#_embed_v3_dc").detach();
+        $("iframe").detach();
 	</script>
-	<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
+{#	<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>#}
 	<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="/static/js/material.min.js"></script>
 	<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <script type='text/javascript' src='/static/js/swiper.min.js' charset='utf-8'></script>
+    <script>
+        var swiper_on_share = new Swiper('.swiper-container_on_share_run', {
+            autoplay: true,
+            loop:true,
+        });
+    </script>
+
+
     <!--配置CSRF保护-->
     <script>
         $.ajaxSetup({
@@ -341,181 +1195,815 @@
     </script>
     <!--注入Config信息-->
 	<script>
-	{{ WechatJSConfig|safe}}
+        {{ WechatJSConfig|safe}}
+
+        wx.ready(function() {
+            wx.hideAllNonBaseMenuItem();
+            wx.hideOptionMenu();
+        })
+
 	</script>
     <script>
+            var guaranty='{{ goal.guaranty|floatformat:2 }}';
+            var down_payment ='{{ goal.down_payment|floatformat:2 }}'; //底金
+            $("#guaranty_down_payment").text(parseFloat(Number(guaranty)+Number(down_payment)));
+
         $(".header_date").click(function () {
             // 如果不能点击，则不处理
             if($(this).hasClass("notouch")){
                 return;
             }
-            var num = $(this).html().trim();
+            var num = $(this).attr("num");
             $(".header_date.active").removeClass("active");
             $(this).addClass("active");
-            $(".datespanel").hide();
-            $("#datespanel" + num).show();
+            //$(".datespanel").hide();
+            //$("#datespanel" + num).show();
             $(".day-index").hide();
-            $("#dayindex" + num).show();
+            $(".dayindex_" + num).show();
         });
-    function uploadBtnFinish(text) {
-        var upload_btn = $("#upload-btn");
-        upload_btn.text(text);
-        upload_btn.addClass("finish");
-        upload_btn.attr({"disabled":"disabled"});
-        $("#avoid-btn").hide();
-    }
-    $("#backup-btn").click(function () {
-        window.location.href = 'index';
-    });
-    $(".weui-popup__overlay").click(function () {
-        $("body").removeClass("popup-open");
-    });
-	$("#avoid-btn").click(function(){
-		var count = parseInt($("#avoid-count").html());
-		if(count > 0){
-			$.confirm({
-			title: '使用免签券',
-			text: '一张券可以免签一次，确认使用？',
-			onOK: function () {
-                    $("#avoid-count").html((count-1).toString());
-                    $.post('/api/running_no_sign_in',{
-                        goal:$("#goal-id__get").html().trim()
-                    },function (response) {
-                        if(response['status'] === 200) {
-                            $.toast("操作成功");
-                            uploadBtnFinish("免签");
-                        }
-                        else{
-                            $.toast("操作失败","cancel");
-                        }
-                    });
-			    }
-			});
-		}
-		else{
-			$.toast("免签券不够","cancel");
-		}
-	});
 
-	$("#upload-btn").click(function () {
-	    $("#upload-popup").popup();
-        $("body").addClass("popup-open");
-    });
-    function initDateCss() {
-        var header = $(".header_date");
-        var width = 1.2 * header.height()+"px";
-        header.css('width',width);
-        header.css('height',width);
-        header.css('line-height', width);
-    }
-    $(document).ready(function () {
-        initDateCss();
-    });
-    wx.ready(function() {
-    });
-    var images = {
-        localId: [],
-        serverId: []
-    };
-    $("#upload-image-panel").click(function () {
-        wx.chooseImage({
-            count: 1,
-            sourceType: ['album'],
-            success: function (res) {
-                images.localId = res.localIds;
-                $("#upload-image-panel").html("");
-                $("#upload-image-panel").html("<img src=\""+images.localId[0]+"\">");
-            }
+        function uploadBtnFinish(text) {
+            //alert(text);
+            var upload_btn = $("#upload-btn");
+            upload_btn.text(text);
+            upload_btn.addClass("finish");
+            upload_btn.attr({"disabled":"disabled"});
+            $("#avoid-btn").hide();
+            var datesdayindex = $("#datesdayindex").val();
+            console.log(datesdayindex);
+            $("#unfinishedTask_"+datesdayindex).text(text);
+        }
+
+        $("#backup-btn").click(function () {
+            window.location.href = 'index';
         });
-    });
-    $("#reading-confirm-btn").click(function () {
-        if (images.localId.length == 0) {
-            $.toast("请先上传图片", "cancel");
-            return;
-        }
-        {% if goal.goal_type == 0 %}
-        var distance = parseFloat($("#page-input").val());
-        {% else %}
-        var distance = parseFloat($("#page-input").html());
-        {% endif %}
-        if(isNaN(distance)){
-            $.toast("请填写有效的公里数", "cancel");
-            return;
-        }
-        var limit = parseFloat($(".panel__target-text").html());
-        if(distance > limit){
-            $.toast("不能超过当日限制", "cancel");
-            return;
-        }
-        var i = 0, length = images.localId.length;
-        images.serverId = [];
 
-        function successUpload() {
-            $.toast("上传成功", "success");
-            $("#reading-confirm-btn").text('上传成功');
-            $.closePopup();
-            $("body").removeClass("popup-open");
-            uploadBtnFinish("已成功打卡");
-        }
-
-        function upload() {
-            $("#reading-confirm-btn").text('上传中');
-            $("#reading-confirm-btn").append('<i class="weui-loading"></i>');
-            wx.uploadImage({
-                localId: images.localId[i],
-                success: function (res) {
-                    i++;
-                    images.serverId.push(res.serverId);
-                    if (i < length) {
-                        upload();
-                    }
-                    else if (i === length) {
-                        $.get('/api/running_sign_in', {
-                                "serverId": res.serverId,
-                                "distance": distance,
-                                "goal": $("#goal-id__get").html()
+        //使用免签券
+        $("#avoid-btn").click(function(){
+            var count = parseInt($("#avoid-count").html());
+            if(count > 0){
+                $.confirm({
+                title: '使用免签券',
+                text: '一张券可以免签一次，确认使用？',
+                    onOK: function () {
+                    //$.showLoading();
+                    //$(".weui-toast_content").text("免签券使用中...");
+                        $("#avoid-count").html((count-1).toString());
+                        $.ajax({
+                            type: "post",
+                            url: "/api/running_no_sign_in",
+                            data:{
+                                goal:$("#goal-id__get").html().trim()
                             },
-                            function (reponse) {
-                            successUpload();
-                        });
-                    }
-                },
-                fail: function (res) {
-                    alert(JSON.stringify(res));
-                }
-            });
-        }
+                            success: function (res) {
+                                console.log(res);
+                                $.hideLoading();
+                                //console.log("成功");
+                                //console.log(res);
+                                if(res.status == "200") {
+                                    $.toast("免签成功", "success", function () {
+                                        window.location.reload();
+                                        uploadBtnFinish("已使用免签券抵消");
+                                    });
+                                }else{
+                                    $.toast("操作失败","cancel");
+                                }
 
-        upload();
-    });
-
-    $(".parise-btn").click(function () {
-        $(this).addClass("active");
-        $.post('/api/running_praise',{
-            punch:$(this).parents(".news-item").data('punch')
-        });
-    });
-
-    $(".report-btn").click(function () {
-        var report_btn = $(this);
-        $.confirm({
-			title: '举报',
-			text: '确认举报该用户打卡记录不属实？举报后将有管理员进行审核',
-			onOK: function () {
-			    $.post('/api/running_report',{
-			        punch:report_btn.parents(".news-item").data('punch')
-                },function (response) {
-			        if(response['status'] === 200){
-			            $.toast("举报成功");
-                    }
-                    else{
-			            $.toast("举报失败,<br/>请联系客服","cancel");
+                            },
+                            error:function(res){
+                                $.hideLoading();
+                            }
+                        })
                     }
                 });
             }
+            else{
+                $.toast("免签券不够","cancel");
+            }
         });
-    });
+
+        //点击上传任务 签到 弹出窗口
+        $("#upload-btn").click(function () {
+            var Num=$(this).attr("Num");
+            $("#reading-confirm-btn").attr("Num",Num);
+
+            if(Num==2){
+                var punch_id=$(this).attr("punch_id");
+                $("#reading-confirm-btn").attr("punch_id",punch_id);
+                var reload_Num=Number($(this).attr("reload"));
+                var nn=3-reload_Num;
+                if(reload_Num<3){
+                    $.confirm("你还可以重新上传"+nn+"次！", function() {
+                      //点击确认后的回调函数
+                        $(".mask_on__container").show();
+                        $("#upload-popup").popup();
+                        $("body").addClass("popup-open");
+                     }, function() {
+
+                      //点击取消后的回调函数
+                    });
+                }else{
+                    $.toast("无重新上传机会", "cancel");
+                    return
+                }
+            }else{
+                $(".mask_on__container").show();
+                $("#upload-popup").popup();
+                $("body").addClass("popup-open");
+            }
+
+            {% if goal.goal_type == 0 %}
+                //自由模式
+                $("#page-input").val("");
+                $("#document_text").val("");
+                //$("#upload-image-panel").html("<p>+ 点击上传照片</p>");
+            {% else %}
+                //日常模式
+                $("#document_text").val("");
+                //$("#upload-image-panel").html("<p>+ 点击上传照片</p>");
+            {% endif %}
+
+        });
+
+        //关闭 签到 弹出
+        $(".weui-popup__overlay").click(function () {
+            //console.log("关闭");
+            $("body").removeClass("popup-open");
+        });
+
+        function initDateCss() {
+            var header = $(".header_date");
+            var width =  $(".row-center_1").width();
+            header.css('width',width/8);
+            //header.css('height',width/8);
+            //header.css('lineHeight', width/8 +"px");
+        }
+
+        $(document).ready(function () {
+            initDateCss();
+        });
+
+        //点赞
+        $(".parise-btn").click(function () {
+            $(this).addClass("active");
+            var sta =Number($(this).attr("sta"))+1;
+            //alert(sta)
+            var parise_btn=$(this);
+            var punch_id=$(this).attr('punch_id');
+            //alert(punch_id);
+            $.post('/api/running_praise',{
+                punch:punch_id,
+            },function (response) {
+                parise_btn.find(".news-item__tail-text").css("color","#B6C1C8");
+                parise_btn.css("color","rgb(182, 193, 200)");
+                parise_btn.find(".news-item__tail-text").text("已赞"+ sta);
+                parise_btn.css("border","1px #B6C1C8 solid");
+                parise_btn.removeClass("report-btn");
+                parise_btn.attr("disabled","disabled");
+            });
+        });
+
+        //举报
+        $(".report-btn").click(function () {
+            var report_btn = $(this);
+            //console.log(report_btn.parents(".news-item").data('punch'));
+            var punch_id=$(this).attr('punch_id');
+            //alert(punch_id);
+            $.confirm({
+                title: '举报',
+                text: '确认举报该用户打卡记录不属实？举报后将有管理员进行审核',
+                onOK: function () {
+                    $.post('/api/running_report',{
+                        punch:punch_id
+                    },function (response) {
+                        if(response['status'] === 200){
+                            $.toast("举报成功");
+                            report_btn.find(".news-item__tail-text").css("color","#B6C1C8");
+                            report_btn.find(".news-item__tail-text").text("已举报");
+                            report_btn.css("border","1px #B6C1C8 solid");
+                            report_btn.removeClass("report-btn");
+                            report_btn.attr("disabled","disabled");
+
+                        }
+                        else{
+                            $.toast("举报失败,<br/>请联系客服","cancel");
+                        }
+                    });
+                }
+            });
+        });
     </script>
+
+    <script>
+        $(function() {
+            var swiper_1 = new Swiper('.swiper-container_1', {
+                autoplay: false,
+                loop:false,
+                initialSlide :100
+            });
+
+
+            //打卡说明
+            $("#activityDescription_but").click(function () {
+                $(".activityDescription_box").show();
+                $(".mask_on").show();
+            });
+
+            //添加QQ 群
+            $("#qqGroupCode").click(function () {
+                $(".qqGroupCode_box").show();
+                $(".mask_on").show();
+            });
+            //detailed_box_text_but
+            $("#detailed_box_text_but").click(function () {
+                $(".detailed_box_text").show();
+                $(".mask_on").show();
+            });
+            
+            //关闭弹窗
+            $(".mask_on").click(function () {
+                $(".rule_box_text").hide();
+                $(".detailed_box_text").hide();
+                $(".qqGroupCode_box").hide();
+                $(".activityDescription_box").hide();
+                $(this).hide();
+            });
+
+            $(".mask_on__1").click(function () {
+                $(".qqGroupCode_box").hide();
+                $(".qqGroupCode_box").css("opacity","1");
+                $(this).hide();
+            });
+
+        });
+
+    </script>
+    <!-- 获取擂主押金 -->
+    <script>
+         //指定10秒刷新一次
+         //search_deposit();
+        function search_deposit() {
+            //console.log("获取擂主押金");
+            setTimeout('search_deposit()',100000);
+            $.ajax({
+                type: "GET",
+                url: "/api/search_deposit",
+                data:{
+                },
+                success: function (res) {
+                    $.hideLoading();
+                    $(".challenger_deposit").hide();
+                    //console.log("成功");
+                    //console.log(res);
+                    if(res.status == "200"){
+                        var data=String(parseInt(res.winner));
+                        var wwww=Number({{ app.bonus_all|floatformat:"0" }});
+                        //console.log(wwww);
+                        var uuuuu=Number(res.winner)+wwww-10000;
+                        //console.log(uuuuu);
+                        //$("#app_bonus_all").text(uuuuu);
+
+                        //console.log(data);
+                        var winner=data.split("");
+                        //console.log(winner.length);
+                        var l=winner.length-1;
+                        //console.log(l);
+                        for (var i=l;i>=0;i--) {
+                            //console.log("i"+i);
+
+                            $(".challenger_deposit_"+i).parent().show();
+                            $(".challenger_deposit_"+i).text(winner[i]);
+                        }
+                    }else if (res.status == "403"){
+                        $(".challenger_deposit_"+1).parent().show();
+                        $(".challenger_deposit_"+1).text(0);
+                    }else{
+                        $(".challenger_deposit_").parent().hide();
+                    }
+
+                    //console.log(res.winner.toString(0));
+                },
+                error:function(res){
+                    $.hideLoading();
+                    //console.log("错误");
+                    //console.log(res);
+                    $(".challenger_deposit_").parent().hide();
+                }
+            })
+        }
+
+    </script>
+
+    <!--  图片放大  -->
+    <script>
+        {% if goal.goal_type == 0 %}
+            //自由模式
+            $("#page-input").on("focus",function () {
+                $(this).val("");
+                console.log("cs")
+            });
+        {% else %}
+            //日常模式
+
+        {% endif %}
+        $("#document_text").on("focus",function () {
+            //$(this).val("");
+            console.log("cs")
+        });
+
+
+
+
+        //图片放大
+        $("body").on("click", ".pictureEnlarge", function () {
+            var src_img = $(this).attr("sta_url");
+            if(src_img==undefined || src_img=="" || src_img==null){
+                //console.log("console.log(src_img);");
+                //console.log(src_img);
+                src_img = $(this).attr("src");
+            }
+            var ImageData_ = $.photoBrowser({
+                items: [
+                    {
+                        image: src_img,
+                        caption: ""
+                    }
+                ]
+            });
+            ImageData_.open();
+        });
+
+    </script>
+
+    <!--- 邀请 -->
+    <script>
+
+        var extra_earn=Number({{ extra_earn |default:'0'}});
+        //extra_earn=1000;
+        if(extra_earn==0){
+            $("#invite_num_plus").hide();
+        }else{
+            $("#invite_num_plus_1").text("+"+extra_earn+' 元');
+        }
+
+        var invite_num=Number({{ invite_num }});
+
+        if(invite_num>10){
+            $("#invite_num_plus_2").text('X500%');
+        }else if(invite_num==0){
+            //$("#invite_num_plus_2").text('X1000%');
+            $("#invite_num_plus_2").hide();
+        }else {
+            var invite_num_text=(1+invite_num*0.5)*100;
+            $("#invite_num_plus_2").text('X'+invite_num_text+'%');
+        }
+
+    </script>
+
+    <!-- 图片上传 改用 base64 -->
+    <script>
+
+        var file_filepath='';
+        var file_refpath='';
+        //图片转成base64 方法
+/*
+        function setImagePreview() {
+            //console.log();
+            var file = document.getElementById("file").files[0];
+            if(!/image\/\w+/.test(file.type)){
+                alert("请确保文件为图像类型");
+                return false;
+            }
+
+            var reader = new FileReader();
+            reader.onload = function(){
+                var base64 = reader.result;
+                console.log(base64);
+                base_64(base64)
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function base_64(base64) {
+            setTimeout(function () {
+                $(".weui-toast_content").text("图片获取中...");
+                $.ajax({
+                   type: "post",
+                   url: "/api/get_base",
+                   data: {
+                       "base64": base64
+                   },
+                   success: function (res) {
+                       if(res.status == 200){
+                           file_filepath=res.file_filepath;
+                           file_refpath=res.file_refpath;
+                           $('#upload_img_file').attr('src',file_refpath);
+                           $("#upload_img_file_p").css("opacity",0);
+                           setTimeout(function () {
+                               $.hideLoading();
+                           }, 1000);
+                       }else{
+                           $.hideLoading();
+                           $.toast("获取失败！请重试上传图片", "cancel",function () {
+
+                           });
+                       }
+                   },
+                   error:function(res){
+                       $.hideLoading();
+                       $.toast("请重试上传图片", "cancel",function () {
+
+                       });
+                       console.log(res)
+                   }
+                });
+
+            }, 1000);
+        }
+
+
+        function run(input_file,get_data){
+            if ( typeof(FileReader) === 'undefined' ){
+                alert("抱歉，你的浏览器不支持 FileReader，不能将图片转换为Base64，请使用现代浏览器操作！");
+            } else {
+                try{
+
+                    var file = input_file.files[0];
+                    //这里我们判断下类型如果不是图片就返回 去掉就可以上传任意文件
+
+                    if(!/image\/\w+/.test(file.type)){
+                        alert("请确保文件为图像类型");
+                        return false;
+                    }
+
+                    var reader = new FileReader();
+                    reader.onload = function(){
+                        get_data(this.result);
+                    };
+                    reader.readAsDataURL(file);
+                }catch (e){
+                    alert('图片转Base64出错啦！'+ e.toString())
+                }
+            }
+        }
+        */
+
+        function ImgToBase64(file, maxLen, callBack) {
+            var img = new Image();
+
+            var reader = new FileReader();//读取客户端上的文件
+            reader.onload = function () {
+                var url = reader.result;//读取到的文件内容.这个属性只在读取操作完成之后才有效,并且数据的格式取决于读取操作是由哪个方法发起的.所以必须使用reader.onload，
+                img.src = url;//reader读取的文件内容是base64,利用这个url就能实现上传前预览图片
+            };
+            img.onload = function () {
+                //生成比例
+                var width = img.width, height = img.height;
+                //计算缩放比例
+                var rate = 1;
+                if (width >= height) {
+                    if (width > maxLen) {
+                        rate = maxLen / width;
+                    }
+                } else {
+                    if (height > maxLen) {
+                        rate = maxLen / height;
+                    }
+                };
+                img.width = width * rate;
+                img.height = height * rate;
+                //生成canvas
+                var canvas = document.createElement("canvas");
+                var ctx = canvas.getContext("2d");
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0, img.width, img.height);
+                var base64 = canvas.toDataURL('image/jpeg', 0.9);
+                callBack(base64);
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        $(function () {
+            //input 上传图片
+        /* */
+           $("input[accept='image/*']").change(function () {
+               $.showLoading();
+               $(".weui-toast_content").text("图片获取中...");
+                var file = $(this)[0].files[0];//获取input file控件选择的文件
+                ImgToBase64(file, 1080, function (base64) {
+                    console.log(base64);
+                    //$("#result").attr("src",base64)
+                    //预览页面上预留一个img元素，载入base64
+                    //设定宽高，不然会自动按照压缩过的图片宽高设定，有可能超出预想的范围。
+        　　　　　　　　　　　//直接利用ajax上传base64到服务器，完毕
+                    setTimeout(function () {
+
+                       $.ajax({
+                               type: "post",
+                               url: "/api/get_base",
+                               data: {
+                                   "activity":"running/",
+                                   "base64": base64
+                               },
+                               success: function (res) {
+                                   if(res.status == 200){
+                                       file_filepath=res.file_filepath;
+                                       file_refpath=res.file_refpath;
+                                       $('#upload_img_file').attr('src',file_refpath);
+                                       $('#upload_img_file').css('opacity',1);
+                                       $("#upload_img_file_p").css("opacity",0);
+                                       setTimeout(function () {
+                                           $.hideLoading();
+                                       }, 500);
+                                   }else{
+                                       $.hideLoading();
+                                       $.toast("获取失败！请重试上传图片", "cancel",function () {
+
+                                       });
+                                   }
+                               },
+                               error:function(res){
+                                   $.hideLoading();
+                                   $.toast("请重试上传图片", "cancel",function () {
+
+                                   });
+                                   console.log(res)
+                               }
+                           });
+                    }, 1000);
+                });
+
+           });
+
+
+           //点击上传 按钮
+            $("#reading-confirm-btn").on("click",function() {
+
+                {#$(".two").css("transform","rotateY(180deg)");#}
+                {#$(".container").css("transform","rotateY(180deg)");#}
+                {#$(".two").css("opacity","1");#}
+                {#$(".two").show();#}
+                {#$(".one").css("opacity","0");#}
+                {##}
+                {#return#}
+
+                $.showLoading();
+                $(".weui-toast_content").text("提交中...");
+                var document_val=$("#document_text").val();
+
+                 /*  输入说明 控制长度 和 特殊字符 */
+                if(document_val.length==0){
+
+                }else{
+                    if (document_val.length > 200) {
+                        $.hideLoading();
+                        $.toptip("不能超过200字", "error");
+                        $("#document_text").focus();
+                        return
+                    }
+
+                    var pattern = /^[a-zA-Z-—=+。，!！￥$#、？：“”`~@%^&*(){}【】[ ;|；,.'‘’\d\u4E00-\u9FA5]+$/i;
+                    /*
+                    if (pattern.test(document_val)){
+                    } else{
+                        $.toptip('含有符号，请重试！', 'error',function () {
+                            $("#document_text").focus();
+                        });
+
+                        $.hideLoading();
+                        return
+                    }
+                    */
+
+                }
+
+                /*  判断上传 图片是否为空 */
+                console.log(file_refpath);
+                if (file_refpath == ''||file_refpath==null || file_refpath==undefined ) {
+                    $.hideLoading();
+                    $.toast("请先上传图片", "cancel");
+                    //$.hideLoading();
+                    return;
+                }
+
+                /*  判断打卡 时间 */
+                if (time_1()) {
+                    console.log("可以打卡")
+                }else {
+                    $.hideLoading();
+                    $.toast("打卡时间已过", "cancel");
+                    //$.hideLoading();
+                    return;
+                }
+
+                /*  获取公里数 */
+                {% if goal.goal_type == 0 %}
+                    var distance = parseFloat($("#page-input").val());
+                    if(distance>99.99){
+                        $.hideLoading();
+                        $.toast("请填写有效的公里数", "cancel");
+                        //$.hideLoading();
+                        return;
+                    }
+                {% else %}
+                    var distance = parseFloat($("#page-input").text());
+                    if(distance>99.99){
+                        $.hideLoading();
+                        $.toast("请填写有效的公里数", "cancel");
+                        //$.hideLoading();
+                        return;
+                    }
+                {% endif %}
+
+                if(isNaN(distance)){
+                    $.hideLoading();
+                    $.toast("请填写有效的公里数", "cancel");
+                    //$.hideLoading();
+                    return;
+                }
+
+                /*  获取goal_id  */
+                var goal_id =$("#goal-id__get").html();
+                /*  ajax 提交 */
+
+                var Num=$(this).attr("Num");
+                if(Num=="2"){
+                    var punch_id=$("#reading-confirm-btn").attr("punch_id");
+                    reopenedUpload(distance,document_val,goal_id,punch_id)
+                }else{
+                    upload(distance,document_val,goal_id);
+                }
+
+                console.log("file_filepath:"+file_filepath);
+                console.log("file_refpath:"+file_refpath);
+
+                console.log("distance:"+distance);
+                console.log("document_val:"+document_val);
+                console.log("goal_id:"+goal_id);
+                //$(".weui-toast_content").text("打卡中...");
+                //ajax end
+
+            });
+            //点击上传 结束
+            //打卡
+            function upload(distance,document_val,goal_id) {
+                $.ajax({
+                    type: "post",
+                    url: "/api/running_sign_in",
+                    data:{
+                        "file_filepath":file_filepath,
+                        "file_refpath":file_refpath,
+                        "distance": distance,
+                        "document":document_val,
+                        "goal":goal_id,
+                        "random":c
+                    },
+                    success: function (res) {
+                        $(".click_col").attr("sta","123");
+
+                        $(".two").css("transform","rotateY(180deg)");
+                        $(".container").css("transform","rotateY(180deg)");
+                        $(".two").css("opacity","1");
+                        //$(".two").css("zIndex","99999999999999999999999");
+                        $(".two").show();
+                        $(".one").css("opacity","0");
+                        $.hideLoading();
+                        $.toast("上传成功", "success", function () {
+                            //window.location.reload();
+                        });
+                    },
+                    error:function(res){
+                        $.hideLoading();
+                        //console.log(res)
+                    }
+                });
+            }
+
+
+            //重新上传
+            function reopenedUpload(distance,document_val,goal_id,punch_id) {
+
+                $.ajax({
+                    type: "post",
+                    url: "/api/upload_again",
+                    data:{
+                        "file_filepath":file_filepath,
+                        "file_refpath":file_refpath,
+                        "distance": distance,
+                        "document":document_val,
+                        "goal":goal_id,
+                        "punch_id":punch_id,
+                        "random":c
+                    },
+                    success: function (res) {
+                        //console.log(res.status);
+                        $(".click_col").attr("sta","123");
+                        //$(".two").css("zIndex","99999999999999999999999");
+                        $(".two").css("transform","rotateY(180deg)");
+                        $(".container").css("transform","rotateY(180deg)");
+                        $(".two").css("opacity","1");
+                        //$(".two").css("zIndex","99999999999999999999999");
+                        $(".two").show();
+                        $(".one").css("opacity","0");
+                        $.hideLoading();
+
+                        $.toast("上传成功", "success", function () {
+                            //window.location.reload();
+                        });
+
+                    },
+                    error:function(res){
+                        $.hideLoading();
+                        //console.log("失败");
+                        //console.log(res)
+                    }
+                });
+            }
+
+
+            function time_1() {
+                var e = new Date ();
+                var H=e.getHours();
+                var m=e.getMinutes();
+                console.log(H);
+                console.log(m);
+                if(H== 23 && m > 45){
+                    return false
+                }else if(H == 0 && m <15){
+                    return false
+                }else{
+                    return true
+                }
+            }
+
+        });
+    </script>
+    <script>
+        var c = checkNum();
+        function checkNum(){
+            var random = getRandom(1, 51);
+            console.log(random);
+            return random;
+        }
+
+        function getRandom(min, max){
+            var r = Math.random() * (max - min);
+            var re = Math.round(r + min);
+            re = Math.max(Math.min(re, max), min);
+            return re;
+        }
+        $(function () {
+            var colHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+            var colWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+            $(".two").width(colWidth*0.75);
+            $(".two").height(colWidth*0.75*1.65);
+
+
+            console.log(c);
+            $("#goal_img").attr("src", "/static/images/goal/" + c + "@2x.png");
+            $("#goal_img").css("opacity", 1);
+            var da__ = new Date ();
+            var now_d = da__.getDate();
+            var now_y=da__.getFullYear();
+            var now_m=da__.getMonth();
+            var now_m_y=new Array("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Spt","Oct","Nov","Dec");
+            now_m=now_m_y[now_m];
+            //now_m =(now_m<10 ? "0"+now_m:now_m);
+            $(".now_d").text(now_d);
+            $(".now_m").text(now_m);
+            $(".now_y").text(now_y);
+        });
+
+        $(".click_col").click(function () {
+
+            console.log("111111111111111");
+            //关闭弹窗
+            var sta=String($(this).attr("sta"));
+            console.log(sta);
+            if(sta== '0'){
+                $(".container").css("transform","rotateY(0deg)");
+                $(".one").css("opacity","1");
+                $(".two").hide();
+                //$(".two").css("zIndex","106");
+                $(".two").css("opacity","0");
+                $(".mask_on__container").hide();
+                $.closePopup();
+                $("#upload-popup").hide();
+                $("body").removeClass("popup-open");
+            }else if(sta=='123'){
+                //$(".two").css("zIndex","106");
+                setTimeout(function(){
+                    window.location.reload();
+                },500);
+            }
+
+        })
+
+
+    </script>
+
 </body>
 
 </html>

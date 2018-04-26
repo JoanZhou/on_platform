@@ -30,12 +30,12 @@ body{
 
 .tabpage-panel .weui-bar__item--on::after{
     display: block;
-    height: 6px;
+    height: 2px;
     border-radius: 6px;
     position: absolute;
-    top: 42px;
-    width: 160%;
-    left: -65%;
+    top: 46px;
+    width: 158%;
+    left: -68%;
     content: '';
     background:-moz-linear-gradient(left,#2CA7FF,lightblue);/*火狐*/
     background:-webkit-gradient(linear, 0% 0%, 100% 0%,from(#2CA7FF), to(lightblue));/*谷歌*/

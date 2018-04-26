@@ -3,14 +3,79 @@
 
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>On!主页</title>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0 minimum-scale=0.5, user-scalable=no" />
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>我的目标</title>
 	<link rel="stylesheet" href="/static/css/weui.min.css" />
 	<link rel="stylesheet" href="/static/css/bootstrap.min.css" />
 	<link rel="stylesheet" href="/static/css/jquery-weui.min.css" />
 	<link rel="stylesheet" href="/static/css/goal.css" />
 	<link rel="stylesheet" href="/static/css/target.css" />
 	<link rel="stylesheet" href="/static/css/share.css"/>
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_591099_obuxdf4g71d1jor.css"/>
+    <link rel="stylesheet" href="/static/css/public.css">
+
+{#    <link rel="stylesheet" href="/static/css/weui.min.css" />#}
+{#	<link rel="stylesheet" href="/static/css/bootstrap.min.css"/>#}
+{#	<link rel="stylesheet" href="/static/css/share.css"/>#}
+	<link rel="stylesheet" href="/static/css/person.css" />
+{#    <link rel="stylesheet" href="/static/css/jquery-weui.min.css"/>#}
+{#    <link rel="stylesheet" href="//at.alicdn.com/t/font_591099_obuxdf4g71d1jor.css"/>#}
+{#    <link rel="stylesheet" href="/static/css/public.css">#}
+    <style>
+        .icon-user,.icon-mubiao,.icon-huodongzhongxin{
+            font-weight: 500;
+        }
+        .iconfont_on{
+            color:rgba(31,162,255,1) !important;
+        }
+        .no_data{
+            width: 100%;
+            position: relative;
+        }
+        .no_data img{
+            width: 60%;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            position: absolute;
+            margin: auto;
+        }
+        .target-list{
+            border: none;
+        }
+        .weui-tabbar__item.weui-bar__item_on .weui-tabbar__icon, .weui-tabbar__item.weui-bar__item_on .weui-tabbar__icon > i, .weui-tabbar__item.weui-bar__item_on .weui-tabbar__label{
+            color: inherit;
+        }
+        .weui-tabbar__label{
+            color: #999999;
+        }
+        .weui-tabbar a:visited {
+            color: #999;
+        }
+        .weui-tabbar__label{
+            line-height: 25px;
+        }
+        .target-list{
+            width: 96%;
+            display: block;
+            margin: 0 auto;
+        }
+        .target-list li{
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .header-mask{
+            background-color: rgba(0,0,0,0.1);
+            background:linear-gradient(to left,rgba(0,0,0,0),rgba(0,0,0,0.6));
+        }
+
+    </style>
 </head>
 
 <body ontouchstart>
@@ -19,15 +84,24 @@
 		<!--轮播图-->
 		<div class="swiper-container">
 			<div class="swiper-wrapper">
-				<div class="swiper-slide" data-link="https://mp.weixin.qq.com/s?__biz=MzI2Mjc4OTU4Ng==&mid=2247483757&idx=1&sn=bad525c9dfd25e2afc74608058c2210d&chksm=ea4481d0dd3308c670620a8c9ada954888e37a618710ff0dbe41942fc2555f495a980ece56e3#rd">
-					<img src="/static/images/swiper-1.jpg" alt="https://mp.weixin.qq.com/cgi-bin/appmsg?begin=0&count=10&type=10&action=list_card&token=1726753336&lang=zh_CN">
+				<div class="swiper-slide" data-link="#">
+					<img src="/static/images/swiper/swiper-1@2x.png" alt="https://mp.weixin.qq.com/cgi-bin/appmsg?begin=0&count=10&type=10&action=list_card&token=1726753336&lang=zh_CN">
 				</div>
-				<div class="swiper-slide" data-link="https://mp.weixin.qq.com/s?__biz=MzI2Mjc4OTU4Ng==&mid=2247483757&idx=2&sn=52f0b8841ca6bfe2c63098e709fbf4cc&chksm=ea4481d0dd3308c66bfb380995fb5075ebfd6f011247d0708ad4c510a381a9f9f91f699b8d91#rd">
-					<img src="/static/images/swiper-2.jpg" alt="">
+                <!--
+				<div class="swiper-slide" data-link="https://mp.weixin.qq.com/s?__biz=MzI2Mjc4OTU4Ng==&mid=2247483817&idx=1&sn=6855ad2314c6775f1d93aeed0814b9a7&chksm=ea448114dd33080228d4fd03d2d6756c708402146c09ed4be2b45d242d99cc53d87a3287f811#rd">
+					<img src="/static/images/swiper/lei@2x_1.jpg" alt="">
 				</div>
-				<div class="swiper-slide" data-link="https://mp.weixin.qq.com/s?__biz=MzI2Mjc4OTU4Ng==&mid=2247483757&idx=3&sn=e1cb922e553a52fdd49425aea14d7421&chksm=ea4481d0dd3308c6eee06268b1279a9f0d0ed21ffb7bd50c2822efe608a557e9c6bcdfdbf673#rd">
-					<img src="/static/images/swiper-3.jpg" alt="">
+                -->
+				<div class="swiper-slide" data-link="https://mp.weixin.qq.com/s?__biz=MzI2Mjc4OTU4Ng==&mid=2247483823&idx=1&sn=8c1bd6a19c8b7d52af2c6028f662ca5a&chksm=ea448112dd330804f1edc6876ca60b5fa93ed247805e398598d086efb19365e8eff3e15eff43#rd">
+					<img src="/static/images/swiper/InvitingFriends@2x.png" alt="">
 				</div>
+                <!--
+
+                -->
+                <div class="swiper-slide" data-link="https://mp.weixin.qq.com/s/EeqEBNizhRHBG2pI0oGnWw" style="">
+                    <img src="/static/images/swiper/swiper_read@2x.png" alt="">
+                </div>
+
 			</div>
 			<div class="swiper-pagination swiper-pagination-bullets">
 				<span class="swiper-pagination-bullet"></span>
@@ -35,103 +109,109 @@
 				<span class="swiper-pagination-bullet"></span>
 			</div>
 		</div>
-		<!--导航栏, 使用微信风格-->
-		<div class="weui-tabbar">
+
+    	<!--我的目标列表-->
+        {% if status %}
+            <ul class="target-list">
+                {% for goal in goals %}
+                    <li class="target-list-item"  _link_="{{ goal.activity_type }}"  data-link="{{ goal.goal_id|cut:'-' }}?activity_type={{ goal.activity_type }}"
+                        {% if goal.activity_type == "0" %}style="background-image: url(/static/images/sleep_goal_bar.jpg);"{% elif goal.activity_type == "1" %}style="background-image: url(/static/images/run_goal_tubar.jpg);"{% else %}style="background-image: url(/static/images/read/read_goal_bar.png);"{% endif %}>
+                        <div class="header-mask"></div>
+                        <div class="row-center between" style="box-sizing:border-box;width: 100%;margin-top: 5px;padding-right: 10px;">
+                            <div class="item-text">{{ goal.activity_dis }}</div>
+                            <div class="item-status">
+                                {% if goal.detail_status == "NOSTART" %}
+                                <div class="status-text icon-start">尚未开始</div>
+                                {% elif goal.detail_status == "ACTIVE" %}
+                                <div class="status-text icon-active">进行中</div>
+                                {% elif goal.detail_status == "FAILED" %}
+                                <div class="status-text icon-fail">失败</div>
+                                {% else %}
+                                <div class="status-text icon-success">目标完成</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div style="margin-left: 10px;z-index: 10;">
+                            {% if goal.activity_type == "2" %}
+                                <span style="font-size: 14px;color: #B6C1C8;opacity: 0">第</span>
+                                <span style="font-size: 14px;color: white;opacity: 0">天</span>
+                            {% else %}
+                                <span style="font-size: 14px;color: #B6C1C8;">第</span>
+                                <span style="font-size: 16px;font-weight:600;color: white;">
+                                    {% if first_day_record == 1 %}
+                                        {% if goal.past_day >= goal.goal_day %}
+                                            {{ goal.goal_day }}
+                                        {% else %}
+                                            {{ goal.past_day }}
+                                        {% endif %}
+                                    {% else %}
+
+                                        {% if goal.past_day >= goal.goal_day %}
+                                            {{ goal.goal_day }}
+                                        {% else %}
+                                            {{ goal.past_day|add:-1 }}
+                                        {% endif %}
+
+                                    {% endif %}/{{ goal.goal_day }}
+                                </span>
+{#                                <span style="font-size: 16px;font-weight:600;color: white;">{{ goal.past_day }}/{{ goal.goal_day }}</span>#}
+                                <span style="font-size: 14px;color: white;">天</span>
+                            {% endif %}
+
+
+
+                        </div>
+
+                        {% if goal.activity_type  == "1" %}
+                            <div style="margin-left: 10px;z-index: 10;">
+                                <span style="font-size: 14px;color: #B6C1C8;">奖金池：</span>
+                                <span style="font-size: 18px;font-weight:600;color: #ff931f;">{{ goal.money|floatformat:"0" }}</span>
+                                <span style="font-size: 14px;color: #B6C1C8;">元</span>
+                            </div>
+                        {% elif goal.activity_type  == "2" %}
+                            <div style="margin-left: 10px;z-index: 10;opacity: 0">
+                                <span style="font-size: 14px;color: #B6C1C8;">奖金池：</span>
+                                <span style="font-size: 18px;font-weight:600;color: #ff931f;">1</span>
+                                <span style="font-size: 14px;color: #B6C1C8;">元</span>
+                            </div>
+                        {% else %}
+
+                        {% endif %}
+
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="no_data">
+                <img src="/static/images/index/no_data_icon@3x.png">
+            </div>
+        {% endif %}
+
+    </div>
+
+    <!--导航栏, 使用微信风格-->
+    <div class="weui-tabbar">
         <a href="/activity/index" class="weui-tabbar__item">
             <div class="weui-tabbar__icon">
-                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                     width="56px" height="56px" viewBox="0 0 56 56" enable-background="new 0 0 56 56" xml:space="preserve">
-                <g>
-                    <path d="M47.991,16.991h-28c-2.209,0-4-1.791-4-4s1.791-4,4-4h28c2.209,0,4,1.791,4,4S50.2,16.991,47.991,16.991z"/>
-                </g>
-                <g>
-                    <path d="M35.991,30.991h-16c-2.209,0-4-1.791-4-4s1.791-4,4-4h16c2.209,0,4,1.791,4,4S38.2,30.991,35.991,30.991z"/>
-                </g>
-                <g>
-                    <path d="M41.991,44.991h-22c-2.209,0-4-1.791-4-4s1.791-4,4-4h22c2.209,0,4,1.791,4,4S44.2,44.991,41.991,44.991z"/>
-                </g>
-                <circle cx="7.991" cy="12.991" r="4"/>
-                <circle cx="7.991" cy="26.991" r="4"/>
-                <circle cx="7.991" cy="40.991" r="4"/>
-                </svg>
+                <i class="iconfont icon-huodongzhongxin"></i>
             </div>
             <p class="weui-tabbar__label">微众活动</p>
         </a>
         <a href="/goal/index" class="weui-tabbar__item weui-bar__item--on">
             <div class="weui-tabbar__icon">
-                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                     width="56px" height="56px" viewBox="0 0 56 56" enable-background="new 0 0 56 56" xml:space="preserve">
-                <g>
-                    <path d="M45.117,27.688c-0.463,0.078-1.52,0.416-3.171,1.013c-1.651,0.598-3.212,1.119-4.682,1.563
-                        c-1.47,0.444-2.404,0.608-2.8,0.492c-0.264-0.078-0.454-0.28-0.569-0.608c-0.115-0.327-0.19-0.665-0.223-1.013
-                        c-0.034-0.348-0.241-0.667-0.62-0.955c-0.379-0.289-0.965-0.433-1.758-0.433c-2.94,0-5.796,0.579-8.571,1.737
-                        c-0.033,0.038-0.09,0.067-0.173,0.087c-0.083,0.02-0.157,0.039-0.224,0.057c-0.067,0.019-0.149,0.028-0.247,0.03
-                        c-0.098,0.001-0.189-0.018-0.273-0.057c-0.084-0.04-0.166-0.097-0.247-0.174c-0.081-0.076-0.148-0.192-0.198-0.348
-                        c-0.051-0.156-0.1-0.349-0.149-0.58c-0.048-0.231-0.073-0.481-0.075-0.752V15.942c0-0.772,0.165-1.456,0.496-2.054
-                        c0.331-0.598,0.678-1.012,1.04-1.245l0.496-0.289c0.231-0.154,0.562-0.328,0.991-0.52c0.429-0.193,1.345-0.463,2.749-0.811
-                        c1.404-0.348,2.882-0.522,4.435-0.52c0.727,0,1.272,0.135,1.634,0.406c0.363,0.27,0.561,0.579,0.595,0.926
-                        c0.034,0.347,0.108,0.685,0.224,1.013c0.115,0.328,0.338,0.531,0.669,0.608c0.463,0.154,1.504,0.029,3.122-0.376
-                        c1.618-0.405,3.121-0.858,4.509-1.359l2.082-0.694c0.793-0.232,1.404-0.271,1.833-0.117c0.429,0.154,0.71,0.453,0.842,0.896
-                        c0.132,0.443,0.284,1.225,0.284,2.345v10.302c0,0.501-0.111,0.926-0.16,1.274c-0.05,0.348-0.232,0.724-0.545,1.128
-                        c-0.314,0.404-0.751,0.683-1.313,0.839L45.117,27.688z M45.117,27.688"/>
-                </g>
-                <g>
-                    <path d="M16,48c-1.657,0-3-1.343-3-3V13c0-1.657,1.343-3,3-3s3,1.343,3,3v32C19,46.657,17.657,48,16,48z"/>
-                </g>
-                </svg>
+                <i class="iconfont icon-mubiao iconfont_on"></i>
             </div>
             <p class="weui-tabbar__label">我的目标</p>
         </a>
         <a href="/user/index" class="weui-tabbar__item">
             <div class="weui-tabbar__icon">
-                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                     width="56px" height="56px" viewBox="0 0 56 56" enable-background="new 0 0 56 56" xml:space="preserve">
-                <g>
-                    <path fill="#050505" d="M27.997,2.986C15.3,2.986,5,13.281,5,25.984c0,12.703,10.3,23.003,22.997,23.003
-                        C40.7,48.986,51,38.686,51,25.984C51,13.281,40.704,2.986,27.997,2.986L27.997,2.986z M27.997,9.862
-                        c4.203,0,7.611,3.41,7.611,7.607c0,4.203-3.408,7.606-7.611,7.606c-4.198,0-7.602-3.403-7.602-7.606
-                        C20.395,13.272,23.8,9.862,27.997,9.862L27.997,9.862z M27.992,42.973c-4.188,0-8.03-1.529-10.99-4.055
-                        c-0.72-0.616-1.135-1.514-1.135-2.466c0-4.257,3.449-7.665,7.706-7.665h8.855c4.262,0,7.694,3.408,7.694,7.665
-                        c0,0.952-0.414,1.85-1.134,2.466C36.028,41.443,32.185,42.973,27.992,42.973L27.992,42.973z M27.992,42.973"/>
-                </g>
-                </svg>
+                <i class="iconfont icon-user"></i>
             </div>
             <p class="weui-tabbar__label">个人中心</p>
         </a>
     </div>
 
-		<!--我的目标列表-->
-		<ul class="target-list">
-			{% for goal in goals%}
-			<li class="target-list-item" data-link="{{ goal.goal_id}}?activity_type={{ goal.activity_type }}" {% if goal.activity_type == "0" %}style="background-image: url(/static/images/sleep_goal_bar.jpg);"{% elif goal.activity_type == "1" %}style="background-image: url(/static/images/run_goal_tubar.jpg);"{% else %}style="background-image: url(/static/images/read_goal_bar.jpeg);"{% endif %}>
-				<div class="header-mask"></div>
-				<div class="row-center between" style="box-sizing:border-box;width: 100%;margin-top: 5px;padding-right: 10px;">
-					<div class="item-text">{{ goal.activity_dis }}</div>
-					<div class="item-status">
-						{% if goal.detail_status == "NOSTART" %}
-						<div class="status-text icon-start">尚未开始</div>
-						{% elif goal.detail_status == "ACTIVE" %}
-						<div class="status-text icon-active">进行中</div>
-						{% elif goal.detail_status == "FAILED" %}
-						<div class="status-text icon-fail">失败</div>
-						{% else %}
-						<div class="status-text icon-success">目标完成</div>
-						{% endif %}
-					</div>
-				</div>
-				<div style="margin-left: 10px;z-index: 10;">
-					<span style="font-size: 14px;color: #B6C1C8;">第</span>
-					<span style="font-size: 16px;font-weight:600;color: white;">{{ goal.past_day }}/{{ goal.goal_day }}</span>
-					<span style="font-size: 14px;color: white;">天</span>
-				</div>
-				<div style="margin-left: 10px;z-index: 10;">
-					<span style="font-size: 14px;color: #B6C1C8;">奖金池：</span>
-					<span style="font-size: 18px;font-weight:600;color: #ff931f;">{{ goal.money|floatformat:"0" }}</span>
-					<span style="font-size: 14px;color: #B6C1C8;">元</span>
-				</div>
-			</li>
-			{% endfor %}
-			<!--
+        <!--
 			<li class="target-list-item">
 				<div class="item-text">线上阅读</div>
 				<div class="item-status">
@@ -161,17 +241,20 @@
 				</div>
 			</li>
 			-->
-		</ul>
-		<script type="text/javascript" src="/static/js/jquery.min.js"></script>
-		<script type="text/javascript" src="/static/js/fastclick.js"></script>
+
+        <script type="text/javascript" src="/static/js/jquery-2.1.4.js"></script>
+        <script type="text/javascript" src="/static/js/jquery-weui-2.1.4.js"></script>
+        <script type="text/javascript" src="/static/js/public.js"></script>
+        <script type="text/javascript" src="/static/js/fastclick.js"></script>
 		<script>
 			// fast click binding
 			$(function () {
 				FastClick.attach(document.body);
 			});
+			$("iframe").detach();
 		</script>
-		<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
-		<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+{#		<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>#}
+{#		<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>#}
 		<script type="text/javascript" src="/static/js/target.js"></script>
 		<script type='text/javascript' src='/static/js/swiper.min.js' charset='utf-8'></script>
 		<script>
@@ -189,14 +272,78 @@
 		<script>
 			$(document).ready(function () {
 				$(".target-list-item").click(function () {
-					window.location.href = $(this).data('link');
+                    var link=$(this).attr('data-link');
+                    //console.log(link);
+                    //window.location.href = '/goal/reading?reading_type='+link
+                    window.location.href =link;
+                    return
+
+                    if(link=="2"){
+                        //读书
+                        window.location.href = '/goal/reading?reading_type=fac28454e818458f86639e7d40554597'
+                    }else if(link=="0"){
+                        //作息
+                        //a5a0206fb2aa4e8995263c7ab0afa1b5
+                        window.location.href = $(this).data(link);
+                    }else if(link=='1'){
+                        window.location.href = $(this).data(link);
+                    }
+
 				});
+				var colHeight=window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+                var colWidth=window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+                console.log(colHeight);
+                console.log(colWidth);
+                var h_1=$(".swiper-container").height();
+                var h_2=$(".weui-tabbar").height();
+                var H_3=colHeight-h_1-h_2-10;
+                $(".no_data").height(H_3);
 			});
-			    $(".swiper-slide").click(function () {
-		   window.location.href = $(this).data('link');
-    });
+            $(".swiper-slide").click(function () {
+                   window.location.href = $(this).data('link');
+            });
 		</script>
-		</div>
+
+    <!--
+        <script>
+
+            console.log("---------------参与人数 {{ join_num }}-------------------");
+            console.log("---------------激活-- {{ fools }}------------------");
+            console.log("---------------参加-- {{ join }}------------------");
+
+
+                {% if join == 1 %}
+                    $("#aprilFool_1").attr("data-link","/foolsday/rank");
+                    //获取日期
+                    var date_=getNowFormatDate();
+                    function getNowFormatDate() {
+                        var date = new Date();
+                        var month = String(date.getMonth() + 1);
+                        var strDate = String(date.getDate());
+                        var currentdate = month+"-"+strDate;
+                        if(currentdate=="4-1" || currentdate=="4-2" || currentdate=="4-3"){
+                            return true
+                        }else{
+                            return false
+                        }
+                    }
+                    console.log(date_);
+                    if(date_){
+                        console.log("是4月1号");
+                        $("#aprilFool_1").show();
+                        $(".no_data").hide()
+                    }else{
+                        console.log("不是4月1号");
+                        $("#aprilFool_2").hide();
+                    }
+                {% else %}
+                    $("#aprilFool_1").attr("data-link","/foolsday/go");
+                {% endif %}
+
+        </script>
+
+        -->
+
 </body>
 
 </html>

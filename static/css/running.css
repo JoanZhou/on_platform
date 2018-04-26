@@ -3,7 +3,6 @@ html, body{
     background: #f5f6f9;
 }
 
-
 .setting-mode__background{
     width: 45vw;
     height: 5vh;
@@ -68,7 +67,7 @@ html, body{
     margin-top: 0;
 }
 
-#free__statusSetButton, #discipline__statusSetButton{
+#free__statusSetButton, #discipline__statusSetButton,#discipline__avoidSetButton{
     padding: 0 0.5rem;
     color: #1fa2ff;;
     background: #ffffff;
@@ -207,7 +206,7 @@ input[type=range]::-ms-track {
 }
 
 .setting-list{
-    margin-top: 20px;
+    margin-top: 15px;
     list-style: none;
 }
 
@@ -215,12 +214,12 @@ input[type=range]::-ms-track {
     display: flex;
     flex-direction:row;
     justify-content: flex-start;
-    margin-top: 2vh;
-    margin-right: 8px;
+    margin-top: 8px;
 }
 
 .image-header{
-    background: url(../images/run_tubar.jpg) center / cover;
+    background: url(/static/images/index/run_tubar_1@3x.png) center / cover;
+    overflow: hidden;
 }
 
 .running__upload-notice{
@@ -255,5 +254,9 @@ input[type=range]::-ms-track {
 
 #upload-btn.finish:active{
     background: #BDBDBD !important;
+}
+
+.news-item__tail-text{
+    margin-left: 0px;
 }
 

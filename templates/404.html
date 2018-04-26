@@ -2,9 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0 minimum-scale=0.5, user-scalable=no" />
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>页面被外星人带走了...</title>
+    <style>
+        html,body{
+            margin: 0;
+            padding: 0;
+        }
+    </style>
 </head>
 <body>
-找不到该页面！
+    <div class="_box" style="width: 100%;height: 100%;">
+        <img src="http://wechat.onmytarget.cn/static/images/error/404@2x.png" style="width: 60%;margin: auto;position: absolute;top: 0;right: 0;left: 0;bottom: 0;">
+    </div>
+<script type="text/javascript" src="http://wechat.onmytarget.cn/static/js/jquery-2.1.4.js"></script>
+<script>
+    var colHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+    var colWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    $("._box").width(colWidth);
+    $("._box").height(colHeight);
+</script>
 </body>
+
 </html>

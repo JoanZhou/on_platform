@@ -3,12 +3,20 @@
 
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0 minimum-scale=0.5, user-scalable=no" />
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
 	<title>我的订单</title>
 	<link rel="stylesheet" href="/static/css/weui.min.css" />
+    <link rel="stylesheet" href="/static/css/jquery-weui.min.css"/>
 	<link rel="stylesheet" href="/static/css/bootstrap.min.css"/>
 	<link rel="stylesheet" href="/static/css/share.css"/>
 	<link rel="stylesheet" href="/static/css/person.css" />
+    <link rel="stylesheet" href="/static/css/public.css">
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_591099_og95fa8paxyr2j4i.css"/>
 	<style>
 		h5 {
 			font-size: 16px;
@@ -19,9 +27,8 @@
 		}
         #modify-btn{
             text-align: center;
-            color: #03BC49;
             font-weight: 600;
-            padding: 10px 0px;
+
         }
 
         #modify-btn:active{
@@ -29,10 +36,10 @@
         }
         .inform-input__text{
             outline: none;
-            max-width: 250px;
+            max-width: 70%;
             border: none;
             background: white;
-            margin-top: 9px;
+            {#margin-top: 9px;#}
             border-bottom: 1px solid white;
         }
 
@@ -84,6 +91,51 @@
             left: 20px;
             z-index: 10;
         }
+        textarea {
+            resize: none;
+        }
+        .iconfont{
+            padding-right: 10px;
+        }
+        label{
+            margin-bottom: 0;
+            color: #666666;
+            font-weight:500;
+        }
+        .weui-cell{
+            font-size: 14px;
+        }
+        h1, h2, h3{
+            margin: 0;
+        }
+        .inform-input__text{
+            max-width: initial;
+        }
+        .order_btn{
+            display: block;
+            border-radius: 5px;
+            color: #1fa2ff;
+            border: 1px solid #1fa2ff;
+            padding: 5px;
+            margin: auto;
+            margin-right: 20px;
+        }
+
+        .wallet-card{
+            padding: 0px 20px 00px 25px;
+        }
+        .weui-cell::before{
+            {#border-top:none;#}
+        }
+        .weui-cell::after {
+            border-bottom:1px solid #e5e5e5 ;
+        }
+        #address-input{
+            width: 90%;
+        }
+        .info-item:nth-child(1){
+            margin-top: 15px;
+        }
 	</style>
 </head>
 
@@ -94,32 +146,145 @@
 		<ul class="info-list">
 			<!--收货地址-->
 			<li class="info-item">
-				<div class="wallet-card">
-                    <div class="row-space">
-                        <p style="font-weight: 600;font-size: 16px;margin-bottom: 0;">收货地址</p>
-                        <a id="modify-btn">修改</a>
-                    </div>
-                    <div class="row-space">
-                        <div class="coloum-center" style="flex:0.3;">
-                            <span class="wallet-card__entry">姓名 :
-                           </span>
-                            <span class="wallet-card__entry">电话 :
-                         </span>
-                            <span class="wallet-card__entry">收货地址 :
-                          </span>
+                {% if name %}
+                    <div class="wallet-card">
+                        <div class="weui-cells weui-cells_form" style="margin-top:0;">
+                            <div class="weui-cell">
+                                <div class="weui-cell__hd">
+                                    <label class="weui-label"><i class="iconfont icon-renren"></i>收货人</label>
+                                </div>
+                                <div class="weui-cell__bd">
+                                    <input class="weui-input inform-input__text" placeholder="请输入姓名"  disabled id="name-input" type="text"  value="{{ name|default:'' }}" >
+                                </div>
+                            </div>
+
+                            <div class="weui-cell">
+                                <div class="weui-cell__hd">
+                                    <label class="weui-label"><i class="iconfont icon-shouji"></i>联系电话</label>
+                                </div>
+                                <div class="weui-cell__bd">
+                                    <input class="weui-input inform-input__text" id="phone-input" type="tel" disabled pattern="[0-9]*" placeholder="请输入手机号" value="{{ phone|default:'' }}">
+                                </div>
+                            </div>
+                            <div class="weui-cell">
+                                <div class="weui-cell__hd">
+                                    <label class="weui-label"><i class="iconfont icon-4"></i>所在地区</label>
+                                </div>
+                                <div class="weui-cell__bd">
+                                    <input class="weui-input inform-input__text" placeholder="请选择城市" id="area-input" type="text" disabled value="{{ area|default:'' }}">
+                                </div>
+                            </div>
+
+                            <div class="weui-cell">
+                                <div class="weui-cell__hd">
+                                    <label class="weui-label" style="margin-bottom: 1.47058824em;"><i class="iconfont icon-zhaowojia"></i>详细地址</label>
+                                </div>
+                                <div class="weui-cell__bd">
+                                    <textarea type="text" rows="2" id="address-input"  placeholder="请输入详细地址" style="height: 2.95em;line-height: 1.47058824;" class="inform-input__text" disabled>{{ address|default:'' }}</textarea>
+                                </div>
+                            </div>
                         </div>
-                        <div class="coloum-center" style="flex: 1;">
-							<input type="text" id="name-input" value="{{ address.name }}" class="inform-input__text" disabled>
-							<input type="text" id="phone-input" value="{{ address.phone }}" class="inform-input__text" disabled>
-							<input type="text" id="address-input" value="{{ address.address }}" class="inform-input__text" disabled>
+
+{#                        <div class="coloum-center" style="flex:0.3;">#}
+{#                            <span class="wallet-card__entry">姓名 :</span>#}
+{#                            <span class="wallet-card__entry">电话 :</span>#}
+{#                            <span class="wallet-card__entry">收货地址 :</span>#}
+{#                        </div>#}
+{##}
+{#                        <div class="coloum-center" style="flex: 1;overflow:hidden;">#}
+{#							<input type="text" id="name-input" value="{{ address.name|default:'' }}" class="inform-input__text" disabled>#}
+{#							<input type="text" id="phone-input" value="{{ address.name|default:'' }}" class="inform-input__text" disabled>#}
+{#                            <textarea type="text" id="address-input" value="{{ address.name|default:'' }}" class="inform-input__text" disabled></textarea>#}
+{#                        </div>#}
+
+                    </div>
+                    <div class="row-space" style="padding-bottom: 10px;margin-top: 10px;">
+                        <button id="modify-btn" class="order_btn bg_white" style="">修改地址</button>
+                    </div>
+
+                {% else %}
+                    <div class="wallet-card">
+
+                        <div class="weui-cells weui-cells_form" style="margin-top:0;">
+                            <div class="weui-cell">
+                                <div class="weui-cell__hd">
+                                    <label class="weui-label"><i class="iconfont icon-renren"></i>收货人</label>
+                                </div>
+                                <div class="weui-cell__bd">
+                                    <input class="weui-input inform-input__text" placeholder="请输入姓名" id="name-input" type="text"  value="{{ name|default:'' }}" >
+                                </div>
+                            </div>
+
+                            <div class="weui-cell">
+                                <div class="weui-cell__hd">
+                                    <label class="weui-label"><i class="iconfont icon-shouji"></i>联系电话</label>
+                                </div>
+                                <div class="weui-cell__bd">
+                                    <input class="weui-input inform-input__text" id="phone-input" type="tel" pattern="[0-9]*" placeholder="请输入手机号" value="{{ phone|default:'' }}">
+                                </div>
+                            </div>
+                            <div class="weui-cell">
+                                <div class="weui-cell__hd">
+                                    <label class="weui-label"><i class="iconfont icon-4"></i>所在地区</label>
+                                </div>
+                                <div class="weui-cell__bd">
+                                    <input class="weui-input inform-input__text" placeholder="请选择城市" id="area-input" type="text" value="{{ area|default:'' }}">
+                                </div>
+                            </div>
+
+                            <div class="weui-cell">
+                                <div class="weui-cell__hd">
+                                    <label class="weui-label" style="margin-bottom: 1.47058824em;"><i class="iconfont icon-zhaowojia"></i>详细地址</label>
+                                </div>
+                                <div class="weui-cell__bd">
+                                    <textarea type="text" rows="1" id="address-input"  placeholder="请输入详细地址" style="height: 2.95em;line-height: 1.47058824;" class="inform-input__text">{{ address|default:'' }}</textarea>
+{#                                    <textarea type="text" rows="3" id="address-input"  placeholder="请输入详细地址" style="height: 1.47058824em;line-height: 1.47058824;" class="inform-input__text">{{ address|default:'' }}</textarea>#}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row-space" style="padding-bottom: 10px;margin-top: 10px;">
+                        <button id="modify-btn" class="order_btn bg_white" style="">保存地址</button>
+                    </div>
+
+                {% endif %}
+
+			</li>
+			<!--个人信息-->
+
+<!--
+			<li class="info-item">
+				<div class="row-center user-header__panel" style="height: 150px;">
+                    <div style="width: 25%;height: 100%;">
+                        <img src="/static/images/reading_book_demo.png" style="height: 100%;">
+                    </div>
+                    <div class="coloum-center" style="margin-left: 20px;flex: 1;height: 100%;">
+                        <div>
+                            <div style="">商品：书</div>
+                            <div style="margin-top: 8px;color: #B6C1C8;">数量: 1本</div>
+                        </div>
+                        <div style="flex:1;vertical-align: bottom;display: flex;flex-direction: column;justify-content: flex-end;">
+                            <div style="color: #B6C1C8;">价格:   <span style="font-size: 20px;color: #ff931f;">30</span>  元</div>
                         </div>
                     </div>
 				</div>
+				<p style="font-size: 15px;margin-left: 25px;margin-bottom: 0;">订单状态</p>
+				<div class="coloum-center wallet-card" style="padding-bottom: 30px;">
+                    <div class="row-center icon-vertical__line record-item">
+                        <i class="ready-icon"></i>
+                        <p class="record__time" style="margin-left: 19px;">已下单</p>
+                        <p class="record__time">2018年4月23日</p>
+                    </div>
+				</div>
 			</li>
-			<!--个人信息-->
+
+
+-->
+
 			{% for order in orders %}
 			<li class="info-item">
-				<div class="row-center user-header__panel" style="height: 150px;">
+				<div class="row-center user-header__panel {% if order.activity_type == '2' %} activity_type_2 {% else %} {% endif %} "{% if order.activity_type == '2' %}   goal_id="{{ order.goal_id|cut:'-' }}" {% else %}{% endif %}  style="height: 150px;">
                     <div style="width: 25%;height: 100%;">
                         <img src="{{ order.order_image }}" style="height: 100%;">
                     </div>
@@ -129,68 +294,423 @@
                             <div style="margin-top: 8px;color: #B6C1C8;">数量: {{ order.order_count }}</div>
                         </div>
                         <div style="flex:1;vertical-align: bottom;display: flex;flex-direction: column;justify-content: flex-end;">
-                            <div style="color: #B6C1C8;">价格:   <span style="font-size: 20px;color: #ff931f;">{{ order.order_money }}</span>  元</div>
+                            <div style="color: #B6C1C8;">价格:
+                                {% if order.order_money == 0 %}
+                                    <span style="font-size: 20px;color: #ff931f;">免费</span>
+                                {% else %}
+                                    <span style="font-size: 20px;color: #ff931f;">{{ order.order_money }}</span>  元
+                                {% endif %}
+
+                            </div>
                         </div>
                     </div>
 				</div>
-				<p style="font-size: 15px;margin-left: 25px;margin-bottom: 0;">订单状态</p>
-				<div class="coloum-center wallet-card" style="padding-bottom: 30px;">
-                    {% if order.confirm_time != None %}
-                    <div class="row-center icon-vertical__line record-item">
-                        <i class="ready-icon"></i>
-                        <p class="record__time">已收件</p>
-                        <p class="record__time">{{ order.confirm_time|date:"Y年m月d日"  }}</p>
-                    </div>
-                    {% elif order.delivery_time != None %}
-                    <div class="row-center icon-vertical__line record-item">
-                        <i class="ready-icon"></i>
-                        <p class="record__time" style="margin-left: 19px;">已发货</p>
-                        <p class="record__time">{{ order.delivery_time|date:"Y年m月d日" }}</p>
-                    </div>
+
+                <div style="padding: 10px 20px 0px 25px;">
+                    {% if order.is_no_confirm %}
+                        <div class="weui-cell" style="padding: 5px 15px;">
+                            <div class="weui-cell__hd">
+                                <label class="weui-label"><i class="iconfont icon-renren"></i><b>收货人&#12288;&#12288;</b></label>
+                            </div>
+                            <div class="weui-cell__bd" id="name_{{ order.order_id|cut:'-' }}">
+                                {{ order.owner_name|default:'' }}
+                            </div>
+                        </div>
+                        <div class="weui-cell" style="padding: 5px 15px;">
+                            <div class="weui-cell__hd">
+                                <label class="weui-label"><i class="iconfont icon-shouji"></i><b>联系电话&#12288;</b></label>
+                            </div>
+                            <div class="weui-cell__bd" id="phone_{{ order.order_id|cut:'-' }}">
+                                {{ order.owner_phone|default:'' }}
+                            </div>
+                        </div>
+                        <div class="weui-cell" style="padding: 5px 15px;">
+                            <div class="weui-cell__hd">
+                                <label class="weui-label"><i class="iconfont icon-4"></i><b>收货地址&#12288;</b></label>
+                            </div>
+                            <div class="weui-cell__bd">
+                                <span id="area_{{ order.order_id|cut:'-' }}">{{ order.area|default:'' }}</span>&nbsp;<span id="address_{{ order.order_id|cut:'-' }}">{{ order.address|default:'' }}</span>
+                            </div>
+                        </div>
+                        <div class="weui-cell" style="padding: 5px 15px;">
+                            <div class="weui-cell__hd">
+                                <label class="weui-label"><i class="iconfont icon-4"></i><b>留言&#12288;&#12288;</b></label>
+                            </div>
+                            <div class="weui-cell__bd">
+                                <textarea type="text" rows="3" id="remarks_{{ order.order_id|cut:'-' }}"  placeholder="" disabled class="inform-input__text" style="width: 90%;">{{ order.remarks|default:'' }}</textarea>
+                            </div>
+                        </div>
                     {% else %}
-                    <div class="row-center icon-vertical__line record-item">
-                        <i class="ready-icon"></i>
-                        <p class="record__time" style="margin-left: 19px;">已下单</p>
-                        <p class="record__time">{{ order.order_time|date:"Y年m月d日" }}</p>
-                    </div>
+                        <div class="weui-cell" style="padding: 5px 15px;">
+                            <div class="weui-cell__hd">
+                                <label class="weui-label"><i class="iconfont icon-renren"></i><b>收货人&#12288;&#12288;</b></label>
+                            </div>
+                            <div class="weui-cell__bd" id="name_{{ order.order_id|cut:'-' }}">
+                                {{ name|default:'' }}
+                            </div>
+                        </div>
+                        <div class="weui-cell" style="padding: 5px 15px;">
+                            <div class="weui-cell__hd">
+                                <label class="weui-label"><i class="iconfont icon-shouji"></i><b>联系电话&#12288;</b></label>
+                            </div>
+                            <div class="weui-cell__bd" id="phone_{{ order.order_id|cut:'-' }}">
+                                {{ phone|default:'' }}
+                            </div>
+                        </div>
+                        <div class="weui-cell" style="padding: 5px 15px;">
+                            <div class="weui-cell__hd">
+                                <label class="weui-label"><i class="iconfont icon-4"></i><b>收货地址&#12288;</b></label>
+                            </div>
+                            <div class="weui-cell__bd">
+                                <span id="area_{{ order.order_id|cut:'-' }}">{{ area|default:'' }}</span>&nbsp;<span id="address_{{ order.order_id|cut:'-' }}">{{ address|default:'' }}</span>
+                            </div>
+                        </div>
+                        <div class="weui-cell" style="padding: 5px 15px;">
+                            <div class="weui-cell__hd">
+                                <label class="weui-label"><i class="iconfont icon-4"></i><b>留言&#12288;&#12288;</b></label>
+                            </div>
+                            <div class="weui-cell__bd">
+                                <textarea type="text" rows="1" id="remarks_{{ order.order_id|cut:'-' }}"  placeholder="请输入留言" class="inform-input__text" style="width: 90%;">{{ order.remarks|default:'' }}</textarea>
+                            </div>
+                        </div>
+
+
                     {% endif %}
-				</div>
+
+                </div>
+
+
+
+                {% if order.is_no_confirm %}
+                    <p style="font-size: 15px;margin-left: 25px;margin-bottom: 0;">订单状态&#12288;&#12288;</p>
+                    {% if order.delivery_time != None %}
+                    <p style="font-size: 15px;margin-left: 25px;margin-bottom: 0;text-align: right;margin-right: 25px;">物流单号：{{ order.postal_code|default:'' }}&#12288;&#12288;<span  class="postal_code font_color_1" data-clipboard-text="{{ order.postal_code|default:'' }}" >复制</span></p>
+                    {% else %}
+                    {% endif %}
+                    <div class="coloum-center wallet-card" style="padding-bottom: 30px;">
+                        {% if order.confirm_time != None %}
+                        <div class="row-center icon-vertical__line record-item">
+                            <i class="ready-icon"></i>
+                            <p class="record__time">已收件</p>
+                            <p class="record__time">{{ order.confirm_time|date:"Y年m月d日"  }}</p>
+                        </div>
+                        {% elif order.delivery_time != None %}
+                        <div class="row-center icon-vertical__line record-item">
+                            <i class="ready-icon"></i>
+                            <p class="record__time" style="margin-left: 19px;">已发货</p>
+                            <p class="record__time">{{ order.delivery_time|date:"Y年m月d日" }}</p>
+                        </div>
+                        {% else %}
+                        <div class="row-center icon-vertical__line record-item">
+                            <i class="ready-icon"></i>
+                            <p class="record__time" style="margin-left: 19px;">已确定订单</p>
+{#                            <p class="record__time" style="margin-left: 19px;">已付款</p>#}
+                            <p class="record__time">{{ order.order_time|date:"Y年m月d日" }}(3个工作日发货)</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% if order.delivery_time != None %}
+                        {% if order.confirm_time != None %}
+                            <div class="row-space" style="padding-bottom: 15px;">
+                                <span style="display: block;padding: 5px;margin: auto;margin-right: auto;margin-right: 20px;">已收货</span>
+                            </div>
+                        {% else %}
+                            <div class="row-space" style="padding-bottom: 15px;">
+                                <button  class="order_btn order_receive bg_white" activity_type="{{ order.activity_type }}" goal_id="{{ order.goal_id|cut:'-' }}"  order_id="{{ order.order_id|cut:'-' }}" style="">确定收货</button>
+                            </div>
+                        {% endif %}
+
+                    {% else %}
+                    {% endif %}
+                {% else %}
+                    <div class="row-space" style="padding-bottom: 15px;">
+                        <button  class="order_btn ensure-btn bg_white" activity_type="{{ order.activity_type }}"  goal_id="{{ order.goal_id|cut:'-' }}"  order_id="{{ order.order_id|cut:'-' }}" style="">确定订单</button>
+                    </div>
+                {% endif %}
+
 			</li>
 			{% endfor %}
 		</ul>
     </div>
-	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
-	<script type="text/javascript" src="/static/js/fastclick.js"></script>
+    <!--
+
+    <button class="weui-btn weui-btn_primary" id="gen-btn">
+			生成目标
+    </button>
+
+    -->
+
+    <script type="text/javascript" src="/static/js/jquery-2.1.4.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-weui-2.1.4.js"></script>
+    <script type="text/javascript" src="/static/js/fastclick.js"></script>
+    <script type="text/javascript" src="/static/js/city-picker.min.js"></script>
+    <script type="text/javascript" src="/static/js/public.js"></script>
+
 	<script>
 		// fast click binding
 		$(function () {
 			FastClick.attach(document.body);
 		});
 	</script>
-	<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
+
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <script src="/static/js/clipboard.min.js"></script>
+    <script>
+        var clipboard = new ClipboardJS('.postal_code');
+        clipboard.on('success', function(e) {
+            //console.log(e);
+            $.toast("复制成功", "success", function () {
+
+            });
+        });
+
+        clipboard.on('error', function(e) {
+            //console.log(e);
+        });
+    </script>
+    <!--配置CSRF保护-->
+    <script>
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
+        });
+    </script>
+    <!--注入Config信息-->
 	<script>
-        $("#modify-btn").click(function(){
+	{{ WechatJSConfig|safe}}
+	</script>
+	<script>
+        //前往活动页面
+        $(".activity_type_2").click(function () {
+            //console.log("123")
+            var goal_id =$(this).attr("goal_id");
+            var link="/goal/"+goal_id+"?activity_type=2";
+            //console.log(link);
+            window.location.href = link;
+        });
+        // 收货
+        //api/receive
+        $(".order_receive").click(function () {
+            var order_id=$(this).attr("order_id").trim();
+            var goal_id=$(this).attr("goal_id").trim();
+            var activity_type=$(this).attr("activity_type").trim();
+            $.confirm({
+                title: '确定提示',
+                text: '确定货已经收到了吗?',
+                onOK: function () {
+                    //点击确认
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/receive",
+                        data:{
+                            "order_id":order_id,
+                            "goal_id":goal_id,
+                            'activity_type':activity_type
+                        },
+                        success: function (res) {
+                            $.hideLoading();
+                            console.log("成功");
+                            console.log(res);
+                            $.hideLoading();
+                            if(res.status==200){
+                                $.toast("确定成功", "success", function () {
+                                    window.location.reload();
+                                });
+                            }else{
+                               $.toast('确定失败', 'cancel',function () {
+                                   window.location.reload();
+                                });
+                            }
+                        },
+                        error:function(res){
+                            $.hideLoading();
+                            console.log("错误");
+                            console.log(res)
+                        }
+                    });
+                },
+                onCancel: function () {
+
+                }
+            });
+
+        });
+
+        //确定订单
+        $(".ensure-btn").click(function () {
+            var order_id=$(this).attr("order_id").trim();
+            var goal_id=$(this).attr("goal_id").trim();
+            var activity_type=$(this).attr("activity_type").trim();
+
+            var name =$("#name_"+order_id).text().trim();
+            var phone =$("#phone_"+order_id).text().trim();
+            var area =$("#area_"+order_id).text().trim();
+            var address =$("#address_"+order_id).text().trim();
+            var remarks =$("#remarks_"+order_id).val().trim();
+
+            if(name=="" || name==undefined || name==null){
+                $.toptip('请填写收货信息！', 'error');
+                return
+            }else if(phone==""|| phone==undefined || phone==null){
+                $.toptip('请填写收货信息！', 'error');
+                return
+            }else if(area==""|| area==undefined || area==null){
+                $.toptip('请填写收货信息！', 'error');
+                return
+            }else if(address==""|| address==undefined || address==null){
+                $.toptip('请填写收货信息！', 'error');
+                return
+            }else{
+
+            }
+
+
+            console.log(order_id);
+            console.log(name);
+            console.log(phone);
+            console.log(area);
+            console.log(address);
+            console.log(remarks);
+
+            $.confirm({
+                title: '确定好了吗？',
+                text: '确定后就不能修改了。',
+                onOK: function () {
+                    //点击确认
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/order_confirm",
+                        data:{
+                            "order_id":order_id,
+                            "goal_id":goal_id,
+                            "name":name,
+                            "phone":phone,
+                            "address":address,
+                            "area":area,
+                            'remarks':remarks,
+                            'activity_type':activity_type
+                        },
+                        success: function (res) {
+                            $.hideLoading();
+                            console.log("成功");
+                            console.log(res);
+                            $.hideLoading();
+                            if(res.status==200){
+                                $.toast("确定成功", "success", function () {
+                                    window.location.reload();
+                                });
+                            }else{
+                                window.location.reload();
+                            }
+                        },
+                        error:function(res){
+                            $.hideLoading();
+                            console.log("错误");
+                            console.log(res)
+                        }
+                    });
+                },
+                onCancel: function () {
+
+                }
+            });
+
+        });
+
+        //保存地址
+        $("#modify-btn").click(function() {
             var status = $(this).attr("checked");
             if(status !== "checked"){
-                $(this).text("保存");
+                $(this).text("保存地址");
                 $(this).attr("checked","checked");
-                $('input[type="text"]').removeAttr("disabled");
-                $('input[type="text"]').addClass('input-activated');
-            }
-            else{
-                $(this).text("修改");
+                $('.inform-input__text').removeAttr("disabled");
+                $('.inform-input__text').addClass('input-activated');
+            } else{
+                $.showLoading();
+                $(".weui-toast_content").text("提交中...");
+                var name= $("#name-input").val().trim();
+                var phone =$("#phone-input").val().trim();
+                var area =$("#area-input").val().trim();
+                var address =$("#address-input").val().trim();
+
+                if(name=="" || name==undefined || name==null){
+                    $.toptip('请填写收货人姓名！', 'error');
+                    $("#name-input").focus();
+                    $.hideLoading();
+                    return
+                }else if(phone==""|| phone==undefined || phone==null){
+                    $.toptip('请填写你的手机号！', 'error');
+                    $("#phone-input").focus();
+                    $.hideLoading();
+                    return
+                }else if(!/^1[34578]\d{9}$/.test(phone)){
+                    $.toptip('输入的手机号格式不对', 'error');
+                    $("#phone-input").focus();
+                    $.hideLoading();
+                    return
+                }else if(area==""|| area==undefined || area==null){
+                    $.toptip('请选择你收货城市！', 'error');
+                    $.hideLoading();
+                    return
+                }else if(address==""|| address==undefined || address==null){
+                    $.toptip('请填写收货详细地址！', 'error');
+                    $("#address-input").focus();
+                    $.hideLoading();
+                    return
+                }else{
+
+                }
+
+                if (!/^1[34578]\d{9}$/.test(phone)) {
+                    $("#phone-input").focus();
+                    $.hideLoading();
+                    return
+                }
+                $(this).text("修改地址");
                 $(this).removeAttr("checked");
-                $('input[type="text"]').attr("disabled");
-                $('input[type="text"]').removeClass('input-activated');
+                $('.inform-input__text').attr("disabled");
+                $('.inform-input__text').removeClass('input-activated');
                 //向后端发送更新信息的请求
+
+                /*
+                $.ajax({
+                    type: "POST",
+                    url: "/api/update_address",
+                    data:{
+                        "name":name,
+                        "phone":phone,
+                        "address":address,
+                        "area":area
+                    },
+                    success: function (res) {
+                        $.hideLoading();
+                        console.log("成功");
+                        console.log(res)
+                    },
+                    error:function(res){
+                        $.hideLoading();
+                        console.log("错误");
+                        console.log(res)
+                    }
+                });
+                */
+
                 var data = JSON.stringify({'name':$("#name-input").val().trim(),
                         'phone':$("#phone-input").val().trim(),
-                        'address':$("#address-input").val().trim()});
+                        'address':$("#address-input").val().trim(),
+                    'area':$("#area-input").val().trim()
+                });
                 $.post('/api/update_address',
                     {
                         'data': data
                     },function (response) {
+                    $.hideLoading();
+                    if(response.status==200){
+                        $.toast("上传成功", "success", function () {
+                            window.location.reload();
+                        });
+                    }else{
 
+                    }
                 });
             }
         });
@@ -199,7 +719,7 @@
             $(this).attr('size', Math.max($(this).val().length*1.5 + 2), 20);
         }
 
-		$('input[type="text"]').bind('input propertychange', function(){
+		$('.inform-input__text').bind('input propertychange', function(){
 			$(this).attr('size', Math.min($(this).val().length*1.5 + 2), 20);
 		});
 
@@ -209,17 +729,73 @@
                 $(this).val($(this).val().replace(/[^\d]+/g,''));
             }
         });
-        $('input[type="text"]').focus(function(){
+        $('.inform-input__text').focus(function(){
             $(this).addClass('input-focus');
         });
-        $('input[type="text"]').focusout(function(){
+        $('.inform-input__text').focusout(function(){
             $(this).removeClass('input-focus');
         });
 
 		$(document).ready(function(){
 			$('input[type="text"]').each(resizeInput);
 		});
-	</script>
+
+
+
+        $(function () {
+            $("#area-input").click(function () {
+                $(".inform-input__text").blur();
+            });
+
+            $("#area-input").cityPicker({
+                title: "选择目的地",
+                showDistrict: false,
+                onChange: function (picker, values, displayValues) {
+                    console.log(values, displayValues);
+                }
+            });
+
+
+        });
+
+
+        /*
+        wx.ready(function() {
+            $("#gen-btn").click(function () {
+                wx.getLocation({
+                    type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+                    success: function (res) {
+                    var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+                    var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+                    var speed = res.speed; // 速度，以米/每秒计
+                    var accuracy = res.accuracy; // 位置精度
+                    }
+                });
+            })
+        })
+        */
+    </script>
+
+    <script>
+        /*
+        $.ajax({
+            type: "GET",
+            url: "/api/search_deposit",
+            data:{
+            },
+            success: function (res) {
+                $.hideLoading();
+                console.log("成功");
+                console.log(res)
+            },
+            error:function(res){
+                $.hideLoading();
+                console.log("错误");
+                console.log(res)
+            }
+        })
+        */
+    </script>
 </body>
 
 </html>

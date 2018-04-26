@@ -3,7 +3,12 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0 minimum-scale=0.5, user-scalable=no" />
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <title>作息</title>
     <link rel="stylesheet" href="/static/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="/static/css/weui.min.css"/>
@@ -12,6 +17,7 @@
     <link rel="stylesheet" href="/static/css/share.css"/>
     <link rel="stylesheet" href="/static/css/activity.css"/>
     <link rel="stylesheet" href="/static/css/sleeping.css"/>
+    <link rel="stylesheet" href="/static/css/public.css">
 </head>
 
 <body ontouchstart>
@@ -294,235 +300,238 @@
 </div>
 <div id="activity-get__id" hidden>{{ app.activity_id }}</div>
 
-<script type="text/javascript" src="/static/js/jquery.min.js"></script>
-<script type="text/javascript" src="/static/js/fastclick.js"></script>
-<script>
-    // fast click binding
-    $(function () {
-        FastClick.attach(document.body);
-    });
-</script>
-<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
-<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="/static/js/material.min.js"></script>
-<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
-<!--配置CSRF保护-->
-<script>
-    $.ajaxSetup({
-        data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
-    });
-</script>
-<!--注入Config信息-->
-<script>
-{{ WechatJSConfig|safe}}
-</script>
-<script>
-    var day_map = {
-        '4 天':  4,
-        '1 周':  7,
-        '2 周': 14,
-        '3 周': 21,
-        '1 月': 30,
-        '2 月': 61
-    };
-    var coefficient_map = {
-        '4 天': '6',
-        '1 周': '10',
-        '2 周': '15',
-        '3 周': '20',
-        '1 月': '24',
-        '2 月': '30'
-    };
-    //保证金，两个模式下是一致的
-    var deposit_map = {
-        '4 天': '0',
-        '1 周': '85',
-        '2 周': '150',
-        '3 周': '180',
-        '1 月': '300',
-        '2 月': '500'
-    };
-    //底金，押金=保证金+底金
-    var excess_map = {
-        '4 天': '60',
-        '1 周': '15',
-        '2 周': '30',
-        '3 周': '60',
-        '1 月': '0',
-        '2 月': '0'
-    };
-    var delay_map = {
-        '4 天': '0',
-        '1 周': '0',
-        '2 周': '1',
-        '3 周': '2',
-        '1 月': '1',
-        '2 月': '1'
-    };
-    var avoid_map = {
-        '4 天': '0',
-        '1 周': '0',
-        '2 周': '0',
-        '3 周': '0',
-        '1 月': '1',
-        '2 月': '3'
-    };
-    var coeff_time_map = {
-        '普 通': '1',
-        '学 生': '0.8'
-    };
-    var mode_map = {
-        '普 通':'N',
-        '学 生':'S'
-    };
+    <script type="text/javascript" src="/static/js/jquery-2.1.4.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-weui-2.1.4.js"></script>
+    <script type="text/javascript" src="/static/js/public.js"></script>
+	<script type="text/javascript" src="/static/js/fastclick.js"></script>
+    <script>
+        // fast click binding
+        $(function () {
+            FastClick.attach(document.body);
+        });
+        $("iframe").detach();
+    </script>
 
-    // 修改总系数与押金值
-    function updateTotal() {
-        var coefficient = parseInt($("#sleep__base-coeff").html().trim());
-        var times = parseFloat($("#sleep__clock-coeff-times").html().trim());
-        var status =  parseFloat($("#sleep__status-coeff-value").html().trim());
-        var excess = parseInt($("#sleep__excess-value").html().trim());
-        var deposit =  parseInt($("#sleep__deposit-value").html().trim());
-        $("#all-coefficient-value").html((coefficient * times * status).toFixed(2));
-        var paymoney = (excess + deposit).toFixed(0);
-        $("#guarantee-cash").html(paymoney);
-        $("#pay-count").html(paymoney);
-    }
-
-    // 修改状态系数倍率
-    function updateCoffTimes(obj) {
-        var option = obj.html().trim();
-        $("#sleep__status-coeff-value").html(coeff_time_map[option]);
-    }
-
-    // 修改周数系数基准值
-    function updateBaseCoff(obj) {
-        var option = obj.html().trim();
-        var moneytimes = 1.0;
-        if($("#sleep__status-text").html().trim() === "学 生"){
-             moneytimes = 0.7;
-         }
-        $("#sleep__base-coeff").html(coefficient_map[option]);
-        $("#sleep__excess-value").html((excess_map[option] * moneytimes).toFixed(0));
-        $("#sleep__deposit-value").html((deposit_map[option] * moneytimes).toFixed(0));
-        $("#sleep__delay").html(delay_map[option]);
-        $("#sleep__avoid").html(avoid_map[option]);
-    }
-
-    // 点击设置时间按钮
-    $(".dropdown-menu .timeSetMenu").click(function () {
-        updateBaseCoff($(this));
-        updateTotal();
-        $("#sleep__time-text").text($(this).text());
-    });
-    // 点击设置降低投入
-    $(".dropdown-menu .statusSetMenu").click(function () {
-        updateCoffTimes($(this));
-        $("#sleep__status-text").text($(this).text());
-        updateBaseCoff($("#sleep__time-text"));
-        updateTotal();
-    });
-    // 修改每日距离产生的倍率
-    $(".mdl-slider").change(function () {
-        var _timeMap ={
-            0:'6:00',
-            1:'6:30',
-            2:'7:00',
-            3:'7:30',
-            4:'8:00'
+    <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/js/material.min.js"></script>
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <!--配置CSRF保护-->
+    <script>
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
+        });
+    </script>
+    <!--注入Config信息-->
+    <script>
+    {{ WechatJSConfig|safe}}
+    </script>
+    <script>
+        var day_map = {
+            '4 天':  4,
+            '1 周':  7,
+            '2 周': 14,
+            '3 周': 21,
+            '1 月': 30,
+            '2 月': 61
         };
-        var sub = $(this).val() - 1;
-        if(sub < 0){
-            sub = 0;
-        }
-        // 以30分钟为最小间隔
-        var cofficient_value = (1.10 - 0.05 * sub ).toFixed(2);
-        if(cofficient_value < 1){
-            cofficient_value = 1.00.toFixed(2);
-        }
-        $("#sleep__clock-desc").text(_timeMap[$(this).val()]);
-        $("#sleep__clock-coeff-times").html(cofficient_value);
-        updateTotal();
-    });
+        var coefficient_map = {
+            '4 天': '6',
+            '1 周': '10',
+            '2 周': '15',
+            '3 周': '20',
+            '1 月': '24',
+            '2 月': '30'
+        };
+        //保证金，两个模式下是一致的
+        var deposit_map = {
+            '4 天': '0',
+            '1 周': '85',
+            '2 周': '150',
+            '3 周': '180',
+            '1 月': '300',
+            '2 月': '500'
+        };
+        //底金，押金=保证金+底金
+        var excess_map = {
+            '4 天': '60',
+            '1 周': '15',
+            '2 周': '30',
+            '3 周': '60',
+            '1 月': '0',
+            '2 月': '0'
+        };
+        var delay_map = {
+            '4 天': '0',
+            '1 周': '0',
+            '2 周': '1',
+            '3 周': '2',
+            '1 月': '1',
+            '2 月': '1'
+        };
+        var avoid_map = {
+            '4 天': '0',
+            '1 周': '0',
+            '2 周': '0',
+            '3 周': '0',
+            '1 月': '1',
+            '2 月': '3'
+        };
+        var coeff_time_map = {
+            '普 通': '1',
+            '学 生': '0.8'
+        };
+        var mode_map = {
+            '普 通':'N',
+            '学 生':'S'
+        };
 
-    $(".weui-popup__overlay").click(
-        function () {
-            $("body").removeClass("popup-open");
+        // 修改总系数与押金值
+        function updateTotal() {
+            var coefficient = parseInt($("#sleep__base-coeff").html().trim());
+            var times = parseFloat($("#sleep__clock-coeff-times").html().trim());
+            var status =  parseFloat($("#sleep__status-coeff-value").html().trim());
+            var excess = parseInt($("#sleep__excess-value").html().trim());
+            var deposit =  parseInt($("#sleep__deposit-value").html().trim());
+            $("#all-coefficient-value").html((coefficient * times * status).toFixed(2));
+            var paymoney = (excess + deposit).toFixed(0);
+            $("#guarantee-cash").html(paymoney);
+            $("#pay-count").html(paymoney);
         }
-    );
-    $("#gen-btn").click(function () {
-        // 指定总价
-        $("#gen-popup").popup();
-        $("body").addClass("popup-open");
-    });
 
-    /* 跳转页面 */
-    $("#backup-btn").click(function () {
-        window.location.href = "index";
-    });
+        // 修改状态系数倍率
+        function updateCoffTimes(obj) {
+            var option = obj.html().trim();
+            $("#sleep__status-coeff-value").html(coeff_time_map[option]);
+        }
 
-    wx.ready(function() {
-        $("#pay-btn").click(function () {
-            //TODO:唤起微信支付的接口，如果支付成功则继续支付
-            // 底金
-            var excess = parseFloat($("#sleep__excess-value").html());
-            // 保证金
-            var deposit = parseFloat($("#sleep__deposit-value").html());
-            // 总系数
-            var coefficient = parseFloat($("#all-coefficient-value").html());
-            // 目标天数
-            var goalday = day_map[$("#sleep__time-text").html().trim()];
-            // 模式
-            var mode = mode_map[$("#sleep__status-text").html().trim()];
-            // 目标起床时间
-            var getuptime = $("#sleep__clock-desc").html().trim();
-            // 免签卡
-            var avoid = parseInt($("#sleep__avoid").html().trim());
-            // 延时卡
-            var delay = parseInt($("#sleep__delay").html().trim());
-            $.post('/api/create_goal', {
-                activity: $("#activity-get__id").html().trim(),
-                goal_type: 1,
-                down_payment: excess,
-                guaranty: deposit,
-                coefficient: coefficient,
-                mode: mode,
-                goal_day: goalday,
-                getuptime: getuptime,
-                nosign: avoid,
-                delay: delay
-            }, function (reponse) {
-                $.post('/wechatpay', {
-                    'goal': reponse['goal'],
-                    'price': excess + deposit
-                }, function (response) {
-                    {% if DEBUG %}
-                    // 唤起微信支付接口
-                    $.post('/payback', {
-                        goal:reponse['goal']
-                    },function (res) {
-                            // 重定向到分享页面
-                            window.location.href = "/goal/share/" + reponse['goal'];
+        // 修改周数系数基准值
+        function updateBaseCoff(obj) {
+            var option = obj.html().trim();
+            var moneytimes = 1.0;
+            if($("#sleep__status-text").html().trim() === "学 生"){
+                 moneytimes = 0.7;
+             }
+            $("#sleep__base-coeff").html(coefficient_map[option]);
+            $("#sleep__excess-value").html((excess_map[option] * moneytimes).toFixed(0));
+            $("#sleep__deposit-value").html((deposit_map[option] * moneytimes).toFixed(0));
+            $("#sleep__delay").html(delay_map[option]);
+            $("#sleep__avoid").html(avoid_map[option]);
+        }
+
+        // 点击设置时间按钮
+        $(".dropdown-menu .timeSetMenu").click(function () {
+            updateBaseCoff($(this));
+            updateTotal();
+            $("#sleep__time-text").text($(this).text());
+        });
+        // 点击设置降低投入
+        $(".dropdown-menu .statusSetMenu").click(function () {
+            updateCoffTimes($(this));
+            $("#sleep__status-text").text($(this).text());
+            updateBaseCoff($("#sleep__time-text"));
+            updateTotal();
+        });
+        // 修改每日距离产生的倍率
+        $(".mdl-slider").change(function () {
+            var _timeMap ={
+                0:'6:00',
+                1:'6:30',
+                2:'7:00',
+                3:'7:30',
+                4:'8:00'
+            };
+            var sub = $(this).val() - 1;
+            if(sub < 0){
+                sub = 0;
+            }
+            // 以30分钟为最小间隔
+            var cofficient_value = (1.10 - 0.05 * sub ).toFixed(2);
+            if(cofficient_value < 1){
+                cofficient_value = 1.00.toFixed(2);
+            }
+            $("#sleep__clock-desc").text(_timeMap[$(this).val()]);
+            $("#sleep__clock-coeff-times").html(cofficient_value);
+            updateTotal();
+        });
+
+        $(".weui-popup__overlay").click(
+            function () {
+                $("body").removeClass("popup-open");
+            }
+        );
+        $("#gen-btn").click(function () {
+            // 指定总价
+            $("#gen-popup").popup();
+            $("body").addClass("popup-open");
+        });
+
+        /* 跳转页面 */
+        $("#backup-btn").click(function () {
+            window.location.href = "index";
+        });
+
+        wx.ready(function() {
+            $("#pay-btn").click(function () {
+                //TODO:唤起微信支付的接口，如果支付成功则继续支付
+                // 底金
+                var excess = parseFloat($("#sleep__excess-value").html());
+                // 保证金
+                var deposit = parseFloat($("#sleep__deposit-value").html());
+                // 总系数
+                var coefficient = parseFloat($("#all-coefficient-value").html());
+                // 目标天数
+                var goalday = day_map[$("#sleep__time-text").html().trim()];
+                // 模式
+                var mode = mode_map[$("#sleep__status-text").html().trim()];
+                // 目标起床时间
+                var getuptime = $("#sleep__clock-desc").html().trim();
+                // 免签卡
+                var avoid = parseInt($("#sleep__avoid").html().trim());
+                // 延时卡
+                var delay = parseInt($("#sleep__delay").html().trim());
+                $.post('/api/create_goal', {
+                    activity: $("#activity-get__id").html().trim(),
+                    goal_type: 1,
+                    down_payment: excess,
+                    guaranty: deposit,
+                    coefficient: coefficient,
+                    mode: mode,
+                    goal_day: goalday,
+                    getuptime: getuptime,
+                    nosign: avoid,
+                    delay: delay
+                }, function (reponse) {
+                    $.post('/wechatpay', {
+                        'goal': reponse['goal'],
+                        'price': excess + deposit
+                    }, function (response) {
+                        {% if DEBUG %}
+                        // 唤起微信支付接口
+                        $.post('/payback', {
+                            goal:reponse['goal']
+                        },function (res) {
+                                // 重定向到分享页面
+                                window.location.href = "/goal/share/" + reponse['goal'];
+                        });
+                        {% else %}
+                        wx.chooseWXPay({
+                            timestamp: response['timeStamp'], // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+                            nonceStr: response['nonceStr'], // 支付签名随机串，不长于 32 位
+                            package: response['package'], // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
+                            signType: response['signType'], // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+                            paySign: response['paySign'], // 支付签名
+                            success: function (res) {
+                                // 重定向到分享页面
+                                window.location.href = "/goal/share/" + reponse['goal'];
+                            }
+                        });
+                        {% endif %}
                     });
-                    {% else %}
-                    wx.chooseWXPay({
-                        timestamp: response['timeStamp'], // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
-                        nonceStr: response['nonceStr'], // 支付签名随机串，不长于 32 位
-                        package: response['package'], // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
-                        signType: response['signType'], // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
-                        paySign: response['paySign'], // 支付签名
-                        success: function (res) {
-                            // 重定向到分享页面
-                            window.location.href = "/goal/share/" + reponse['goal'];
-                        }
-                    });
-                    {% endif %}
                 });
             });
         });
-    });
 
-</script>
+    </script>
 </body>
 
 </html>

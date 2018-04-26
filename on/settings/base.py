@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
@@ -23,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'h6a7f@uq5fshj%w^8n=tbrsawpj_^n99c2i*w9%tn)4jr%15-h'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 HOST = 'http://wechat.onmytarget.cn'
 
@@ -33,9 +32,10 @@ ALLOWED_HOSTS = [
     'wechat.onmytarget.cn',
     '219.239.227.221',
     '115.159.53.105',
-    '*'
+    '*',
+    '127.0.0.1',
+    '183.16.192.177'
 ]
-
 
 # Application definition
 
@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    # 'comments',
     'rest_framework',
     'gunicorn',
     'on',
@@ -84,7 +84,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'on.wsgi.application'
 
-
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
@@ -103,18 +102,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
+LANGUAGE_CODE = 'zh-Hans'
 
-LANGUAGE_CODE = 'en-us'
-
+TIME_ZONE = 'Asia/Shanghai'
 USE_I18N = True
 
 USE_L10N = True
 
 USE_TZ = False
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
@@ -143,7 +140,7 @@ LOGGING = {
             'format': '%(levelname)s %(asctime)s %(module)s %(process)s %(message)s',
         },
         'standard': {
-             'format': '%(levelname)s %(asctime)s %(message)s',
+            'format': '%(levelname)s %(asctime)s %(message)s',
         },
     },
     'handlers': {
@@ -151,19 +148,25 @@ LOGGING = {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
             'formatter': 'verbose',
-            'filename': '/home/ubuntu/weblog/error.log',
+            # 'filename': '/home/ubuntu/weblog/error.log',
+
+            'filename': '/home/ws/weblog/error.log',
         },
         'infohandler': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
             'formatter': 'standard',
-            'filename': '/home/ubuntu/weblog/info.log',
+            'filename': '/home/ws/weblog/info.log',
+
+            # 'filename': '/home/ubuntu/weblog/info.log',
         },
         'moneyhandler': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
             'formatter': 'standard',
-            'filename': '/home/ubuntu/weblog/money.log',
+            # 'filename': '/home/ubuntu/weblog/money.log',
+            #
+            'filename': '/home/ws/weblog/money.log',
         }
     },
     'loggers': {
@@ -177,11 +180,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True
         },
-        'app':{
+        'app': {
             'handlers': ['infohandler'],
             'level': 'INFO'
         },
-        'money':{
+        'money': {
             'handlers': ['moneyhandler'],
             'level': 'DEBUG',
             'propagate': True
@@ -194,3 +197,6 @@ AVATAR_ROOT = '/static/avatar/'
 AVATAR_DIR = os.path.join(BASE_DIR, "../static/avatar")
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+SESSION_COOKIE_AGE=60*60*2
+
+
