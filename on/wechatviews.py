@@ -18,15 +18,14 @@ from wechatpy.replies import ImageReply
 from wechatpy.utils import check_signature
 from datetime import timedelta, date, datetime
 from on.activities.reading.models import ReadingGoal
-from on.user import UserInfo, UserTrade, UserWithdraw, UserOrder, UserInvite, Invitenum, newUserWithdraw, UserAddress
+from on.user import UserInfo, UserTrade, UserWithdraw, UserOrder, UserInvite, Invitenum, newUserWithdraw, UserAddress, \
+    InviteIncome
 from on.activities.running.models import RunningGoal, Activity
 from on.views import get_son_models
 from on.views import oauth
 from on.wechatconfig import oauthClient, client
 from on.wechatconfig import TOKEN, payClient, NotifyUrl
 from django.db import connection
-
-
 
 article_2018 = [{
     # On!说明
@@ -94,18 +93,11 @@ inform_articles = [{
 article_leizhu = [
     {
         # On!说明
-        'title': '世界读书日，好书100本免费大放送！',
-        'description': '今天您能够免费读到一本好书！',
-        'image': 'http://mmbiz.qpic.cn/mmbiz_jpg/GsETib8eibZY03W7ia3TDIAGDX2b6rOFXtOWich6Ql8CMjaBQ0jS5kSGh5v1XIZhw987stIcTPmN7AatIR63TiaYATA/0',
-        'url': 'https://mp.weixin.qq.com/s/EeqEBNizhRHBG2pI0oGnWw'
-    },
-    # {
-    #     # On!说明
-    #     'title': '擂主模式开始啦！打卡最高瓜分10万',
-    #     'description': '1元瓜分10万，夭寿啦！！！',
-    #     'image': 'http://mmbiz.qpic.cn/mmbiz_jpg/GsETib8eibZY3cPu5XAXukpkgHw23PmO0agVtXkHWa9VDrYZ3C8BtYBahFsawnMZiaBDoib4V9Dl9N5Pa4ZX7dx9Tg/0',
-    #     'url': 'https://mp.weixin.qq.com/s?__biz=MzI2Mjc4OTU4Ng==&mid=2247483817&idx=1&sn=6855ad2314c6775f1d93aeed0814b9a7&chksm=ea448114dd33080228d4fd03d2d6756c708402146c09ed4be2b45d242d99cc53d87a3287f811#rd'
-    # }
+        'title': '新增排行榜功能&无限模式调整',
+        'description': '排行榜刷起来啦！',
+        'image': 'http://mmbiz.qpic.cn/mmbiz_jpg/GsETib8eibZY3LLGFBAA66ODnoT1xf1JbFgpfpbOCd1sX6vHsBjPcSjOtINatibibWKQsbGYA1E1JjT0D24IKeico9A/0',
+        'url': 'https://mp.weixin.qq.com/s/QDP2bsESexC_SFWXlOgSMw'
+    }
 ]
 # from on.temp.template_map import template
 from on.temp.push_template import do_push
@@ -186,6 +178,25 @@ app_information = 'App将在4月份上线，敬请期待！'
 # 固定回复模板
 inform_str = '请稍等，On!君还在路上！'
 withdraw = "我的房间->个人中心->我的钱包->提现"
+menu = """
+你好，请点击选择内容：
+        
+    1. <a href='https://mp.weixin.qq.com/s/sXEFZrg01y9S28Ns3Hn2mA'>平台介绍</a>
+    
+    2. <a href='https://mp.weixin.qq.com/s/V-3gnToW1lRVI8Xe6OxKaw'>活动参与方式</a>
+    
+    3. <a href='https://mp.weixin.qq.com/s/-XPienbyq1snwMDcfvHILQ'>结算提现方式</a>
+    
+    4. <a href='https://mp.weixin.qq.com/s/7d1T8CMxn_enXg7UKWMSrg'>商品及订单问题</a>
+    
+    5. <a href='https://mp.weixin.qq.com/s/e7LQzUe6DjaN9Zc9rjafFQ'>平台元素说明</a>
+        
+出现异常情况，请直接联系客服
+（打卡、报错、提现等问题）
+回复“999”获取客服微信
+ 
+感谢你对On!的支持
+"""
 scan = "欢迎关注On！"
 introduce_informmation = ""
 
@@ -235,7 +246,7 @@ def wechat_check(request):
                 elif msg.event == "subscribe_scan":
                     reply = create_reply(article_leizhu, message=msg)
                     xml_data = str(request.body.decode())
-                    print(xml_data,"454545454")
+                    print(xml_data, "454545454")
                     dict = xmltodict.parse(xml_data)
                     user = dict["xml"]["EventKey"]
                     user_li = re.findall(r"qrscene_(\d+)", user)
@@ -274,8 +285,12 @@ def wechat_check(request):
                         reply = create_reply(article_2018, message=msg)
                     elif "提现" in content:
                         reply = create_reply(withdraw, message=msg)
+                    elif "测试" in content:
+                        reply = create_reply(menu, message=msg)
+                    elif "999" in content:
+                        reply = ImageReply(message=msg, media_id='nvnR6egwWE1WzzIcMXo403dxqfcx5fV_GRhQnRH8Wsw')
                     else:
-                        reply = create_reply('', message=msg)
+                        reply = create_reply(menu, message=msg)
                 else:
                     reply = create_reply('', message=msg)
             else:
@@ -283,7 +298,6 @@ def wechat_check(request):
             return HttpResponse(reply.render(), content_type="application/xml")
         except (InvalidSignatureException, InvalidAppIdException):
             return HttpResponse(status=403)
-
 
 
 @oauth
@@ -302,13 +316,11 @@ def wechat_pay(request):
             # 如果使用余额
             if rem == '1':
                 # 查询用户现在的余额是多少
-                user_balance_now = UserInfo.objects.get(user_id=user.user_id).balance
                 # 实际应该要付的金额可以直接传过去
                 if reality > 0.01:
                     # 若实际支付出去的金额大于0的话，说明余额的钱不够全部支付金额的
                     fee = int(float(reality) * 100)
                     # 余额清零
-                    UserInfo.objects.clear_balance(user_id=user.user_id)
                     goal_id = request.POST['goal']
                     order_res = payClient.order.create(trade_type="JSAPI",
                                                        body="目标活动押金",
@@ -323,12 +335,12 @@ def wechat_pay(request):
                     return JsonResponse(pay_code)
                 # 如果实际应该要付的金额<=0.01，那么就直接让用户支付0.01
                 else:
-                    print("0.1的情况")
                     if reality == 0.01:
                         # 现在是等于0.01的情况，要判断余额确实大于应付
                         # assert user_balance_now > int(float(deserve) * 100)
                         fee = int(float(reality) * 100)
-                        goal_id = request.POST['goal']
+                        goal_id = request.POST.get('goal')
+                        print(666666666666666666,goal_id)
                         order_res = payClient.order.create(trade_type="JSAPI",
                                                            body="目标活动押金",
                                                            total_fee=fee,
@@ -415,7 +427,7 @@ def transfer_to_person(request):
                         payment_no=data["payment_no"]
                     )
                 except Exception as e:
-                    print("创建体现记录失败",e)
+                    print("创建体现记录失败", e)
                 # 更新用户的余额
                 user_info = UserInfo.objects.get(user_id=user.user_id)
                 user_info.balance = 0
@@ -499,7 +511,7 @@ def wechat_pay_back(request):
             try:
                 user = UserInfo.objects.get_user_by_openid(res['openid'])
                 goal_id = res['attach']
-                print(goal_id,type(goal_id),"订单里面查出来的id")
+                print(goal_id, type(goal_id), "订单里面查出来的id")
                 # 把支付的结果写入交易表中
                 if not UserTrade.objects.exist_trade(res['transaction_id']):
                     UserTrade.objects.create_trade(goal_id=goal_id, trade_data=res)
@@ -508,18 +520,18 @@ def wechat_pay_back(request):
                     sub_models = get_son_models(Goal)
                     for sub_model_key in sub_models:
                         sub_model = sub_models[sub_model_key]
-                        goal = sub_model.objects.filter(user_id=user.user_id,goal_id=goal_id,status='PENDING')
+                        goal = sub_model.objects.filter(user_id=user.user_id, goal_id=goal_id, status='PENDING')
                         # TODO
                         if goal:
                             goal = goal.first()
                             print("如果找到了用户该类型的goal，将其设置为活跃状态")
                             try:
                                 print("将用户的状态设置为活跃")
-                                sub_model.objects.filter(user_id=user.user_id, goal_id=goal_id, status='PENDING').update(status="ACTIVE")
+                                sub_model.objects.filter(user_id=user.user_id, goal_id=goal_id,
+                                                         status='PENDING').update(status="ACTIVE")
                                 print("设置成功")
                             except Exception as e:
-                                print("状态修改失败",e)
-
+                                print("状态修改失败", e)
 
                             # 更新用户的余额信息
                             print("更新用户的余额信息")
@@ -530,19 +542,20 @@ def wechat_pay_back(request):
                             except Exception as e:
                                 print(e)
 
-
                             # # 更新用户的押金信息
                             deposit = goal.guaranty + goal.down_payment
                             UserInfo.objects.update_deposit(user_id=user.user_id,
                                                             pay_delta=decimal.Decimal(deposit))
-                            print("更新跑步活动对应活动的奖金池与参与人数")
                             # 更新对应活动的奖金池与参与人数
                             if goal.activity_type == "1":
                                 goal.update_activity(user_id=user.user_id)
-                                activate = Activity.objects.get(activity_type=1)
-                                activate.bonus_all += decimal.Decimal(10)
-                                activate.save()
-
+                                # activate = Activity.objects.get(activity_type=1)
+                                # activate.bonus_all += decimal.Decimal(10)
+                                # activate.save()
+                                try:
+                                    income_handle(res["openid"], goal.activity_type)
+                                except Exception as e:
+                                    print(e)
                                 # 构造模板
                                 openid = res["openid"]
                                 goal_content = "恭喜你成功报名参加活动"
@@ -556,44 +569,93 @@ def wechat_pay_back(request):
                                 print("用户{}支付成功,当前用户id:{}".format(user.nickname, user.user_id))
                                 print("开始发送模板")
                                 do_push(data)
-                            # 支付成功，删除用户未支付成的所有记录
+                                # 支付成功，删除用户未支付成的所有记录
                                 try:
                                     failed = RunningGoal.objects.filter(user_id=user.user_id, status="PENDING")
                                     failed.delete()
                                 except Exception as e:
-                                    print(e,'删除记录未成功')
+                                    print(e, '删除记录未成功')
 
-
-                                #发送模板
-
-                            # 如果是阅读活动，则需要在支付完成后新建一个发货订单
-                            print("开始创建订单")
                             if goal.activity_type == "2":
                                 try:
                                     active = Activity.objects.get(activity_id='fac28454e818458f86639e7d40554597')
-                                    active.active_participants +=1
+                                    active.active_participants += 1
                                     active.save()
                                     with connection.cursor() as cursor:
-                                        resp = cursor.execute("""DELETE FROM on_readinggoal WHERE user_id=%s AND `status`='PENDING'""",[user.user_id])
+                                        resp = cursor.execute(
+                                            """DELETE FROM on_readinggoal WHERE user_id=%s AND `status`='PENDING'""",
+                                            [user.user_id])
                                 except Exception as e:
                                     print("删除订单中的pending失败，{}".format(e))
                                 print("支付成功，开始创建订单")
                                 try:
-                                    print(goal.goal_id,goal.goal_type,goal.price)
+                                    print(goal.goal_id, goal.goal_type, goal.price)
                                     read_goal = ReadingGoal.objects.get(goal_id=goal_id)
                                     UserOrder.objects.create_reading_goal_order(user_id=user.user_id,
                                                                                 order_name=read_goal.book_name,
                                                                                 order_money=read_goal.price,
                                                                                 order_image=read_goal.imageurl,
-                                                                                goal_id = read_goal.goal_id
+                                                                                goal_id=read_goal.goal_id
                                                                                 )
                                     print("订单创建成功")
                                 except Exception as e:
-                                    print(e,"订单未创建成功")
+                                    print(e, "订单未创建成功")
+                                try:
+                                    income_handle(res["openid"], goal.activity_type)
+                                except Exception as e:
+                                    print(e)
 
-
+                            if goal.activity_type == "0":
+                                try:
+                                    # 更新了奖金池的总系数
+                                    goal.update_activity(user_id=user.user_id)
+                                    activity = Activity.objects.get(activity_id="a5a0206fb2aa4e8995263c7ab0afa1b5")
+                                    activity.active_participants += 1
+                                    activity.save()
+                                    with connection.cursor() as cursor:
+                                        resp = cursor.execute(
+                                            """DELETE FROM on_sleepinggoal WHERE user_id=%s AND `status`='PENDING'""",
+                                            [user.user_id])
+                                        print(resp)
+                                    try:
+                                        income_handle(res["openid"], goal.activity_type)
+                                    except Exception as e:
+                                        print(e)
+                                    openid = res["openid"]
+                                    goal_content = "恭喜你成功报名参加活动"
+                                    activate = "作息"
+                                    # date_time = time.strftime('%Y年%m月%d日', time.localtime(time.time()))
+                                    start_time = timezone.now().strftime('%m月%d日')
+                                    end_time = (timezone.now() + timedelta(days=goal.goal_day)).strftime('%m月%d日')
+                                    if goal.goal_day <= 21:
+                                        date_time = "{}-{}".format(start_time, end_time)
+                                    else:
+                                        date_time = "无限期"
+                                    url = 'http://wechat.onmytarget.cn/'
+                                    data = send_tem(openid, url, goal_content, activate, date_time)
+                                    print("用户{}支付成功,当前用户id:{}".format(user.nickname, user.user_id))
+                                    print("开始发送模板")
+                                    do_push(data)
+                                except Exception as e:
+                                    print(e)
+                            if goal.activity_type == "3":
+                                pass
+                            else:
+                                pass
 
                             break
             except Exception as e:
                 logger.error(e)
             return HttpResponse(xml_str)
+
+
+def income_handle(openid, activity_type):
+    # 获取用户的openid,根据用户的openid在邀请表里面进行查询操作
+    # 首先获取邀请人的userid，邀请到的话进行下一步，邀请不到的话则是直接pass掉
+    user_id = UserInvite.objects.get_user_invite(openid=openid)
+    if not user_id:
+        pass
+    else:
+        # 此时说明邀请成功，并且有邀请人的userid，先判断在用户邀请收益表里面有没有记录，若是没有话先去创建一条记录66
+        InviteIncome.objects.invite_handle(user_id=user_id, activity_type=activity_type)
+    return True

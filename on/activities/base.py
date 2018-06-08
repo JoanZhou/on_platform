@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 import uuid
 from django.db import models
-from on.user import UserInfo, UserTicket, UserTicketUseage, UserSettlement, UserRefund
+from on.user import UserInfo, UserTicket, UserTicketUseage, UserSettlement, UserRefund,BonusRank
 import django.utils.timezone as timezone, datetime
 from datetime import timedelta
 import math
 import decimal
 import logging
 from django.conf import settings
+
 ACTIVITY_CHOICES = (
     (u'0', u'作息'),
     (u'1', u'跑步'),
     (u'2', u'阅读(尝新)'),
-    # (u'2', u'购书阅读2期')
+    (u'3', u'步行'),
+    (u'4', u'骑行')
 )
 
 STATUS_CHOICES = (
@@ -174,6 +176,7 @@ class Goal(models.Model):
         user_end_time = (self.start_time + timedelta(days=1)).strftime("%Y-%m-%d")
         if len(RunningPunchRecord.objects.filter(goal_id=self.goal_id,
                                                  record_time__range=(start_time, user_end_time))) > 0:
+
             # 目标天数 - （现在的时间天数 - 开始的时间数）- 1天
             left = self.goal_day - (timezone.now().date() - self.start_time.date()).days - 1
         else:
@@ -207,6 +210,14 @@ class Goal(models.Model):
                 print("用户赚的的金额{}".format(earn_pay))
                 self.bonus += decimal.Decimal(earn_pay)
                 self.save()
+                try:
+                    rank = BonusRank.objects.filter(user_id=self.user_id)
+                    if rank:
+                        BonusRank.objects.add_run(user_id=self.user_id, profit=decimal.Decimal(earn_pay))
+                    else:
+                        BonusRank.objects.create(user_id=self.user_id, run=decimal.Decimal(earn_pay))
+                except Exception as e:
+                    logger.error(e)
                 # 修改用户赚得的总金额
                 UserInfo.objects.update_balance(user_id=self.user_id, pay_delta=earn_pay)
 
@@ -219,12 +230,22 @@ class Goal(models.Model):
                 print("用户赚的的金额{}".format(earn_pay))
                 self.bonus += decimal.Decimal(earn_pay)
                 self.save()
+                try:
+                    rank = BonusRank.objects.filter(user_id=self.user_id)
+                    if rank:
+                        BonusRank.objects.add_run(user_id=self.user_id, profit=earn_pay)
+                    else:
+                        BonusRank.objects.create(user_id=self.user_id, run=earn_pay)
+                except Exception as e:
+                    logger.error(e)
                 # 修改用户赚得的总金额
                 UserInfo.objects.update_balance(user_id=self.user_id, pay_delta=earn_pay)
-
                 # 在settlement表中增加记录
                 UserSettlement.objects.earn_profit(self.goal_id, earn_pay)
         return earn_pay
+
+
+
 
     def exist_punch_last_day(self):
         """
@@ -232,15 +253,16 @@ class Goal(models.Model):
         :return: 如果存在，则返回True;否则，返回False
         """
         if self.punch.get_day_record(-1):
-            print("若前一天存在打卡")
             return True
         else:
-            print("若前一天没有打卡")
             return False
 
     # 判断是否是第一天
     def is_first_day(self):
+        print("开始判断是不是第一天")
         if timezone.now().strftime("%Y-%m-%d") == self.start_time.strftime("%Y-%m-%d"):
+            a = timezone.now().strftime("%Y-%m-%d") - self.start_time.strftime("%Y-%m-%d")
+            print(a,"若是现在的时间跟开始时间相等，那么就是第一天，返回的是true")
             return True
         else:
             return False
@@ -264,7 +286,7 @@ class Goal(models.Model):
                     # 查看前一天到今天是否存在打卡记录
                     if self.exist_punch_last_day():
                         # 如果存在打卡记录,则不付出钱
-                        if self.left_day <= 0:
+                        if self.left_day < 0:
                             print("日常模式的剩余天数小于零，说明活动结束")
                             if self.down_payment <= 0 and self.guaranty <= 0:
                                 self.status = "FAILED"
@@ -276,8 +298,8 @@ class Goal(models.Model):
                             pass
                     else:
                         # 如果不存在打卡记录
-                        if self.is_first_day():
-                            print("开始判断是否是第一天")
+                        if self.is_first_day == True:
+                            print("今天是第一天，不做任何处理")
                             # 有返回值的时候是第一天，直接pass
                             pass
                         else:
@@ -290,7 +312,7 @@ class Goal(models.Model):
                                 self.status = "FAILED"
                                 print("押金保证金都小于0，表示失败")
                             # 检查目标是否已经算失败了, 在日常模式下如果两者均为0, 则判定目标失败
-                            if self.left_day <= 0:
+                            if self.left_day < 0:
                                 print("日常模式的剩余天数小于零，说明活动结束")
                                 if self.down_payment <= 0 and self.guaranty <= 0:
                                     self.status = "FAILED"
@@ -303,7 +325,8 @@ class Goal(models.Model):
                 else:
                     print("进入自由模式，开始扣除金额，当前的活动类型是{}".format(self.goal_type))
                     # 如果是自由模式下，当left_day为负数时结算
-                    if self.left_day <= 0:
+
+                    if self.left_day < 0:
                         print("现在的left_day：{}自由模式下，当剩余天数小于零的时候开始结算".format(self.left_day))
                         # 将自由模式下的钱数结算
                         pay_out = self.calc_pay_out()
@@ -313,8 +336,7 @@ class Goal(models.Model):
                             self.status = "SUCCESS"
                         else:
                             self.status = "FAILED"
-                # if self.status == "SUCCESS" or self.status == "FAILED":
-                #     self.update_activity_person()
+
                 # 更新到数据库中
                 self.save()
                 UserInfo.objects.update_deposit(user_id=self.user_id, pay_delta=-pay_out)
@@ -328,6 +350,9 @@ class Goal(models.Model):
             logger.error(e)
             return 0, 0
             # 判断是否使用免签卡，暂时修改
+
+
+
 
     # def use_no_sign_in_date(self, daydelta):
     #     today = timezone.now().date() + timedelta(daydelta)

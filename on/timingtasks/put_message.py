@@ -1,8 +1,8 @@
 # coding=utf-8
-from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import timedelta
 import django.utils.timezone as timezone
+from django.http import JsonResponse
 from on.models import RunningPunchRecord, RunningGoal, ReadingGoal, ReadingPunchRecord, SleepingPunchRecord, Activity
 from on.user import UserInfo
 import pytz
@@ -14,13 +14,16 @@ from on.temp.push_template import do_push
 import decimal
 import math
 import xmltodict
-
+from on.settings.local import DEBUG
 WECHAT_APPID = "wx4495e2082f63f8ac"
 WECHAT_APPSECRET = "23f0462bee8c56e09a2ac99321ed9952"
 
 
+sched = BackgroundScheduler()
+app_logger = logging.getLogger('app')
 # 获取accessToken
 def getToken():
+    print('开始获取新的access_token')
     # 获取用户的accesstoken
     url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' + WECHAT_APPID + "&secret=" + WECHAT_APPSECRET
     token_str = requests.post(url).content.decode()
@@ -29,8 +32,8 @@ def getToken():
     return token
 
 
-sched = BackgroundScheduler()
-app_logger = logging.getLogger('app')
+
+
 
 
 # 未完成目标提醒
@@ -140,29 +143,34 @@ def get_no_sign():
 
 #
 def search_message():
-    open_list = get_no_sign()
+    try:
+        open_list = get_no_sign()
+        for openid in open_list:
+            user = UserInfo.objects.get(wechat_id=openid)
+            goal = RunningGoal.objects.get(user_id=user.user_id)
+            url = "http://wechat.onmytarget.cn/goal/{}?activity_type=1".format(goal.goal_id)
+            goal_type = goal.goal_type
+            # 目标距离
+            goal_distance = goal.goal_distance
+            # 单日距离
+            kilos_day = goal.kilos_day
+            # 目标天数
+            goal_day = goal.goal_day
+            if goal_type == 1:
+                detail = "在{}天内，每天完成{}公里".format(goal_day, kilos_day)
+                category = "跑步日常模式"
+            else:
+                detail = "在{}天内，一共完成{}公里".format(goal_day, goal_distance)
+                category = "跑步自由模式"
 
-    for openid in open_list:
-        user = UserInfo.objects.get(wechat_id=openid)
-        goal = RunningGoal.objects.get(user_id=user.user_id)
-        url = "http://wechat.onmytarget.cn/goal/{}?activity_type=1".format(goal.goal_id)
-        goal_type = goal.goal_type
-        # 目标距离
-        goal_distance = goal.goal_distance
-        # 单日距离
-        kilos_day = goal.kilos_day
-        # 目标天数
-        goal_day = goal.goal_day
-        if goal_type == 1:
-            detail = "在{}天内，每天完成{}公里".format(goal_day, kilos_day)
-            category = "跑步日常模式"
-        else:
-            detail = "在{}天内，一共完成{}公里".format(goal_day, goal_distance)
-            category = "跑步自由模式"
+            end_time = (goal.start_time + timedelta(days=goal_day)).strftime("%m月%d日")
+            data = initiative(openid, url, detail, category)
+            do_push(data)
+        return JsonResponse({"status":200})
+    except Exception as e:
+        print(e)
+        pass
 
-        end_time = (goal.start_time + timedelta(days=goal_day)).strftime("%m月%d日")
-        data = initiative(openid, url, detail, category)
-        do_push(data)
 
 
 # 查询昨日没有打卡的用户
@@ -177,42 +185,48 @@ def search_nosign():
 
 # 发送
 def save_openid():
-    obj = search_nosign()
-    for goal in obj:
-        # 判断该用户昨天是否有打卡记录
-        # 说明不是第一天
-        if not goal.exist_punch_last_day():
-            user = goal.user_id
-            openid = UserInfo.objects.get(user_id=user).wechat_id
-            url = 'http://wechat.onmytarget.cn/user/index'
-            goal_day = goal.goal_day
-            kilos_day = goal.kilos_day
-            first = "跑步"
-            target = "在{}天，每天完成{}公里".format(goal_day, kilos_day)
-            nosignday = (timezone.now() - timedelta(days=1)).strftime("%Y-%m-%d")
-            guaranty = goal.guaranty
-            down_payment = goal.down_payment
-            if goal.goal_type == 1:
-                # 每次扣多少钱
-                money = goal.average
-                # 剩下应该扣多少次
-                # 当是日常模式的时候
-                times = int(down_payment) / int(money)
-                if int(guaranty) != 0:
-                    deduct = " 保证金￥{}".format(guaranty)
-                else:
-                    deduct = " 底金￥{}".format(down_payment / int(times))
+    try:
+        obj = search_nosign()
+        for goal in obj:
+            # 判断该用户昨天是否有打卡记录
+            # 说明不是第一天
+            if not goal.exist_punch_last_day():
+                user = goal.user_id
+                openid = UserInfo.objects.get(user_id=user).wechat_id
+                url = 'http://wechat.onmytarget.cn/user/index'
+                goal_day = goal.goal_day
+                kilos_day = goal.kilos_day
+                first = "跑步"
+                target = "在{}天，每天完成{}公里".format(goal_day, kilos_day)
+                nosignday = (timezone.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+                guaranty = goal.guaranty
+                down_payment = goal.down_payment
+                if goal.goal_type == 1:
+                    # 每次扣多少钱
+                    money = goal.average
+                    # 剩下应该扣多少次
+                    # 当是日常模式的时候
+                    times = int(down_payment) / int(money)
+                    if int(guaranty) != 0:
+                        deduct = " 保证金￥{}".format(guaranty)
+                    else:
+                        deduct = " 底金￥{}".format(down_payment / int(times))
 
-                surplus = "底金￥{}X{}次".format(money, int(times))
+                    surplus = "底金￥{}X{}次".format(money, int(times))
 
-                data = field_tem(openid, url, first, target, nosignday, deduct, surplus)
-                if goal.is_first_day:
-                    print("first day do nothing ")
-                    return
-                else:
-                    do_push(data)
-        else:
-            return
+                    data = field_tem(openid, url, first, target, nosignday, deduct, surplus)
+                    if goal.is_first_day:
+                        print("first day do nothing ")
+                        return
+                    else:
+                        do_push(data)
+                return JsonResponse({"status": 200})
+
+            else:
+                return
+    except Exception as e:
+        pass
+
 
 
 # def allot_money():
@@ -246,15 +260,95 @@ def save_openid():
 #             user.all_profit += decimal.Decimal(average_lei)
 #             user.save()
 #             print("extra_money，all_profit保存成功")
+def morning_attention_temp(openid,goal_type):
+    data = {
+        "touser": openid,
+        "template_id": "CB9aLimSfCXD_ErWqN6mqjKkoL37WGOJ9y9WEo8Ykp8",
+        "url": "http://wechat.onmytarget.cn/activity/a5a0206fb2aa4e8995263c7ab0afa1b5",
+        "topcolor": "#FF0000",
+        "data": {
+            "first": {
+                "value": "您好，你有目标还未完成。",
+                "color": "#173177"
+            },
+            "keyword1": {
+                "value": "作息活动",
+                "color": "#173177"
+            },
+            "keyword2": {
+                "value": goal_type,
+                "color": "#173177"
+            },
+            "keyword3": {
+                "value": "今天早上8:00",
+                "color": "#173177"
+            },
+            "remark": {
+                "value": "请尽快完成，谢谢！",
+                "color": "#173177"
+            },
+        }
+    }
+    return data
+from on.activities.sleeping.models import SleepingPunchRecord,SleepingGoal
+def send_attention():
+    try:
+        #今天的日期是
+        time_now = timezone.now().strftime("%Y-%m-%d")
+        #查询出所有正在参与的用户的openid
+        sleep = SleepingGoal.objects.filter(status="ACTIVE")
+
+        if sleep:
+            #找出正在参与且早上没有打卡的用户
+            for user in sleep:
+                punch = SleepingPunchRecord.objects.filter(user_id=user.user_id, punch_time=time_now)
+                if user.sleep_type == 0:
+                    #此时分为昨天打了卡的情况与昨天睡前没有打卡记录的情况
+                    #如果昨天睡前打了卡
+                    if punch:
+                        #获取未打卡用户的openid，goaltype
+                        for msg in punch.filter(get_up_time__isnull=True):
+                            openid = UserInfo.objects.get(user_id=msg.user_id).wechat_id
+
+                            data = morning_attention_temp(openid,"睡眠模式")
+                            do_push(data)
+                            time.sleep(2)
+                    else:
+                        #昨天睡前没有打卡，因为今天没有查询到打卡记录
+                        openid = UserInfo.objects.get(user_id=user.user_id).wechat_id
+                        data = morning_attention_temp(openid, "睡眠模式")
+                        do_push(data)
+                        time.sleep(2)
+                elif user.sleep_type == 1:
+                    #此时是早起模式
+                    if not punch:
+                        #说明没有打卡记录
+                        openid = UserInfo.objects.get(user_id=user.user_id).wechat_id
+                        data = morning_attention_temp(openid, "早起模式")
+                        do_push(data)
+                        time.sleep(2)
+                    else:
+                        #说明有记录，早起模式的记录是当天创建的，所以一定是打了卡
+                        pass
+            return JsonResponse({"status": 200})
+    except Exception as e:
+        pass
 
 
-
+def test_template():
+    #openid,goal_type
+    data = morning_attention_temp("o0jd6wgPxXAFK9aifqR858FOWDV0","无限")
+    do_push(data)
+    return JsonResponse({"status": 200})
 
 
 # 每天九点运行任务
 sched.add_job(search_message, 'cron', day_of_week='0-6', hour=21, minute=0, timezone=pytz.timezone('Asia/Shanghai'))
 sched.add_job(save_openid, 'cron', day_of_week='0-6', hour=9, minute=0, timezone=pytz.timezone('Asia/Shanghai'))
+sched.add_job(send_attention, 'cron', day_of_week='0-6', hour=7, minute=30, timezone=pytz.timezone('Asia/Shanghai'))
+sched.add_job(test_template, 'cron', day_of_week='0-6', hour=11, minute=28, timezone=pytz.timezone('Asia/Shanghai'))
 
+# sched.add_job(getToken,'interval',seconds=600)
 # 定时分配金额
 # sched.add_job(allot_money, 'cron', day_of_week='0-6', hour=23, minute=50, timezone=pytz.timezone('Asia/Shanghai'))
 sched.start()

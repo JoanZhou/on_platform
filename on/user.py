@@ -50,19 +50,19 @@ class UserManager(models.Manager):
     def update_deposit(self, user_id, pay_delta):
         user = self.get(user_id=user_id)
         user.deposit += decimal.Decimal(pay_delta)
-        if user.deposit<0:
-            user.deposit=0
+        if user.deposit < 0:
+            user.deposit = 0
         user.save()
 
     # 当用户结束活动之后，将获取到的金额存储到余额中
-    def save_balance(self, user_id, price, bonus):
+    def save_balance(self, user_id, price, bonus,extra_earn):
         user = self.get(user_id=user_id)
         user.balance += decimal.Decimal(price)
         # 活动结束之后，将用户的累计收益改为0
         print("开始修改累计收益{}".format(price))
         user.add_money -= bonus
         print("将用户的累计收益改为0")
-        user.extra_money = 0
+        user.extra_money -= extra_earn
         print("将用户的额外收益改成0")
         print("修改累计收益成功{}".format(user.add_money))
         user.save()
@@ -73,6 +73,20 @@ class UserManager(models.Manager):
         user.balance += decimal.Decimal(bonus)
         user.add_money -= decimal.Decimal(bonus)
         user.save()
+
+    # sleep活动处理
+    def sleep_handle(self,user_id,bonus,guaranty,extra_earn):
+        try:
+            user = self.get(user_id=user_id)
+            #将用户的收益写进余额
+            user.balance += decimal.Decimal(bonus)+decimal.Decimal(guaranty)+decimal.Decimal(extra_earn)
+            #再将用户的累计收益出去余额
+            user.add_money -= decimal.Decimal(bonus)
+            user.extra_money -= extra_earn
+            user.save()
+        except Exception as e:
+            print(e)
+            pass
 
     # 额外收益处理
 
@@ -97,7 +111,6 @@ class UserManager(models.Manager):
         filePath = os.path.join(settings.AVATAR_DIR, str(user_id) + ".jpg")
         # 引用所使用的路径
         refPath = os.path.join(settings.AVATAR_ROOT, str(user_id) + ".jpg")
-        nickname = nickname
         # 写入文件内容
         with open(filePath, 'wb') as f:
             f.write(response.content)
@@ -105,7 +118,6 @@ class UserManager(models.Manager):
         user = self.create(user_id=user_id,
                            sex=sex,
                            wechat_id=openid,
-                           # nickname="{}".format(nickname.encode()),
                            nickname=user_id,
                            headimgurl=refPath)
         # 创建用户历史记录数据表
@@ -397,6 +409,22 @@ class UserRelation(models.Model):
     # 备注, 由于备注存在双向关系
     remark = models.CharField(null=True, max_length=255)
 
+class UserInviteManager(models.Manager):
+    """当用户要请的人参加活动的时候距离被他邀请的人相聚三天的时候，算是邀请人邀请成功"""
+    def get_user_invite(self,openid):
+        time_now = timezone.now().date()
+        print(time_now)
+        user = self.filter(invite=openid)
+
+        if user:
+            user = user[0]
+            print(user.user_id, "是哪个用户邀请的人")
+            invite_time = user.create_time.date()
+            if time_now-invite_time == 2:
+                return user.user_id
+            else:
+                return False
+        return False
 
 class UserInvite(models.Model):
     # 这个是关系id，每一个用户对应一个关系，id值是唯一的
@@ -409,7 +437,7 @@ class UserInvite(models.Model):
     create_time = models.DateTimeField(auto_created=True)
     # 是否参与愚人节活动
     fools_day = models.IntegerField(null=False, default=0)
-
+    objects = UserInviteManager()
     class Meta:
         db_table = "on_userinvite"
 
@@ -778,3 +806,144 @@ class Tutorial(models.Model):
         db_table = "on_tutorial"
 
 
+
+
+class InviteIncomeManager(models.Manager):
+
+    def invite_handle(self,activity_type,user_id):
+        from on.models import SleepingGoal, RunningGoal, ReadingGoal
+        try:
+            invite = self.filter(user_id=user_id)
+            user = UserInfo.objects.get(user_id=user_id)
+            if invite:
+                invite = invite[0]
+                if activity_type == "0":
+                    invite.sleep += 1
+                    sleepGoal = SleepingGoal.objects.get(user_id=user_id)
+                    sleepGoal.extra_earn += decimal.Decimal(2)
+                    sleepGoal.save()
+                elif activity_type == "1":
+                    invite.run += 1
+                    runGoal = RunningGoal.objects.get(user_id=user_id)
+                    runGoal.extra_earn += decimal.Decimal(2)
+                    runGoal.save()
+                elif activity_type == "2":
+                    invite.read +=1
+                    #阅读表无法直接操作
+                    readGoal = ReadingGoal.objects.get(user_id=user_id)
+                    extra_earn = readGoal.extra_earn+decimal.Decimal(2)
+                    ReadingGoal.objects.filter(user_id=user_id).update(extra_earn=extra_earn)
+                user.extra_money += decimal.Decimal(2)
+            else:
+                if activity_type == "0":
+                    self.create(user_id=user_id,sleep=1)
+                    sleepGoal = SleepingGoal.objects.get(user_id=user_id)
+                    sleepGoal.extra_earn += decimal.Decimal(2)
+                    sleepGoal.save()
+                elif activity_type == "1":
+                    self.create(user_id=user_id, run=1)
+                    runGoal = RunningGoal.objects.get(user_id=user_id)
+                    runGoal.extra_earn += decimal.Decimal(2)
+                    runGoal.save()
+                elif activity_type == "2":
+                    self.create(user_id=user_id, read=1)
+                    readGoal = ReadingGoal.objects.get(user_id=user_id)
+                    extra_earn = readGoal.extra_earn + decimal.Decimal(2)
+                    ReadingGoal.objects.filter(user_id=user_id).update(extra_earn=extra_earn)
+                user.extra_money += decimal.Decimal(2)
+            user.save()
+            invite.save()
+            return True
+        except Exception as e:
+            print("用户的邀请收益发生错误",e)
+            return False
+
+class InviteIncome(models.Model):
+    id = models.IntegerField(primary_key=True,default=0)
+    user_id = models.IntegerField(default=0, null=False)
+    run = models.IntegerField(null=False,default=0)
+    read = models.IntegerField(null=False,default=0)
+    sleep = models.IntegerField(null=False,default=0)
+    objects = InviteIncomeManager()
+    class Meta:
+        db_table = "on_invite_income"
+
+class BonusManager(models.Manager):
+
+    def add_run(self,user_id,profit):
+        try:
+            user = self.filter(user_id=user_id)
+            if user:
+                user = user[0]
+                user.run += profit
+                user.save()
+        except Exception as e:
+            print(e)
+            return True
+
+    def add_read(self,user_id,profit):
+        try:
+            user = self.filter(user_id=user_id)
+            if user:
+                user = user[0]
+                user.read += profit
+                user.save()
+        except Exception as e:
+            print(e)
+            return True
+    def add_sleep(self,user_id,profit):
+        try:
+            user = self.filter(user_id=user_id)
+            if user:
+                user = user[0]
+                user.sleep += profit
+                user.save()
+        except Exception as e:
+            print(e)
+            return True
+    def add_ride(self,user_id,profit):
+        try:
+            user = self.filter(user_id=user_id)
+            if user:
+                user = user[0]
+                user.ride += profit
+                user.save()
+        except Exception as e:
+            print(e)
+            return True
+    def add_walk(self,user_id,profit):
+        try:
+            user = self.filter(user_id=user_id)
+            if user:
+                user = user[0]
+                user.walk += profit
+                user.save()
+        except Exception as e:
+            print(e)
+            return True
+
+
+class BonusRank(models.Model):
+    user_id = models.IntegerField(primary_key=True,default=0)
+    run = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    read = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    sleep = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    ride = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    walk = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    objects = BonusManager()
+    class Meta:
+        db_table = "on_bonusrank"
+
+
+
+
+
+
+
+class LoginRecord(models.Model):
+    id = models.CharField(primary_key=True,default=uuid.uuid4,max_length=60)
+    user_id = models.IntegerField(primary_key=True,default=0)
+    timeNow = models.DateTimeField()
+    nickname = models.CharField(max_length=200,null=True)
+    class Meta:
+        db_table = "on_loginrecord"

@@ -2,7 +2,7 @@ from django.db import models
 from django.http import JsonResponse
 import uuid
 from on.activities.base import Goal, Activity
-from on.user import UserInfo, UserRecord
+from on.user import UserInfo, UserRecord,BonusRank
 import django.utils.timezone as timezone
 from django.conf import settings
 import os
@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 import math
 import decimal
 import time
-
+from logging import getLogger
 
 class ReadingGoalManager(models.Manager):
     # 生成一个目标
@@ -87,6 +87,9 @@ class ReadingGoal(Goal):
     reality_price = models.DecimalField(max_digits=12, decimal_places=2, null=False)
     # 用户应该要付出的金额
     deserve_price = models.DecimalField(max_digits=12, decimal_places=2, null=False)
+    # 活动额外收益
+    extra_earn = models.DecimalField(max_digits=12, decimal_places=2, null=False,default=0)
+    # punch_times = models.IntegerField(null=True)
     objects = ReadingGoalManager()
 
     # 读书活动不需要定时
@@ -119,7 +122,7 @@ class ReadingGoal(Goal):
         # 增加用户的累计参加次数
         UserRecord.objects.update_join(user=UserInfo.objects.get(user_id=user_id), coeff=self.coefficient)
 
-
+logger = getLogger("read")
 class ReadingPunchRecordManager(models.Manager):
 
     # 获取时间
@@ -136,20 +139,19 @@ class ReadingPunchRecordManager(models.Manager):
 
         # 用户开始打卡
         goal = ReadingGoal.objects.get(goal_id=goal_id)
+
+
         goal_page = goal.goal_page
-        print(type(goal_page), goal_page, "书的总页数")
         # 已经读完的页数
         finish_page = goal.finish_page
-        print(type(finish_page), finish_page, "已经读完的页数")
         print(type(today_page), today_page, "今天，读完的页数")
-        print(goal_page, "书的页数")
         reality_page = int(today_page) - int(finish_page)
         print(reality_page, "本次读的页数")
         # 今日完成的页数
         today_page = math.floor(float(today_page))
         print(type(reality_page), reality_page, "今日完成的页数")
-        if today_time > 21600:
-            today_time = 21600
+        if today_time > 18000:
+            today_time = 18000
         # 今天读书消耗的时间
         today_time = math.ceil(float(today_time))
         print(type(today_time), today_time, "完成今日页数需要的时间")
@@ -159,7 +161,6 @@ class ReadingPunchRecordManager(models.Manager):
             read = read[0]
             start_time = read.start_time
             time_delta = timezone.now().day - start_time.day + 1
-            print(time_delta, "测试用户读书大卡的自动结束，只要这个值等于30就表示是一个月")
             if time_delta >= 30:
                 # 无法保存
                 ReadingGoal.objects.filter(goal_id=goal_id).update(status="SUCCESS")
@@ -202,13 +203,14 @@ class ReadingPunchRecordManager(models.Manager):
 
         # 开始计算返还page_avg*today_pge*read_coffe*day_num
         bonus = decimal.Decimal(page_avg) * reality_page * decimal.Decimal(read_coffe) * decimal.Decimal(day_coffe)
-        print(type(bonus), bonus, 1111111111111111111111111111)
+        print("{}本次阅读获得的金额{}".format(user_id,bonus))
         # 由于数据保存不成功，绕开最开始的保存方法
         # goal.bonus += decimal.Decimal(bonus)
         # goal.finish_page += today_page
         # goal.save()
         # 取出最开始的收益+打卡收益
         read_bonus = goal.bonus + bonus
+
         try:
             # 取出最开始的打卡页数+本次打卡的页数
             ReadingGoal.objects.filter(goal_id=goal_id).update(bonus=decimal.Decimal(read_bonus),
@@ -230,7 +232,6 @@ class ReadingPunchRecordManager(models.Manager):
         today_record = timezone.now().strftime("%Y-%m-%d")
         if today_record != record_time or len(punch_id) == 0:
             try:
-                print(bonus, 1235453236365355)
                 self.create(goal_id=str(goal_id), bonus=bonus, start_page=goal.finish_page, reading_page=reality_page,
                             reading_delta=today_time, record_time=record_time, user_id=user_id)
             except Exception as e:
@@ -245,7 +246,15 @@ class ReadingPunchRecordManager(models.Manager):
                 read_punch.save()
             except Exception as e:
                 print("保存当天的数据失败", e)
-
+        logger.info("活动id：{},用户{}打卡所用的时间是{},本次阅读的页数是{},本次阅读所获得的金额是：{}".format(goal_id,user_id, today_time, reality_page,bonus))
+        try:
+            rank = BonusRank.objects.filter(user_id=user_id)
+            if rank:
+                BonusRank.objects.add_read(user_id=user_id,profit=bonus)
+            else:
+                BonusRank.objects.create(user_id=user_id,read=bonus)
+        except Exception as e:
+            logger.error(e)
         if goal.status == "SUCCESS":
             UserInfo.objects.update_balance(user_id=goal.user_id, pay_delta=goal.bonus)
             # 更新参加活动的总人数
@@ -348,6 +357,7 @@ class ReadTime(models.Model):
 class Saying(models.Model):
     id = models.IntegerField(primary_key=True, null=False)
     content = models.TextField(null=False)
+    activity_type = models.IntegerField()
 
     class Meta:
         db_table = "on_say"
@@ -408,6 +418,7 @@ class ReadingPunchPraise(models.Model):
     user_id = models.IntegerField()
     punch_id = models.CharField(max_length=255)
 
+
     class Meta:
         db_table = "on_readingpunchpraise"
 
@@ -430,6 +441,7 @@ class Reply(models.Model):
     other_id = models.CharField(null=False, max_length=255)
     r_content = models.TextField(null=False)
 
+
     @property
     def get_user_message(self):
         user = UserInfo.objects.filter(user_id=self.user_id)
@@ -443,9 +455,7 @@ class Reply(models.Model):
 
 class Read_Finish_SaveManager(models.Manager):
     def save_finish(self, goal_id):
-        print("打印一下用户的id，看看是不是自己的", goal_id)
         goal = ReadingGoal.objects.filter(goal_id=goal_id)
-        print(goal, "看看是否查询到了值")
         if goal:
             goal = goal[0]
             finish_dict = {

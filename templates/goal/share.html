@@ -58,23 +58,38 @@
         </p>
         <p style="margin-top:5px; color: #000;font-size:0.8rem;font-weight: 600;">{{ goal_intro }}</p>
     </div>
+    <!--
+    goal.activity_type == "0"   作息
+    goal.activity_type == "1"   跑步
+    goal.activity_type == "2"   读书
+    goal.activity_type == "3"   步行
+    goal.activity_type == "4"   骑行
+    -->
     <div class="target-bottom__layer" style="overflow: hidden">
         <p style="margin-bottom: 10px;color: #B6C1C8;font-size: 0.8rem;font-weight: 600;">识别二维码进入活动群参与更多活动</p>
         {% if activity == "0" %}
-        <img src="/static/images/on_share/on_share_sleep.jpg">
+        <img src="/static/images/on_share/on_share_sleep_1.jpg">
         {% elif activity == "1" %}
         <div class="qqGroupCode_box" style="opacity:1;display: block;height:initial;width: 90%;margin: 0 auto;overflow: hidden">
             <div class="swiper-container_on_share_run" style="display: block;">
                 <div class="swiper-wrapper">
+                    <!--
                     <div class="swiper-slide" data-link="#">
                         <img src="/static/images/on_share/on_share_run_1.jpg" style="margin: 0 auto 25px;display: block;width: 60%" >
                     </div>
+                    -->
                     <div class="swiper-slide" data-link="#">
                         <img src="/static/images/on_share/on_share_run_2.jpg" style="margin: 0 auto 25px;display: block;;width: 60%" >
                     </div>
                 </div>
             </div>
         </div>
+        {% elif activity == "2" %}
+            <img src="/static/images/on_share/on_share_read_1.jpg">
+        {% elif activity == "3" %}
+            <img src="/static/images/on_share/on_share_walk_1.jpg">
+        {% elif activity == "4" %}
+            <img src="/static/images/on_share/on_share_ride_1.jpg">
         {% else %}
         <img src="/static/images/on_share/on_share_read_1.jpg">
         {% endif %}
@@ -82,7 +97,7 @@
 
     </div>
     <div style="width: 60%;display: block;margin: auto;">
-        <a href="#" id="close-btn" class="button button-primary button-pill" style="display: block;margin: auto;width: 80%">完成</a>
+        <a href="/activity/index" id="close-btn" class="button button-primary button-pill" style="display: block;margin: auto;width: 80%">完成</a>
     </div>
 </body>
     <script type="text/javascript" src="/static/js/jquery-2.1.4.js"></script>

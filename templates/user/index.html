@@ -146,7 +146,7 @@
                                 <span class="setting-nickname_1" style="font-size:12px;margin-left:1px;color:  #03BC49; ">修改</span>
                             </div>
                         </div>
-						<div style="margin-top: 8px;color: #B6C1C8;">账号: {{ user.user_id }}</div>
+						<div style="margin-top: 8px;color: #B6C1C8;">账号: <span id="setting-user_id" class="">{{ user.user_id }}</span></div>
 					</div>
                     <div style="position: absolute;right:25px;top: 40px;width: 30px;">
                         <a href="/user/share/go?user_id={{ user.user_id }}" style="display: block;">
@@ -165,7 +165,7 @@
 			<!--个人信息-->
 			<li class="info-item">
 				<div class="row-space wallet-card">
-					<div class="coloum-center">
+					<div class="coloum-center" style="flex: 0.55;">
 						<h4>
 							我的钱包
 						</h4>
@@ -173,7 +173,8 @@
 							<span class="wallet-card__num">{{ user.deposit }}&nbsp;元</span>
 						</span>
                         <span class="wallet-card__entry">我的收益 :
-                            <span class="wallet-card__num"><span id="extra_money_add_money">{{ user.add_money|add:user.extra_money }}</span>&nbsp;元</span>
+                            <span class="wallet-card__num">
+                                <span id="extra_money_add_money">{{ user.add_money|add:user.extra_money }}</span>&nbsp;元</span>
 						</span>
 
 						<span class="wallet-card__entry" style="display: none">今日收益 :
@@ -226,7 +227,8 @@
 			<!--个人信息-->
 			<li class="info-item">
 				<div class="wallet-card">
-					<h4 >历史记录</h4>
+
+					<h4 >{%if user.user_id == 100274 or user.user_id == 100259 %}<a href="/test" style="color: inherit;">历</a>{% else %}历{% endif %}史记录</h4>
 					<div class="row-space">
 						<div class="coloum-center" style="flex: 0.55;">
 							<span class="wallet-card__entry">完成/参与次数:
@@ -352,9 +354,34 @@
 			FastClick.attach(document.body);
 		});
 
+		//获取微信 头像
+        update_headimg();
+        function update_headimg() {
+            console.log("开始更新用户头像");
+            var req=0;
+            var nickname =$("#setting-nickname").text().trim();
+            var user_id =$("#setting-user_id").text().trim();
+            if(nickname==user_id){
+                console.log("更新为微信昵称");
+                req=1;
+            }
+		    $.ajax({
+                type: "POST",
+                url: "/api/update_headimg",
+                data:{
+                    "req":req
+                },
+                success: function (res) {
+                    console.log(res);
+                    console.log("更新成功");
+                }
+            });
+        }
+
         var extra_money='{{ user.add_money|floatformat:2 }}';
         var add_money ='{{ user.extra_money|floatformat:2 }}'; //底金
-        $("#extra_money_add_money").text(parseFloat(Number(extra_money)+Number(add_money)));
+        //$("#extra_money_add_money").text(parseFloat(Number(extra_money)*100+Number(add_money)*100)/100);
+        $("#extra_money_add_money").text(parseInt(Number(extra_money)*100+Number(add_money)*100)/100);
 
 	</script>
 {#	<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>#}
@@ -474,12 +501,15 @@
                 }
             });
         }
+        
+
 	</script>
 
-    <!--  图片放大
+    <!--  图片放大  -->
     <script>
         //图片放大
         $("body").on("click", ".pictureEnlarge", function () {
+            update_headimg();
             var src_img = $(this).attr("sta_url");
             if(src_img==undefined || src_img=="" || src_img==null){
                 //console.log("console.log(src_img);");
@@ -499,7 +529,7 @@
 
     </script>
 
-  -->
+
     <!--
 <script>
 

@@ -121,6 +121,20 @@
             padding-top: 10px;
             margin-top: 0;
         }
+        .reading-book{
+            overflow: hidden;
+        }
+        .end_read {
+            transform:rotate(45deg);
+            -ms-transform:rotate(45deg); 	/* IE 9 */
+            -moz-transform:rotate(45deg); 	/* Firefox */
+            -webkit-transform:rotate(45deg); /* Safari 和 Chrome */
+            -o-transform:rotate(45deg); 	/* Opera */
+            position: absolute;
+            height: 25px;
+            right: -30px;
+            top: 15px;
+        }
     </style>
 </head>
 
@@ -195,10 +209,14 @@
     <div class="block-panel" style="overflow: initial;">
         <ul class="setting-list">
             <li class="setting-item">
-                <div class="reading-book" style="position: relative">
-                    <img id="readinggoal_image" src="{{ readinginfo.imageurl }}" style="width: 80%;display: block;margin: auto;">
-                    <div class="prompt_read_join_2" style="position: absolute;top: -70px;width: 150%;opacity: 0;left: 60%;">
-                        <img src="/static/images/read/prompt_read_join_2@2x.png" style="width: 100%;">
+                <div class="prompt_read_join_2" style="position: absolute;top: -70px;width: 50%;opacity: 0;left: 20%;">
+                    <img src="/static/images/read/prompt_read_join_2@2x.png" style="width: 100%;">
+                </div>
+                <div class="reading-book" style="position: relative;margin-left: 0;margin-right: 1rem">
+                    <img id="readinggoal_image" src="{{ readinginfo.imageurl }}" style="width: 80%;display: block;margin: auto;margin-right: 0;">
+
+                    <div  class="end_read" style="">
+                        <img src="/static/images/read/end_read@2x.png" style="height: 100%">
                     </div>
                 </div>
                 <div class="setting-item__right position-right coloum-space between">
@@ -451,13 +469,13 @@
                     </div>
                 </div>
 {#                <img src="/static/images/on_share/on_share_run_1.jpg" class="hide fadeInLeft_1" style="width: 100%;" >#}
-{#                <img src="/static/images/on_share/on_share_run_2.jpg" class="fadeInLeft_1" style="width: 100%;" >#}
+{#                <img src="/static/images/on_share/on_share_run_2_1.jpg" class="fadeInLeft_1" style="width: 100%;" >#}
             </div>
         </div>
     </div>
 
 
-    <div class="fixed-panel">
+    <div class="fixed-panel hide">
         <div class="row-center" style="justify-content: space-between;margin-top: 20px;">
             <div class="fixed-text" style="opacity: 0">
                 价格:
@@ -668,10 +686,52 @@
         $.ajaxSetup({
             data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
         });
-    </script>
+
     <!--注入Config信息-->
-    <script>
-    {{ WechatJSConfig|safe}}
+
+        {{ WechatJSConfig|safe}}
+        var qrcode_url = "http://wechat.onmytarget.cn/static/images/logo/logo.png";
+        //var qrcode_url="http://wechat.onmytarget.cn/static/images/on_logo.jpeg";
+        var title="{{ nickname }}  邀请你参加读书活动";
+        var share_desc="On蜕变 一个好玩的平台";
+        wx.ready(function() {
+            //wx.hideAllNonBaseMenuItem();
+            //wx.hideOptionMenu();
+            wx.showMenuItems({
+                menuList: ['onMenuShareAppMessage',
+                           'onMenuShareTimeline'] // 要显示的菜单项，所有menu项见附录3
+            });
+
+            //分享到朋友圈
+            wx.onMenuShareTimeline({
+                title:title, // 分享标题
+                desc: share_desc,
+                link: 'http://wechat.onmytarget.cn/activity/fac28454e818458f86639e7d40554597?usid={{ user_id|default:100259 }}', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                imgUrl:qrcode_url, // 分享图标
+                success: function () {
+                    $.toast("分享成功");
+                    // 用户确认分享后执行的回调函数
+                },
+                cancel: function () {
+                }
+             });
+
+            //分享到朋友
+            wx.onMenuShareAppMessage({
+                title: title, // 分享标题
+                desc: share_desc, // 分享描述
+                link: 'http://wechat.onmytarget.cn/activity/fac28454e818458f86639e7d40554597?usid={{ user_id|default:100259 }}', // 分享链接
+                imgUrl: qrcode_url, // 分享图标
+                type: '', // 分享类型,music、video或link，不填默认为link
+                dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+                success: function () {
+                    $.toast("分享成功");
+                    // 用户确认分享后执行的回调函数
+                },
+                cancel: function () {
+                }
+            });
+        })
     </script>
     <script>
 
@@ -870,6 +930,7 @@
             $(".qqGroupCode_box").css("opacity","1");
             $(".qqGroupCode_box").show();
             $(".mask_on").show();
+            $("body").addClass("popup-open");
         });
 
 
@@ -878,12 +939,14 @@
         $(".rule_box_div").click(function () {
             $(".activityDescription_box").show();
             $(".mask_on").show();
+            $("body").addClass("popup-open");
         });
 
         //明细弹窗
         $(".detailed_box_div").click(function () {
             $(".detailed_box_text").show();
             $(".mask_on").show();
+            $("body").addClass("popup-open");
         });
          //关闭弹窗
         $(".mask_on").click(function () {
@@ -892,11 +955,13 @@
             $(".detailed_box_text").hide();
             $(".qqGroupCode_box").hide();
             $(this).hide();
+            $("body").removeClass("popup-open");
         });
         $(".mask_on__1").click(function () {
             $(".qqGroupCode_box").hide();
             $(".qqGroupCode_box").css("opacity","1");
             $(this).hide();
+            $("body").removeClass("popup-open");
         });
     </script>
 </body>

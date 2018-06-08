@@ -4,12 +4,10 @@ import json
 import functools
 from wechatpy.oauth import WeChatOAuth
 from django.http import HttpResponse, JsonResponse
-from on.user import UserInfo, UserRelation, UserTrade, UserAddress, UserOrder, UserInvite, FoolsDay, Invitenum, Tutorial
+from on.user import UserInfo, UserRelation, UserTrade, UserAddress, UserOrder, UserInvite, FoolsDay, Invitenum, Tutorial,LoginRecord
 from on.models import Activity, Goal, RunningPunchRecord, ReadingGoal, SleepingGoal, RunningGoal
 from on.activities.reading.models import BookInfo
-from on.serializers import UserSerializer, ActivitySerializer
-from django.views.decorators.csrf import csrf_exempt
-from functools import wraps
+from on.activities.walking.models import WalkingGoal, WalkingPunchRecord
 from django.http import HttpResponseRedirect
 from on.wechatconfig import oauthClient, client
 from django.conf import settings
@@ -18,25 +16,34 @@ import decimal
 from .QR_invite import user_qrcode
 from django.views.decorators.csrf import csrf_exempt
 from on.errorviews import page_not_found
+import requests
+import os
+import time
+import django.utils.timezone as timezone
 
 mappings = {
     "0": "sleeping.html",
     "1": "running.html",
     "2": "reading.html",
-    "3": "origami.html"
+    "3": "walking.html",
+    "4": "riding.html"
 }
 
-
+# o0jd6wtPNYaqn08CXQvtStOC-Vfw
 # o0jd6wgPxXAFK9aifqR858FOWDV0(王顺)
 # o0jd6wh-yDVy-2YzvR-hz2gr_pUA歐成東
 # o0jd6wnbJqpDofcVMx_MAbrw6dqQ (没有参加)
+# 100321:o0jd6wsAJBf-NJFh6VJAhTJpcaRI
 # o0jd6wg4m0iO5Mj-HOY7NuqbsyDs
-# 异常o0jd6wuBuoWGSMVrxz9vHR1VBneo
+# o0jd6woGTwBfu_LrZiZw1bxZlLXE
+# 100001o0jd6wk8OK89nbVqwwwPklrxQ
+#o0jd6wkLzUs5NC_d48w5Ee6Ht0ME
+#o0jd6wkLzUs5NC_d48w5Ee6Ht0ME 276
 def oauth(method):
     @functools.wraps(method)
     def warpper(request, *args, **kwargs):
         if settings.DEBUG:
-            user_info = {"openid": "o0jd6wgPxXAFK9aifqR858FOWDV0",
+            user_info = {"openid": "o0jd6wtPNYaqn08CXQvtStOC-Vfw",
                          "nickname": "",
                          "sex": "1",
                          "headimgurl": "http://wx.qlogo.cn/mmopen/g3MonUZtNHkdmzicIlibx6iaFqAc56vxLSUfpb6n5WKSYVY0ChQKkiaJSgQ1dZuTOgvLLrhJbERQQ4eMsv84eavHiaiceqxibJxCfHe/46",
@@ -55,7 +62,6 @@ def oauth(method):
                 return method(request, *args, **kwargs)
             if request.method == 'GET':
                 code = request.GET['code'] if 'code' in request.GET else None
-                print(code, "当前登陆的用户")
                 oauthClient.redirect_uri = settings.HOST + request.get_full_path()
                 # 如果有授权code, 说明是重定向后的页面
                 if code:
@@ -79,7 +85,27 @@ def oauth(method):
                                                                 user_info["headimgurl"],
                                                                 int(user_info["sex"]))
                     except Exception as e:
-                        print(e)
+                        print(e, '创建用户失败')
+                        try:
+                            usid = request.GET.get("usid", "")
+                            if usid:
+                                wechat_config = get_wechat_config(request)
+                                user = UserInfo.objects.get(user_id=usid)
+                                nickname = user.nickname
+                                imgUrl = user.headimgurl
+                                url = "/static/qrcode/{}.jpg".format(usid)
+                                context = {
+                                    "user_id": usid,
+                                    "wechat_config": wechat_config,
+                                    "nickname": nickname,
+                                    "imgUrl": imgUrl,
+                                    "url": url
+                                }
+                                return render(request, 'user/share.html', context)
+                            else:
+                                return render(request, 'on_qrcode.html')
+                        except Exception as e:
+                            print('分享二维码失败{}'.format(e))
                     else:
                         request.session['user'] = user
                         return method(request, *args, **kwargs)
@@ -112,9 +138,9 @@ def show_activities(request):
         times = None
     activities = Activity.objects.all().order_by("-activity_type")
     # TODO: fake
-    activities = fake_data(activities)
+    # activities = fake_data(activities)
     return render(request, 'activity/index.html', {
-        'activities': activities, "user_id": user.user_id, "times": times})
+        'activities': activities, "user_id": user.user_id, "times": times,"WechatJSConfig": get_wechat_config(request)})
 
 
 # 展示用户的用户的协议
@@ -134,23 +160,23 @@ def agreement(request):
 #     return render(request, 'user/test.html', context)
 
 # fake数据
-def fake_data(activities):
-    for activity in activities:
-        # 作息数据
-        if activity.activity_type == "0":
-            activity.coefficient += decimal.Decimal(155)
-            activity.active_participants += 15
-            activity.bonus_all += decimal.Decimal(2310)
-        # 跑步数据
-        elif activity.activity_type == "1":
-            activity.coefficient += decimal.Decimal(0)
-            activity.active_participants += 0
-            activity.bonus_all += decimal.Decimal(0)
-        # 阅读数据
-        else:
-            activity.active_participants += 0
-            activity.bonus_all += decimal.Decimal(0)
-    return activities
+# def fake_data(activities):
+#     for activity in activities:
+#         # 作息数据
+#         if activity.activity_type == "0":
+#             activity.coefficient += decimal.Decimal(0)
+#             activity.active_participants += 0
+#             activity.bonus_all += decimal.Decimal(0)
+#         # 跑步数据
+#         elif activity.activity_type == "1":
+#             activity.coefficient += decimal.Decimal(0)
+#             activity.active_participants += 0
+#             activity.bonus_all += decimal.Decimal(0)
+#         # 阅读数据
+#         elif activity.activity_type == "3":
+#             activity.active_participants += 0
+#             activity.bonus_all += decimal.Decimal(0)
+#     return activities
 
 
 # 获取某个模型的所有子模型
@@ -164,12 +190,13 @@ def get_son_models(model):
 # 显示活动的页面
 @oauth
 def show_specific_activity(request, pk):
-    user = request.session['user']
+    user = request.session.get("user")
+
     activity = Activity.objects.get(activity_id=pk)
     # 余额
     balance = UserInfo.objects.get(user_id=user.user_id).balance
     # TODO:FakeDATA
-    activity = fake_data([activity])[0]
+    # activity = fake_data([activity])[0]
     # TODO
     if not settings.DEBUG:
         user = request.session['user']
@@ -202,21 +229,21 @@ def show_specific_activity(request, pk):
 
     # 专门为读书设立的字段
     readinginfo = BookInfo.objects.get_book_info(book_id=1)
+    person_goals = []
     if activity.activity_type == ReadingGoal.get_activity():
         person_goals = ReadingGoal.objects.filter(status="ACTIVE")[:5]
     elif activity.activity_type == SleepingGoal.get_activity():
         person_goals = SleepingGoal.objects.filter(status="ACTIVE")[:5]
-    else:
+    elif activity.activity_type == RunningGoal.get_activity():
         person_goals = RunningGoal.objects.filter(status="ACTIVE")[:5]
+    elif activity.activity_type == WalkingGoal.get_activity():
+        person_goals = WalkingGoal.objects.filter(status="ACTIVE")[:5]
     # 生成一个persons集合
     persons = set()
     for person_goal in person_goals:
         persons.add(UserInfo.objects.get(user_id=person_goal.user_id))
     record = Tutorial.objects.filter(user_id=user.user_id)
-    if record:
-        times = record[0].times_in_read
-    else:
-        times = None
+    times = record[0].times_in_read if record else None
 
     return render(request, 'activity/{0}'.format(mappings[activity.activity_type]), {
         "app": activity,
@@ -225,8 +252,86 @@ def show_specific_activity(request, pk):
         "persons": persons,
         "DEBUG": settings.DEBUG,
         "balance": balance,
-        "times": times
+        "times": times,
+        "user_id": user.user_id,
+        # "user_comments": owen,
+        "user": user
     })
+
+
+# def get_datas(activity_type, user):
+#     datas = []
+#     if activity_type == '0':
+#         from on.activities.sleeping.models import CommentSleep, ReplySleep, SleepingPunchPraise, SleepingPunchReport
+#         datas = user_comments(user, comment_obj=CommentSleep, punch_report_obj=SleepingPunchReport,
+#                               reply_obj=ReplySleep, praise_obj=SleepingPunchPraise)
+#     elif activity_type == '2':
+#         from on.activities.reading.models import Comments, Reply, ReadingPunchPraise, ReadingPunchReport
+#         datas = user_comments(user, comment_obj=Comments, reply_obj=Reply, praise_obj=ReadingPunchPraise,
+#                               punch_report_obj=ReadingPunchReport)
+#     elif activity_type == "1":
+#         from on.activities.running.models import RunningPunchRecord,RunReply,RunningGoal,RunningPunchPraise,RunningPunchReport
+#         comments = RunningPunchRecord.objects.all().order_by("-record_time")
+#         datas_run = []
+#         for comm in comments:
+#             every_user = UserInfo.objects.get(user_id=comm.goal.user_id)
+#             report = RunningPunchReport.objects.filter(punch_id=comm.punch_id)
+#             reply = RunReply.objects.filter(other_id=comm.punch_id)
+#             response = [{"content": i.r_content, "other_id": i.user_id, "nickname": every_user.nickname} for
+#                         i in reply] if len(reply) > 0 else ""
+#             is_no_report = 1 if len(report) > 0 else 0
+#             praise = RunningPunchPraise.objects.filter(punch_id=comm.punch_id, user_id=user.user_id)
+#             is_no_prise = 1 if len(praise) > 0 else 0
+#             ref = comm.voucher_ref.split(",") if len(comm.voucher_ref) > 0 else ""
+#             nik = every_user.nickname
+#             datas_run.append({
+#                 'user_id': comm.goal.user_id,
+#                 "content": comm.document,
+#                 "c_time": comm.record_time,
+#                 "prise": comm.praise,
+#                 "report": comm.report,
+#                 "voucher_ref": ref,
+#                 "headimgurl": every_user.headimgurl,
+#                 "nickname": nik,
+#                 "is_no_report": is_no_report,
+#                 "is_no_prise": is_no_prise,
+#                 "reply_data": response
+#             })
+#     return datas_run
+
+
+# def user_comments(user, comment_obj, punch_report_obj, reply_obj, praise_obj):
+#     comment_obj = comment_obj.objects.filter(is_delete=0, is_top=1).order_by("-c_time")
+#     datas = []
+#     for comment in comment_obj:
+#         report = punch_report_obj.objects.filter(punch_id=comment.id)
+#         reply = reply_obj.objects.filter(other_id=comment.id)
+#         response = [{"content": i.r_content, "other_id": i.user_id, "nickname": i.get_user_message.nickname} for
+#                     i in reply] if len(reply) > 0 else ""
+#         is_no_report = 1 if len(report) > 0 else 0
+#         prise = praise_obj.objects.filter(punch_id=comment.id, user_id=user.user_id)
+#         is_no_prise = 1 if len(prise) > 0 else 0
+#         ref = comment.voucher_ref.split(",") if len(comment.voucher_ref) > 0 else ""
+#         top = comment.is_top
+#         nik = comment.get_some_message.nickname
+#         if top == 0:
+#             datas.append({
+#                 "id": comment.id,
+#                 'user_id': comment.user_id,
+#                 "content": comment.content,
+#                 "c_time": comment.c_time,
+#                 "prise": comment.prise,
+#                 "report": comment.report,
+#                 "voucher_ref": ref,
+#                 "is_delete": comment.is_delete,
+#                 "is_top": comment.is_top,
+#                 "headimgurl": comment.get_some_message.headimgurl,
+#                 "nickname": nik,
+#                 "is_no_report": is_no_report,
+#                 "is_no_prise": is_no_prise,
+#                 "reply_data": response
+#             })
+#         return datas
 
 
 # 显示个人页面
@@ -581,58 +686,138 @@ def foolsday_rank(request):
 def user_screenshot(request):
     user_id = request.GET.get("user_id")
     user = UserInfo.objects.filter(user_id=user_id)[0]
-    img_random = request.session.get("img_random")
-    active_participants = Activity.objects.get(activity_id="32f2a8dbe89d43c7b9ecfea19947b057").active_participants
+    img_random = request.GET.get("img_random")
+    activity_type = request.GET.get("activity_type")
+    active_participants = Activity.objects.get(activity_type=activity_type).active_participants
     try:
-        run = RunningGoal.objects.filter(user_id=user_id, status="ACTIVE")[0]
-        url = "/static/qrcode/{}.jpg".format(user_id)
-        context = {
-            "user_id": user_id,
-            "nickname": user.nickname,
-            "headimgurl": user.headimgurl,
-            "punch_day": run.punch_day,
-            "ticket": url,
-            "img_random": img_random,
-            "active_participants": active_participants
-        }
-        return render(request, "user/screenshot.html", context)
+        if activity_type == "1":
+            run = RunningGoal.objects.filter(user_id=user_id, status="ACTIVE")[0]
+            punch_day = run.punch_day
+            url = "/static/qrcode/{}.jpg".format(user_id)
+            context = {
+                "user_id": user_id,
+                "nickname": user.nickname,
+                "headimgurl": user.headimgurl,
+                "punch_day": punch_day,
+                "ticket": url,
+                "img_random": img_random,
+                "active_participants": active_participants
+            }
+            return render(request, "user/screenshot.html", context)
+        elif activity_type == "0":
+            from on.activities.sleeping.models import SleepingGoal
+            url = "/static/qrcode/{}.jpg".format(user_id)
+            # SleepingGoal.objects.get(user_id=user_id).punch_day
+            context = {
+                "user_id": user_id,
+                "nickname": user.nickname,
+                "headimgurl": user.headimgurl,
+                "ticket": url,
+                "img_random": img_random,
+                "active_participants": active_participants,
+                "punch_day": SleepingGoal.objects.get(user_id=user_id).punch_day
+            }
+            return render(request, "user/screenshot.html", context)
+
     except Exception as e:
         print(e)
 
 
 @csrf_exempt
 def in_homepage(request):
-    user = request.session["user"]
-    print("开始进入教程")
-    if request.method == "POST":
-        print("如果是post请求")
-        try:
+    try:
+        if request.method == "POST":
+            user = request.session["user"]
             record = Tutorial.objects.filter(user_id=user.user_id)[0]
-            print("开始修改")
             record.times_in_homepage += 1
             record.save()
-            print("修改成功")
             return JsonResponse({"status": 200})
-        except Exception as e:
+    except Exception as e:
             print(e)
-    else:
-        return JsonResponse({"status": 201})
+            return JsonResponse({"status": 201})
 
 
 @csrf_exempt
 def in_read(request):
     user = request.session["user"]
-    print("开始进入教程")
     if request.method == "POST":
-        print("如果是post请求")
         try:
             record = Tutorial.objects.filter(user_id=user.user_id)[0]
-            print("开始修改")
             record.times_in_read += 1
             record.save()
-            print("修改成功")
             return JsonResponse({"status": 200})
         except Exception as e:
             print(e)
     else:
         return JsonResponse({"status": 201})
+
+
+WECHAT_APPID = "wx4495e2082f63f8ac"
+WECHAT_APPSECRET = "23f0462bee8c56e09a2ac99321ed9952"
+
+
+# 获取accessToken
+def getToken():
+    # 获取用户的accesstoken
+    url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' + WECHAT_APPID + "&secret=" + WECHAT_APPSECRET
+    token_str = requests.post(url).content.decode()
+    token_json = json.loads(token_str)
+    token = token_json['access_token']
+    return token
+
+
+@csrf_exempt
+def update_headimgurl(request):
+    if request.POST:
+        try:
+            user = request.session.get("user")
+            req = int(request.POST.get("req"))
+            token = getToken()
+            url = """https://api.weixin.qq.com/cgi-bin/user/info?access_token={}&openid={}&lang=zh_CN""".format(token,
+                                                                                                                user.wechat_id)
+            resp = requests.get(url)
+            filePath = os.path.join(settings.AVATAR_DIR, str(user.user_id) + ".jpg")
+            # 引用所使用的路径
+            re = resp.content.decode()
+            json_str = json.loads(re)
+            name = json_str["nickname"]
+            img = json_str["headimgurl"]
+            data = requests.get(img)
+            time.sleep(1)
+            with open(filePath, "wb") as f:
+                f.write(data.content)
+                time.sleep(1)
+            if req == 0:
+                pass
+            elif req == 1:
+                user.nickname = name
+                try:
+                    user.save()
+                except Exception as e:
+                    print("更换name失败，失败原因", e)
+                    return JsonResponse({"status": "e"})
+            else:
+                pass
+            return JsonResponse({"status": 200})
+        except Exception as e:
+            print("更换头像失败，失败原因", e)
+    else:
+        return JsonResponse({"status": 403})
+
+@csrf_exempt
+def login_record(request):
+    #用户进入的时候记录用户的信息
+    if settings.DEBUG:
+        user_id = 100274
+        nickname = "fhskfs"
+    else:
+        user = request.session.get("user")
+        user_id = user.user_id
+        nickname = user.nickname
+
+    timeNow = timezone.now().strftime("%Y-%m-%d %H:%M")
+    try:
+        LoginRecord.objects.create(user_id=user_id, timeNow=timeNow, nickname=nickname)
+    except Exception as e:
+        print(e)
+    return JsonResponse({"status":200})

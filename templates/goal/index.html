@@ -92,15 +92,32 @@
 					<img src="/static/images/swiper/lei@2x_1.jpg" alt="">
 				</div>
                 -->
+
+                <!--
 				<div class="swiper-slide" data-link="https://mp.weixin.qq.com/s?__biz=MzI2Mjc4OTU4Ng==&mid=2247483823&idx=1&sn=8c1bd6a19c8b7d52af2c6028f662ca5a&chksm=ea448112dd330804f1edc6876ca60b5fa93ed247805e398598d086efb19365e8eff3e15eff43#rd">
 					<img src="/static/images/swiper/InvitingFriends@2x.png" alt="">
 				</div>
-                <!--
-
                 -->
-                <div class="swiper-slide" data-link="https://mp.weixin.qq.com/s/EeqEBNizhRHBG2pI0oGnWw" style="">
-                    <img src="/static/images/swiper/swiper_read@2x.png" alt="">
+
+
+                <div class="swiper-slide" data-link="https://mp.weixin.qq.com/s/QDP2bsESexC_SFWXlOgSMw" style="">
+                    <img src="/static/images/swiper/swiper_5_29.jpg" alt="">
                 </div>
+                <div class="swiper-slide" data-link="https://mp.weixin.qq.com/s/VdME4a_vVOEBvt3Q7u-1ow" style="">
+                    <img src="/static/images/sleeping/sleeping_banner@2x.png" alt="">
+                </div>
+
+                <!--
+                <div class="swiper-slide" data-link="#" style="">
+                    <img src="/static/images/ride/ride_banner@2x.png" alt="">
+                </div>
+
+                <div class="swiper-slide" data-link="#" style="">
+                    <img src="/static/images/walking/walking_banner@2x.png" alt="">
+                </div>
+                -->
+
+
 
 			</div>
 			<div class="swiper-pagination swiper-pagination-bullets">
@@ -111,11 +128,24 @@
 		</div>
 
     	<!--我的目标列表-->
+    <!--
+    goal.activity_type == "0"   作息
+    goal.activity_type == "1"   跑步
+    goal.activity_type == "2"   读书
+    goal.activity_type == "3"   步行
+    goal.activity_type == "4"   骑行
+    -->
         {% if status %}
             <ul class="target-list">
                 {% for goal in goals %}
                     <li class="target-list-item"  _link_="{{ goal.activity_type }}"  data-link="{{ goal.goal_id|cut:'-' }}?activity_type={{ goal.activity_type }}"
-                        {% if goal.activity_type == "0" %}style="background-image: url(/static/images/sleep_goal_bar.jpg);"{% elif goal.activity_type == "1" %}style="background-image: url(/static/images/run_goal_tubar.jpg);"{% else %}style="background-image: url(/static/images/read/read_goal_bar.png);"{% endif %}>
+                        {% if goal.activity_type == "0" %}style="background-image: url(/static/images/sleeping/sleep_goal_bar@2x.png);"
+                        {% elif goal.activity_type == "1" %}style="background-image: url(/static/images/running/run_goal_tubar@2x.png);"
+                        {% elif goal.activity_type == "2" %}style="background-image: url(/static/images/read/read_goal_bar.png);"
+                        {% elif goal.activity_type == "3" %}style="background-image: url(/static/images/walking/goal_walking_goal_tubar.png);"
+                        {% elif goal.activity_type == "4" %}style="background-image: url(/static/images/ride/goal_ride_goal_tubar.png);"
+                        {% else %}
+                        {% endif %}>
                         <div class="header-mask"></div>
                         <div class="row-center between" style="box-sizing:border-box;width: 100%;margin-top: 5px;padding-right: 10px;">
                             <div class="item-text">{{ goal.activity_dis }}</div>
@@ -135,24 +165,62 @@
                             {% if goal.activity_type == "2" %}
                                 <span style="font-size: 14px;color: #B6C1C8;opacity: 0">第</span>
                                 <span style="font-size: 14px;color: white;opacity: 0">天</span>
-                            {% else %}
-                                <span style="font-size: 14px;color: #B6C1C8;">第</span>
-                                <span style="font-size: 16px;font-weight:600;color: white;">
-                                    {% if first_day_record == 1 %}
-                                        {% if goal.past_day >= goal.goal_day %}
-                                            {{ goal.goal_day }}
-                                        {% else %}
-                                            {{ goal.past_day }}
-                                        {% endif %}
-                                    {% else %}
+                            {% elif goal.activity_type == "0" %}
 
+                                <span style="font-size: 14px;color: #B6C1C8;">
+                                    {% if goal.goal_day == 9999 %}
+                                        你已经连续第&nbsp;<span style="font-size: 16px;font-weight:600;color: white;">{{ goal.past_day|add:-1 }}</span>&nbsp;天早起
+                                    {% else %}
+                                        <span style="font-size: 14px;color: #B6C1C8;">第</span>
                                         {% if goal.past_day >= goal.goal_day %}
                                             {{ goal.goal_day }}
                                         {% else %}
                                             {{ goal.past_day|add:-1 }}
                                         {% endif %}
+                                        /&nbsp;{{ goal.goal_day }}
+                                        <span style="font-size: 14px;color: white;">天</span>
 
-                                    {% endif %}/{{ goal.goal_day }}
+                                    {% endif %}
+                                </span>
+{#                                <span style="font-size: 16px;font-weight:600;color: white;">{{ goal.past_day }}/{{ goal.goal_day }}</span>#}
+
+                            {% else %}
+                                <span style="font-size: 14px;color: #B6C1C8;">第</span>
+                                <span style="font-size: 16px;font-weight:600;color: white;">
+                                    {% if goal.goal_day == 9999 %}
+                                        {% if first_day_record == 1 %}
+                                            {% if goal.past_day >= goal.goal_day %}
+                                                {{ goal.goal_day }}
+                                            {% else %}
+                                                {{ goal.past_day }}
+                                            {% endif %}
+                                        {% else %}
+
+                                            {% if goal.past_day >= goal.goal_day %}
+                                                {{ goal.goal_day }}
+                                            {% else %}
+                                                {{ goal.past_day|add:-1 }}
+                                            {% endif %}
+
+                                        {% endif %}
+                                    {% else %}
+                                        {% if first_day_record == 1 %}
+                                            {% if goal.past_day >= goal.goal_day %}
+                                                {{ goal.goal_day }}
+                                            {% else %}
+                                                {{ goal.past_day }}
+                                            {% endif %}
+                                        {% else %}
+
+                                            {% if goal.past_day >= goal.goal_day %}
+                                                {{ goal.goal_day }}
+                                            {% else %}
+                                                {{ goal.past_day|add:-1 }}
+                                            {% endif %}
+
+                                        {% endif %}/&nbsp;{{ goal.goal_day }}
+                                    {% endif %}
+
                                 </span>
 {#                                <span style="font-size: 16px;font-weight:600;color: white;">{{ goal.past_day }}/{{ goal.goal_day }}</span>#}
                                 <span style="font-size: 14px;color: white;">天</span>
@@ -168,7 +236,26 @@
                                 <span style="font-size: 18px;font-weight:600;color: #ff931f;">{{ goal.money|floatformat:"0" }}</span>
                                 <span style="font-size: 14px;color: #B6C1C8;">元</span>
                             </div>
+                        {% elif goal.activity_type  == "0" %}
+                            <div style="margin-left: 10px;z-index: 10;opacity: 1">
+                                <span style="font-size: 14px;color: #B6C1C8;">奖金池：</span>
+                                <span style="font-size: 18px;font-weight:600;color: #ff931f;">{{ goal.money|floatformat:"0" }}</span>
+                                <span style="font-size: 14px;color: #B6C1C8;">元</span>
+                            </div>
+
                         {% elif goal.activity_type  == "2" %}
+                            <div style="margin-left: 10px;z-index: 10;opacity: 0">
+                                <span style="font-size: 14px;color: #B6C1C8;">奖金池：</span>
+                                <span style="font-size: 18px;font-weight:600;color: #ff931f;">1</span>
+                                <span style="font-size: 14px;color: #B6C1C8;">元</span>
+                            </div>
+                        {% elif goal.activity_type  == "3" %}
+                            <div style="margin-left: 10px;z-index: 10;opacity: 0">
+                                <span style="font-size: 14px;color: #B6C1C8;">奖金池：</span>
+                                <span style="font-size: 18px;font-weight:600;color: #ff931f;">1</span>
+                                <span style="font-size: 14px;color: #B6C1C8;">元</span>
+                            </div>
+                        {% elif goal.activity_type  == "4" %}
                             <div style="margin-left: 10px;z-index: 10;opacity: 0">
                                 <span style="font-size: 14px;color: #B6C1C8;">奖金池：</span>
                                 <span style="font-size: 18px;font-weight:600;color: #ff931f;">1</span>

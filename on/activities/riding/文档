@@ -1,0 +1,37 @@
+骑行活动
+    1、创建活动
+            日常模式：
+                goal_day
+                guarantee
+
+
+
+当用户成功创建活动 后 生成一张 系数表 Coefficient（在sleep model中）
+riding_type = goal_type  0  是自由模式   1是日常模式
+记录 该用户的 默认系数, 后期每天打卡 更新
+
+
+
+
+额外距离小于3 但是 打卡天数大于3
+
+data:{
+        goal_type              日常模式  1， 自由模式0
+        guaranty               保证金
+        coefficient            系数
+        multiple               倍数翻倍用
+        kilos_day              日常模式的目标距离
+        goal_distance，        自由模式的目标距离
+        mode
+        goal_day               目标天数一周 7， 2周 14， 3周  21， 无限 9999
+        reality_price          实付
+        deserve_price          应付
+        down_num               扣完底金需要的次数
+        down_payment           底金10 down_num是一次， 20是2次
+        activate_deposit       活动押金 = 保证金 + 底金
+        deduction_point        暂时无参
+        deduction_guaranty     暂时无参
+
+        is_no_use_point        暂时无参
+        punch_attention        暂时无参
+        },

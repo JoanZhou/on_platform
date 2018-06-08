@@ -2,6 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0 minimum-scale=0.5, user-scalable=no" />
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <title>API测试</title>
     <link rel="stylesheet" href="/static/css/weui.min.css"/>
     <link rel="stylesheet" href="/static/css/bootstrap.min.css"/>
@@ -15,10 +21,29 @@
 <body>
     <div class="main_content ">
         <div>
-            {{ comm_list }}
+{#            {{ comm_list }}#}
         </div>
 
-        <button class="font_color_1 btn_test">测试</button>
+        <div style="display: block;width: 60%;height: 100px;margin:20px auto;">
+            <button href="javascript:;" class="weui-btn weui-btn_primary font_orange_2 btn_test_5 font_size_12">测试图片发送</button>
+        </div>
+
+        <div style="display: block;width: 60%;height: 100px;margin:20px auto;">
+            <button href="javascript:;" class="weui-btn weui-btn_primary font_orange_2 btn_test_1 font_size_12">更新收益</button>
+        </div>
+
+        <div style="display: block;width: 60%;height: 100px;margin:20px auto;">
+            <button href="javascript:;" class="weui-btn weui-btn_primary font_orange_2 btn_test_2 font_size_12">查询打卡天数</button>
+        </div>
+
+        <div style="display: block;width: 60%;height: 100px;margin:20px auto;">
+            <button href="javascript:;" class="weui-btn weui-btn_primary font_orange_2 btn_test_3 font_size_12">API 测试</button>
+        </div>
+
+        <div >
+            <button href="javascript:;" class="weui-btn weui-btn_primary font_orange_2 btn_test_4 font_size_12">收益 初始化</button>
+        </div>
+
     </div>
     <div class="hide_content">
 
@@ -38,15 +63,17 @@
     </script>
 
     <script>
-        $(".btn_test").click(function () {
-            console.log("API 测试");
+        //更新收益
+        $(".btn_test_1").click(function () {
+            //return
+            console.log("更新收益 API 测试");
             $.showLoading();
-            $(".weui-toast_content").text("API 测试中...");
+            $(".weui-toast_content").text("更新收益 API 测试中...");
             $.ajax({
                 type: "POST",
-                url: "/api/load_comments",
+                url: "/api/update_all_profit",
                 data:{
-                    "c_num":1
+                   // "c_num":1
                 },
                 success: function (res) {
                     //alert(res);
@@ -73,6 +100,164 @@
             });
             
         });
+
+
+        //查询人数
+        $(".btn_test_2").click(function () {
+            //return
+            console.log("查询人数 API 测试");
+            $.showLoading();
+            $(".weui-toast_content").text("查询人数 API 测试中...");
+            $.ajax({
+                type: "POST",
+                url: "/api/update_punchday",
+                data:{
+                   // "c_num":1
+                },
+                success: function (res) {
+                    //alert(res);
+                    $.hideLoading();
+                    console.log(res);
+                    setTimeout(function () {
+                        if(res.status=="403"){
+                            $.toast("失败", "cancel");
+                            return
+                        }
+                        $.toast("查询人数 成功");
+                    }, 500);
+                },
+                error:function(res){
+                    console.log(res);
+                    $.hideLoading();
+                    setTimeout(function () {
+                        $.toast("错误", "cancel");
+                    }, 500);
+                },
+                complete: function(XMLHttpRequest, textStatus) {
+                    console.log("ajax 公用");
+                }
+            });
+
+        });
+
+
+        //API 测试
+        $(".btn_test_3").click(function () {
+            return
+            console.log("API 测试");
+            $.showLoading();
+            $(".weui-toast_content").text("API 测试中...");
+            $.ajax({
+                type: "POST",
+                url: "",
+                data:{
+                   // "c_num":1
+                },
+                success: function (res) {
+                    //alert(res);
+                    $.hideLoading();
+                    console.log(res);
+                    setTimeout(function () {
+                        if(res.status=="403"){
+                            $.toast("失败", "cancel");
+                            return
+                        }
+                        $.toast("成功");
+                    }, 500);
+                },
+                error:function(res){
+                    console.log(res);
+                    $.hideLoading();
+                    setTimeout(function () {
+                        $.toast("错误", "cancel");
+                    }, 500);
+                },
+                complete: function(XMLHttpRequest, textStatus) {
+                    console.log("ajax 公用");
+                }
+            });
+
+        });
+
+        // api/init_profit
+        // 收益 初始化
+        $(".btn_test_4").one("click",function(){
+            //return
+            //console.log("API 测试");
+            $.showLoading();
+            $(".weui-toast_content").text("API 测试中...");
+            $.ajax({
+                type: "POST",
+                url: "/api/init_profit",
+                data:{
+                   // "c_num":1
+                },
+                success: function (res) {
+                    //alert(res);
+                    $.hideLoading();
+                    console.log(res);
+                    setTimeout(function () {
+                        if(res.status=="403"){
+                            $.toast("失败", "cancel");
+                            return
+                        }
+                        $.toast("收益 初始化 成功");
+                    }, 500);
+                },
+                error:function(res){
+                    console.log(res);
+                    $.hideLoading();
+                    setTimeout(function () {
+                        $.toast("错误", "cancel");
+                    }, 500);
+                },
+                complete: function(XMLHttpRequest, textStatus) {
+                    console.log("ajax 公用");
+                }
+            });
+
+        });
+
+        // 测试 图片 发送
+        $(".btn_test_5").one("click",function(){
+            //return
+            //console.log("API 测试");
+            $.showLoading();
+            $(".weui-toast_content").text("API 测试 图片 发送...");
+            $.ajax({
+                type: "POST",
+                url: "/api/send_img_test",
+                data:{
+                   // "c_num":1
+                },
+                success: function (res) {
+                    //alert(res);
+                    $.hideLoading();
+                    console.log(res);
+                    setTimeout(function () {
+                        if(res.status=="403"){
+                            $.toast("失败", "cancel");
+                            return
+                        }
+                        $.toast("成功");
+                    }, 500);
+                },
+                error:function(res){
+                    console.log(res);
+                    $.hideLoading();
+                    setTimeout(function () {
+                        $.toast("错误", "cancel");
+                    }, 500);
+                },
+                complete: function(XMLHttpRequest, textStatus) {
+                    console.log("ajax 公用");
+                }
+            });
+
+        });
+
+
+
     </script>
 </body>
 

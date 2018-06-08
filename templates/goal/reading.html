@@ -239,12 +239,26 @@
         #upload-panel{
             height: auto;
         }
+        .modalTextarea_box{
+            width: 96%;
+            height: 150px;
+            font-size: 17px;
+            border: 1px #f6f1f1 solid;
+            padding: 2%;
+        }
 
         .modalTextarea{
-            border: #e7e7e7 solid 1px;
+            {#border: #e7e7e7 solid 1px;#}
+            height: 150px;
+            font-size: 17px;
+            border: none;
+            text-indent: 2em;
             width: 100%;
-            height: 200px;
+            {#border-top: 1px #f6f1f1 solid;#}
+            {#border-bottom: 1px #f6f1f1 solid;;#}
         }
+        input,button,select,textarea{outline:none}
+        textarea{resize:none}
     </style>
 
     <!---  重置样式     -->
@@ -273,13 +287,13 @@
 
         .news-item__content{
             position: relative;
-            max-height: 80px;
+            max-height: 100px;
             height: auto;
             overflow: hidden;
         }
         .uploaderInput_box{
             {#overflow: hidden;#}
-            margin: 10px;
+            {#margin: 10px;#}
         }
         .news-item__content-img{
             overflow: hidden;
@@ -314,6 +328,17 @@
             width: 70px;
             height: 70px;
         }
+        .uploaderInput_box_{
+            width: 28%;
+            margin-left: 3%;
+            height: 100px;
+            overflow: hidden;
+        }
+
+        .uploaderInput_box_ .news-item__content-img{
+            width: 28%;
+            height: 100%;
+        }
         .weui-photo-browser-modale,.photo-container{
             z-index: 999999999999999;
         }
@@ -345,6 +370,25 @@
         .reply_data{
             margin-top: 10px;
         }
+        .news-list{
+            border-top:1px solid #e5e5e5;
+        }
+        .news-item:before {
+            content: " ";
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            height: 1px;
+            border-top: 1px solid #e5e5e5;
+            color: #e5e5e5;
+            -webkit-transform-origin: 0 0;
+            transform-origin: 0 0;
+            -webkit-transform: scaleY(.5);
+            transform: scaleY(.5);
+            left: 15px;
+            z-index: 2;
+        }
 
         /*
         点赞，举报，回复
@@ -357,7 +401,10 @@
             height: 22px;
             line-height: 18px;
             color: rgba(31,162,255,1);
+            /*
             border: 1px #1fa2ff solid;
+            */
+            border: none;
         }
 
         .button_sty_yes{
@@ -368,10 +415,14 @@
             height: 22px;
             line-height: 18px;
             color: rgba(182, 193, 200,1);
-            border: 1px solid rgba(182, 193, 200,1);
+            border: none;
         }
         .button_sty_yes > span{
             color: rgba(182, 193, 200,1);
+        }
+
+        .icon-dianzan{
+            font-size: 14px;
         }
 
     </style>
@@ -443,6 +494,10 @@
 				<div class="header_avatar-text" style="color: #B6C1C8; font-size: 0.7rem;line-height: 20px;height: 20px;">已返还押金</div>
 				<div class="header__text">
 					<span style="color: #565c66;  font-weight: 600;">{{ goal.bonus|default:0.00 }}</span>
+                    <div style="display: inline-block;margin-left: 5px">
+                        <p id="invite_num_plus_1" class="invite_num_plus" style="font-size: 0.4rem;color: #eca285;line-height: 0.4rem;text-align: center;"></p>
+                        <p id="invite_num_plus_1_1"  class="invite_num_plus" style="font-size: 0.4rem;color: #eca285;line-height: 0.4rem;text-align: center;margin-top: 2px;"></p>
+                    </div>
 				</div>
 			</div>
 		</div>
@@ -521,861 +576,717 @@
 	</div>
 
 
-<!-- -->
-	<div id="upload-panel">
-        {% for day in datesinform %}
-            {% for dates in day %}
-                <div class="day-index dayindex_{{ dates.dayindex }}" {% if dates.date == "0" %}style="display: none;" {% else %} {% if dates.is_day_now|yesno:"1,0" == "1" %}{% else %}style="display: none;"{% endif %}{% endif %} >
+    <!-- 中间页面主要内容（个人每日信息） -->
+        <div id="upload-panel">
+            {% for day in datesinform %}
+                {% for dates in day %}
+                    <div class="day-index dayindex_{{ dates.dayindex }}" {% if dates.date == "0" %}style="display: none;" {% else %} {% if dates.is_day_now|yesno:"1,0" == "1" %}{% else %}style="display: none;"{% endif %}{% endif %} >
 
-    <!-- 判断 是否 到货 -->
-        <!-- 到货 -->
-                {% if is_start|yesno:"1,0" == "1" %}
-                    <!-- 第几天 -->
-                    第{{ dates.dayindex }}天
-                    <div class="panel__body">
-                        <div class="upload-sidebar left"></div>
+            <!-- 判断 是否 到货 -->
+                <!-- 到货 -->
+                    {% if is_start|yesno:"1,0" == "1" %}
+                        <!-- 第几天 -->
+                        <span> 第{{ dates.dayindex }}天</span>
+                        <div class="panel__body">
+                            <div class="upload-sidebar left"></div>
 
-            <!--  判断是否是有效 日期 -->
-                        {% if dates.dayindex > 0 %}
-
-                    <!--  判断是否是今天 -->
-                        <!--  是今天 -->
-                            {% if dates.is_day_now|yesno:"1,0" == "1"%}
-
-                            <!--  判断是否是第一天 -->
-                                <!-- 是第一天-->
-                                {% if dates.dayindex == 1 %}
-                                    <!--判断 是否 打卡 -->
-                                        <!-- 打卡 -->
-                                        {% if dates.isfinish %}
-                                            <div class="upload-card coloum-space center">
-                                                <p class="panel__title">书名：《{{ goal.book_name }}》</p>
-                                                <p class="panel__middle">已阅读至 <span class="panel__middle-focus">{{ dates.reading_page }}</span> 页</p>
-                                                <p class="panel__bottom">目标：在 <span class="panel__bottom-focus">{{ goal.goal_day }}</span> 天内完成 <span class="panel__bottom-focus">《{{ goal.book_name }}》</span> 的阅读</p>
-                                            </div>
-                                        {% else %}
-                                        <!-- 没有 打卡 -->
-                                            <div class="upload-card coloum-space center read_start_bg">
-                                                <div style="position:absolute; top:0;left: -10px;width: 90px;z-index: 0">
-                                                    <img src="/static/images/read/read_start_1@2x.png" style="width: 100%">
-                                                </div>
-                                                <div style="position:absolute; bottom:0;right: -10px;width: 90px;z-index: 0">
-                                                    <img src="/static/images/read/read_start_2@2x.png" style="width: 100%">
-                                                </div>
-
-                                                <div class="coloum-space center" style="margin-top: 20px;">
-                                                    <span class="read_start_font font_color_1" style="color: #B6C1C8;">书是人类进步的阶梯<br>马上开始阅读吧！</span>
-                                                </div>
-                                                <p class="panel__bottom" style="z-index: 1">目标：在 <span class="panel__bottom-focus">{{ goal.goal_day }}</span> 天内完成 <span class="panel__bottom-focus">《{{ goal.book_name }}》</span> 的阅读</p>
-                                            </div>
-                                        {% endif %}
-                                    <!--判断 是否 打卡 end -->
-                                {% else %}
-                                <!-- 今天 不是第一天-->
-                                    <!-- 打卡 -->
-                                        {% if dates.isfinish %}
-                                            <div class="upload-card row-center center nopadding" style="color: #B6C1C8;">
-                                                <div style="position: absolute;top:10px;">
-{#                                                    <p style="font-size: 0.8rem;">今天完成</p>#}
-                                                    <p style="font-size: 0.8rem;">今天收益 {{ dates.bonus }}</p>
-                                                </div>
-
-                                                <div class="coloum-space center">
-                                                    <p style="color: #B6C1C8;font-size: 14px;">阅读时间</p>
-                                                    <p>
-                                                        <span style="font-size: 22px;color: #1fa2ff;">
-                                                            {{ dates.reading_delta }}
-                                                        </span>
-                                                            分钟
-                                                    </p>
-                                                </div>
-
-
-                                                <div class="panel__split"></div>
-                                                <div class="coloum-space center">
-                                                    <p style="color: #B6C1C8;font-size: 14px;">已阅读至</p>
-                                                    <p>
-        {#                                                <span style="font-size: 22px;color: #1fa2ff;">{{ dates.start_page|floatformat:"0" }}</span>页至#}
-                                                        <span style="font-size: 22px;color: #1fa2ff;">
-{#                                                            {{ dates.reading_page }}#}
-                                                            {{ goal.finish_page }}
-                                                        </span>
-                                                            页
-                                                    </p>
-                                                </div>
-                                                <div style="position: absolute;bottom:10px;">
-                                                    <p class="panel__bottom">目标：在 <span class="panel__bottom-focus">{{ goal.goal_day }}</span> 天内完成 <span class="panel__bottom-focus">《{{ goal.book_name }}》</span> 的阅读</p>
-                                                </div>
-                                            </div>
-                                        {% else %}
-                                            <!-- 没有打卡 -->
-                                            <div class="upload-card coloum-space center" style="overflow:hidden;">
-                                                <div class="coloum-space center">
-                                                    <span style="color: #B6C1C8;">今天没有阅读</span>
-                                                </div>
-{#                                                <p class="panel__middle">已阅读至 <span class="panel__middle-focus">{{ dates.reading_page }}</span> 页</p>#}
-                                                <p class="panel__middle p_overflow" style="margin-bottom: -10px;">{{ dates.saying }}</p>
-{#                                                <p class="panel__middle">已阅读至 <span class="panel__middle-focus">{{ dates.reading_page }}</span> 页</p>#}
-                                                <p class="panel__bottom">目标：在 <span class="panel__bottom-focus">{{ goal.goal_day }}</span> 天内完成 <span class="panel__bottom-focus">《{{ goal.book_name }}》</span> 的阅读</p>
-                                            </div>
-                                        {% endif %}
-                                    <!--判断 是否 打卡 end -->
-                                {% endif %}
-                            <!--  判断是否是第一天 end-->
-                            {% else %}
+                <!--  判断是否是有效 日期 -->
+                            {% if dates.dayindex > 0 %}
 
                         <!--  判断是否是今天 -->
-                        <!--  不是今天 -->
-                                {% if dates.isfinish %}
+                            <!--  是今天 -->
+                                {% if dates.is_day_now|yesno:"1,0" == "1"%}
 
-                                    <div class="upload-card row-center center nopadding" style="color: #B6C1C8;">
-                                        <div style="position: absolute;top:10px;">
-                                            <p style="font-size: 0.8rem;">当天收益 {{ dates.bonus }}</p>
+                                <!--  判断是否是第一天 -->
+                                    <!-- 是第一天-->
+                                    {% if dates.dayindex == 1 %}
+                                        <!--判断 是否 打卡 -->
+                                            <!-- 打卡 -->
+                                            {% if dates.isfinish %}
+                                                <div class="upload-card coloum-space center">
+                                                    <p class="panel__title">书名：《{{ goal.book_name }}》</p>
+                                                    <p class="panel__middle">已阅读至 <span class="panel__middle-focus">{{ dates.reading_page }}</span> 页</p>
+                                                    <p class="panel__bottom">目标：在 <span class="panel__bottom-focus">{{ goal.goal_day }}</span> 天内完成 <span class="panel__bottom-focus">《{{ goal.book_name }}》</span> 的阅读</p>
+                                                </div>
+                                            {% else %}
+                                            <!-- 没有 打卡 -->
+                                                <div class="upload-card coloum-space center read_start_bg">
+                                                    <div style="position:absolute; top:0;left: -10px;width: 90px;z-index: 0">
+                                                        <img src="/static/images/read/read_start_1@2x.png" style="width: 100%">
+                                                    </div>
+                                                    <div style="position:absolute; bottom:0;right: -10px;width: 90px;z-index: 0">
+                                                        <img src="/static/images/read/read_start_2@2x.png" style="width: 100%">
+                                                    </div>
+
+                                                    <div class="coloum-space center" style="margin-top: 20px;">
+                                                        <span class="read_start_font font_color_1" style="color: #B6C1C8;">书是人类进步的阶梯<br>马上开始阅读吧！</span>
+                                                    </div>
+                                                    <p class="panel__bottom" style="z-index: 1">目标：在 <span class="panel__bottom-focus">{{ goal.goal_day }}</span> 天内完成 <span class="panel__bottom-focus">《{{ goal.book_name }}》</span> 的阅读</p>
+                                                </div>
+                                            {% endif %}
+                                        <!--判断 是否 打卡 end -->
+                                    {% else %}
+                                    <!-- 今天 不是第一天-->
+                                        <!-- 打卡 -->
+                                            {% if dates.isfinish %}
+                                                <div class="upload-card row-center center nopadding" style="color: #B6C1C8;">
+                                                    <div style="position: absolute;top:10px;">
+                                                        <p style="font-size: 0.8rem;">今天收益 {{ dates.bonus }}</p>
+                                                    </div>
+
+                                                    <div class="coloum-space center">
+                                                        <p style="color: #B6C1C8;font-size: 14px;">阅读时间</p>
+                                                        <p>
+                                                            <span style="font-size: 22px;color: #1fa2ff;">
+                                                                {{ dates.reading_delta }}
+                                                            </span>
+                                                                分钟
+                                                        </p>
+                                                    </div>
+
+                                                    <div class="panel__split"></div>
+                                                    <div class="coloum-space center">
+                                                        <p style="color: #B6C1C8;font-size: 14px;">已阅读至</p>
+                                                        <p>
+                                                            <span style="font-size: 22px;color: #1fa2ff;">
+                                                                {{ goal.finish_page }}
+                                                            </span>
+                                                                页
+                                                        </p>
+                                                    </div>
+                                                    <div style="position: absolute;bottom:10px;">
+                                                        <p class="panel__bottom">目标：在 <span class="panel__bottom-focus">{{ goal.goal_day }}</span> 天内完成 <span class="panel__bottom-focus">《{{ goal.book_name }}》</span> 的阅读</p>
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                                <!-- 没有打卡 -->
+                                                <div class="upload-card coloum-space center" style="overflow:hidden;">
+                                                    <div class="coloum-space center">
+                                                        {% if goal.finish_page >= readinginfo.page_num %}
+                                                            <span style="color: #B6C1C8;">你已经完成本次阅读</span>
+                                                        {% else %}
+                                                             <span style="color: #B6C1C8;">今天没有阅读</span>
+                                                        {% endif %}
+
+                                                    </div>
+                                                    <p class="panel__middle p_overflow" style="margin-bottom: -10px;">{{ dates.saying }}</p>
+                                                    <p class="panel__bottom">目标：在 <span class="panel__bottom-focus">{{ goal.goal_day }}</span> 天内完成 <span class="panel__bottom-focus">《{{ goal.book_name }}》</span> 的阅读</p>
+                                                </div>
+                                            {% endif %}
+                                        <!--判断 是否 打卡 end -->
+                                    {% endif %}
+                                <!--  判断是否是第一天 end-->
+                                {% else %}
+
+                            <!--  判断是否是今天 -->
+                            <!--  不是今天 -->
+                                    {% if dates.isfinish %}
+
+                                        <div class="upload-card row-center center nopadding" style="color: #B6C1C8;">
+                                            <div style="position: absolute;top:10px;">
+                                                <p style="font-size: 0.8rem;">当天收益 {{ dates.bonus }}</p>
+                                            </div>
+
+                                            <div class="coloum-space center">
+                                                <p style="color: #B6C1C8;font-size: 14px;">阅读时间</p>
+                                                <p>
+                                                    <span style="font-size: 22px;color: #1fa2ff;">
+                                                        {{ dates.reading_delta }}
+                                                    </span>
+                                                        分钟
+                                                </p>
+                                            </div>
+
+
+                                            <div class="panel__split"></div>
+                                            <div class="coloum-space center">
+                                                <p style="color: #B6C1C8;font-size: 14px;">当天阅读</p>
+                                                <p>
+                                                    <span style="font-size: 22px;color: #1fa2ff;">
+                                                        {{ dates.reading_page }}
+                                                    </span>
+                                                        页
+                                                </p>
+                                            </div>
+                                            <div style="position: absolute;bottom:10px;">
+                                                <p class="panel__bottom">目标：在 <span class="panel__bottom-focus">{{ goal.goal_day }}</span> 天内完成 <span class="panel__bottom-focus">《{{ goal.book_name }}》</span> 的阅读</p>
+                                            </div>
                                         </div>
-
-                                        <div class="coloum-space center">
-                                            <p style="color: #B6C1C8;font-size: 14px;">阅读时间</p>
-                                            <p>
-                                                <span style="font-size: 22px;color: #1fa2ff;">
-                                                    {{ dates.reading_delta }}
-                                                </span>
-                                                    分钟
-                                            </p>
-                                        </div>
-
-
-                                        <div class="panel__split"></div>
-                                        <div class="coloum-space center">
-                                            <p style="color: #B6C1C8;font-size: 14px;">当天阅读</p>
-                                            <p>
-{#                                                <span style="font-size: 22px;color: #1fa2ff;">{{ dates.start_page|floatformat:"0" }}</span>页至#}
-                                                <span style="font-size: 22px;color: #1fa2ff;">
-                                                    {{ dates.reading_page }}
-                                                </span>
-                                                    页
-                                            </p>
-                                        </div>
-                                        <div style="position: absolute;bottom:10px;">
+                                    {% else %}
+                                        <div class="upload-card coloum-space center" style="overflow:hidden;">
+                                            <div class="coloum-space center">
+                                                <span style="color: #B6C1C8;">当天没有阅读</span>
+                                            </div>
+                                            <p class="panel__middle p_overflow"  style="margin-bottom: -10px;">{{ dates.saying }}</p>
                                             <p class="panel__bottom">目标：在 <span class="panel__bottom-focus">{{ goal.goal_day }}</span> 天内完成 <span class="panel__bottom-focus">《{{ goal.book_name }}》</span> 的阅读</p>
                                         </div>
-                                    </div>
-{#                                    <div class="upload-card coloum-space center">#}
-{#                                        <div class="weui-flex" style="height: 150px;width: 100%;">#}
-{#                                            <div class="weui-flex__item">#}
-{#                                                <span style="color: #B6C1C8;font-size: 14px;">阅读内容：#}
-{#                                                <span style="font-size: 22px;color: #1fa2ff;">{{ dates.start_page|floatformat:"0" }}#}
-{#                                                </span>页至#}
-{#                                                <span style="font-size: 22px;color: #1fa2ff;">#}
-{#                                                    {{ dates.reading_page }}#}
-{#                                                </span>#}
-{#                                                    页#}
-{#                                                </span>#}
-{#                                            </div>#}
-{#                                            <div class="weui-flex__item">#}
-{#                                                <span style="color: #B6C1C8;font-size: 14px;">阅读内容：#}
-{#                                                <span style="font-size: 22px;color: #1fa2ff;">{{ dates.start_page|floatformat:"0" }}#}
-{#                                                </span>页至#}
-{#                                                <span style="font-size: 22px;color: #1fa2ff;">#}
-{#                                                    {{ dates.reading_page }}#}
-{#                                                </span>#}
-{#                                                    页#}
-{#                                                </span>#}
-{#                                            </div>#}
-{#                                        </div>#}
-{##}
-{#                                    </div>#}
-                                {% else %}
-                                    <div class="upload-card coloum-space center" style="overflow:hidden;">
-                                        <div class="coloum-space center">
-                                            <span style="color: #B6C1C8;">当天没有阅读</span>
-                                        </div>
-                                        <p class="panel__middle p_overflow"  style="margin-bottom: -10px;">{{ dates.saying }}</p>
-                                        <p class="panel__bottom">目标：在 <span class="panel__bottom-focus">{{ goal.goal_day }}</span> 天内完成 <span class="panel__bottom-focus">《{{ goal.book_name }}》</span> 的阅读</p>
-                                    </div>
+                                    {% endif %}
+
                                 {% endif %}
-
+                        <!--  判断是否是今天 end-->
                             {% endif %}
-                    <!--  判断是否是今天 end-->
-                        {% endif %}
-            <!--  判断是否是有效 日期 end-->
-                        <div class="upload-sidebar right"></div>
-                    </div>
+                <!--  判断是否是有效 日期 end-->
+                            <div class="upload-sidebar right"></div>
+                        </div>
 
-                    {% if dates.is_day_now|yesno:"1,0" == "1"%}
+                        {% if dates.is_day_now|yesno:"1,0" == "1"%}
 
-                        {% if state|yesno:"1,0" == "0"%}
-                            <div class="weui-flex" style="margin: 0 6%;">
-                                <div class="weui-flex__item">
-                                    <button class="weui-btn weui-btn_primary upload-btn__style start continue-read-btn bg_color_1_"  sta="0" id="">
-                                        开始阅读
-                                    </button>
-                                </div>
-                                <div class="weui-flex__item">
-                                    <button class="weui-btn weui-btn_primary upload-btn__style bg_color_1_" id="read_comment">
-                                        评论
-                                    </button>
-                                </div>
-                            </div>
-                            <button class="read_finish border_orange_1 font_orange_1 borderRadius_15 bg_no" id="">
-                                    <span>结束</span>
-                            </button>
-                        {% else %}
-                            <div class="weui-flex"  style="margin: 0 6%;">
-                                <div class="weui-flex__item">
-                                    <button class="weui-btn weui-btn_primary upload-btn__style start continue-read-btn bg_color_1_"   sta="1" id="">
-                                        阅读完成
-                                    </button>
-                                </div>
-                                <div class="weui-flex__item">
-                                    <button class="weui-btn weui-btn_primary upload-btn__style bg_color_1_" style="width: 80%" id="read_comment">
-                                        评论
-                                    </button>
-                                </div>
-                            </div>
+                            {% if state|yesno:"1,0" == "0"%}
+                                <div class="weui-flex" style="margin: 0 6%;">
+                                    <div class="weui-flex__item">
+                                        {% if goal.finish_page >= readinginfo.page_num %}
+                                            <button class="weui-btn weui-btn_primary upload-btn__style" style="background: #BDBDBD;" disabled>
+                                                本书完成
+                                            </button>
+                                        {% else %}
+                                             <button class="weui-btn weui-btn_primary upload-btn__style start continue-read-btn bg_color_1_"  sta="0" id="">
+                                                开始阅读
+                                            </button>
+                                        {% endif %}
 
-                            <button class="read_finish border_orange_1 font_orange_1 borderRadius_15 bg_no" id="">
-                                    <span>结束</span>
-                            </button>
-                        {% endif %}
-                    {% else %}
-                        {% if dates.isfinish %}
-                            <button class="weui-btn weui-btn_primary upload-btn__style" style="background: #BDBDBD;" disabled>
-                                已阅读
-                            </button>
-                        {% else %}
-                            <button class="weui-btn weui-btn_primary upload-btn__style" style="background: #BDBDBD;" disabled>
-                                未阅读
-                            </button>
-                        {% endif %}
-
-                    {% endif %}
-
-
-    <!-- 判断 是否 未到货 到货 -->
-        <!-- 未到货 到货 -->
-                {% else %}
-                    <!-- 第几天 -->
-{#                    已经创建订单{{ dates.dayindex }}天#}
-                    {% if is_no_confirm|yesno:"1,0" == "1" %}
-                        书正在路上
-                    {% else %}
-                        你还未确定发货地址
-                    {% endif %}
-                    <div class="panel__body">
-                        <div class="upload-sidebar left"></div>
-                        {% if dates.dayindex > 0 %}
-                            {% if dates.is_day_now|yesno:"1,0" == "1"%}
-                                <div class="upload-card coloum-space center read_start_bg">
-                                    <div style="position:absolute; top:0;left: -10px;width: 90px;z-index: 0">
-                                        <img src="/static/images/read/read_start_1@2x.png" style="width: 100%">
                                     </div>
-                                    <div style="position:absolute; bottom:0;right: -10px;width: 90px;z-index: 0">
-                                        <img src="/static/images/read/read_start_2@2x.png" style="width: 100%">
+                                    <div class="weui-flex__item">
+                                        <button class="weui-btn weui-btn_primary upload-btn__style bg_color_1_" id="read_comment">
+                                            分享
+                                        </button>
                                     </div>
-
-                                    <div class="coloum-space center" style="margin-top: 20px;">
-                                        <span class="read_start_font font_color_1" style="color: #B6C1C8;font-size: 14px;">《{{ goal.book_name }}》<br>即将达到您的手中<br>敬请期待！</span>
-                                    </div>
-                                    <p class="panel__bottom" style="z-index: 1">在 <span class="panel__bottom-focus">{{ goal.goal_day }}</span> 天内完成的阅读</p>
                                 </div>
-
-{#                                <p class="panel__title">书名：《{{ goal.book_name }}》</p>#}
-{#                                <p class="panel__middle">书到手后即可开始第1次阅读</p>#}
-                            </div>
+                                <button class="read_finish border_orange_1 font_orange_1 borderRadius_15 bg_no" id="">
+                                        <span>结束</span>
+                                </button>
                             {% else %}
-                            <div class="upload-card row-center center nopadding">
-                                <div class="coloum-space center">
-                                    <span style="color: #B6C1C8;">别着急，任务还没开始呢！</span>
+                                <div class="weui-flex"  style="margin: 0 6%;">
+                                    <div class="weui-flex__item">
+                                        {% if goal.finish_page >= readinginfo.page_num %}
+                                            <button class="weui-btn weui-btn_primary upload-btn__style" style="background: #BDBDBD;" disabled>
+                                                本书完成
+                                            </button>
+                                        {% else %}
+                                             <button class="weui-btn weui-btn_primary upload-btn__style start continue-read-btn bg_color_1_"   sta="1" id="">
+                                                阅读完成
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                    <div class="weui-flex__item">
+                                        <button class="weui-btn weui-btn_primary upload-btn__style bg_color_1_" style="width: 80%" id="read_comment">
+                                            分享
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
+
+                                <button class="read_finish border_orange_1 font_orange_1 borderRadius_15 bg_no" id="">
+                                        <span>结束</span>
+                                </button>
                             {% endif %}
-                        {% endif %}
-                        <div class="upload-sidebar right"></div>
-
-                    </div>
-
-                    {% if dates.is_day_now|yesno:"1,0" == "1"%}
-                        {% if is_no_confirm|yesno:"1,0" == "1" %}
-                            <a href="/user/order" class="weui-btn weui-btn_primary upload-btn__style start bg_color_1_" id="">
-                                前往确定收货
-                            </a>
-{#                            <button class="weui-btn weui-btn_primary upload-btn__style start start-read-btn" id="">#}
-{#                                书已到手#}
-{#                            </button>#}
                         {% else %}
-                            <a href="/user/order" class="weui-btn weui-btn_primary upload-btn__style start bg_color_1_" id="">
-                                前往确定订单
-                            </a>
+                            {% if dates.isfinish %}
+                                <button class="weui-btn weui-btn_primary upload-btn__style" style="background: #BDBDBD;" disabled>
+                                    已阅读
+                                </button>
+                            {% else %}
+                                <button class="weui-btn weui-btn_primary upload-btn__style" style="background: #BDBDBD;" disabled>
+                                    未阅读
+                                </button>
+                            {% endif %}
+
                         {% endif %}
 
+
+        <!-- 判断 是否 未到货 到货 -->
+            <!-- 未到货 到货 -->
                     {% else %}
-                        <button class="weui-btn weui-btn_primary upload-btn__style" disabled>
+                        <!-- 第几天 -->
+    {#                    已经创建订单{{ dates.dayindex }}天#}
+                        {% if is_no_confirm|yesno:"1,0" == "1" %}
                             书正在路上
-                        </button>
+                        {% else %}
+                            你还未确定发货地址
+                        {% endif %}
+                        <div class="panel__body">
+                            <div class="upload-sidebar left"></div>
+                            {% if dates.dayindex > 0 %}
+                                {% if dates.is_day_now|yesno:"1,0" == "1"%}
+                                    <div class="upload-card coloum-space center read_start_bg">
+                                        <div style="position:absolute; top:0;left: -10px;width: 90px;z-index: 0">
+                                            <img src="/static/images/read/read_start_1@2x.png" style="width: 100%">
+                                        </div>
+                                        <div style="position:absolute; bottom:0;right: -10px;width: 90px;z-index: 0">
+                                            <img src="/static/images/read/read_start_2@2x.png" style="width: 100%">
+                                        </div>
+
+                                        <div class="coloum-space center" style="margin-top: 20px;">
+                                            <span class="read_start_font font_color_1" style="color: #B6C1C8;font-size: 14px;">《{{ goal.book_name }}》<br>即将达到您的手中<br>敬请期待！</span>
+                                        </div>
+                                        <p class="panel__bottom" style="z-index: 1">在 <span class="panel__bottom-focus">{{ goal.goal_day }}</span> 天内完成的阅读</p>
+                                    </div>
+
+    {#                                <p class="panel__title">书名：《{{ goal.book_name }}》</p>#}
+    {#                                <p class="panel__middle">书到手后即可开始第1次阅读</p>#}
+                                </div>
+                                {% else %}
+                                <div class="upload-card row-center center nopadding">
+                                    <div class="coloum-space center">
+                                        <span style="color: #B6C1C8;">别着急，任务还没开始呢！</span>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endif %}
+                            <div class="upload-sidebar right"></div>
+
+                        </div>
+
+                        {% if dates.is_day_now|yesno:"1,0" == "1"%}
+                            {% if is_no_confirm|yesno:"1,0" == "1" %}
+                                <a href="/user/order" class="weui-btn weui-btn_primary upload-btn__style start bg_color_1_" id="">
+                                    前往确定收货
+                                </a>
+    {#                            <button class="weui-btn weui-btn_primary upload-btn__style start start-read-btn" id="">#}
+    {#                                书已到手#}
+    {#                            </button>#}
+                            {% else %}
+                                <a href="/user/order" class="weui-btn weui-btn_primary upload-btn__style start bg_color_1_" id="">
+                                    前往确定订单
+                                </a>
+                            {% endif %}
+
+                        {% else %}
+                            <button class="weui-btn weui-btn_primary upload-btn__style" disabled>
+                                书正在路上
+                            </button>
+                        {% endif %}
+
+
                     {% endif %}
 
+        <!-- 判断 是否 到货 end -->
 
-                {% endif %}
-
-    <!-- 判断 是否 到货 end -->
-
-                </div>
-            {% endfor %}
-        {% endfor %}
-
-    </div>
-
-
-
-    <div class="bd" style="z-index: 0">
-        <div class="page__bd" style="z-index: 0">
-
-        <!-- 推荐 评论 -->
-            <div class="weui-cells" style="margin: 0;">
-
-            {% for comm in datas %}
-                {% if comm.is_delete == 0 %}
-                    {% if comm.user_id == goal.user_id or goal.user_id == 100259 or goal.user_id == 100101 or goal.user_id == 100267 or goal.user_id == 101077  or goal.user_id == 100274 %}
-                    <div class="weui-cell weui-cell_swiped" id="">
-                        <div class="weui-cell__bd">
-                            <ul>
-                                <li class="news-item" data-punch="{{ comm.id }}" style="overflow:hidden;">
-                                    <div class="new-item__content">
-                                        <div>
-                                            <img src="{{ comm.headimgurl }}" class="news-item__header-img pictureEnlarge">
-                                            <span class="news-item__header-text">{{ comm.nickname }}</span>
-
-                                            <span style="color: #B6C1C8;display: inline-block;float: right">{{ comm.c_time }}</span>
-                                        </div>
-                                        <div style="margin-left: 46px;">
-                                            <p>{{ comm.content|default:"" }}</p>
-                                        </div>
-                                        <div class="news-item__content" style="height: auto;margin-left: 36px;">
-
-                                            {% for foo in comm.voucher_ref %}
-                                                <div class="uploaderInput_box" style="margin-top: 10px;display: block;float: left;
-                                                background: url({{ foo }}) center;
-                                                background-size: cover;
-                                                background-repeat: no-repeat;
-                                                ">
-                                                    <img class="news-item__content-img box_left voucher_ref_img pictureEnlarge" style="position: absolute;opacity: 0" src="{{ foo }}">
-                                                </div>
-                                            {% endfor %}
-
-                                        </div>
-
-                                        <div class="reply_data reply_data_{{ comm.id }}">
-                                            {% for fooooo in comm.reply_data %}
-                                                <div style="margin-left: 64px;">
-                                                    <p class="word_break" style="color: #333333;"><span class="news-item__header-text">{{ fooooo.nickname }}</span> 回复 ：<span style="color: #4a4a4a;">{{ fooooo.content|default:"" }}</span></p>
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-
-                                    </div>
-                                    <div class="news-item__horzon"></div>
-                                    <div class="weui-flex news-item__bottom" style="float: right;display: initial;">
-                                        <div class="weui-flex__item" style="padding-left: 50px;display: none">
-                                            <span style="color: #B6C1C8;">{{ comm.c_time|date:"m-d H:i"  }}</span>
-                                        </div>
-                                        <div class="weui-flex__item weui-flex" style="flex: 2;">
-
-                                                {% if comm.is_no_praise == 1 %}
-                                                    <button href="javascript:;" class="news-item__tail-btn weui-flex__item active weui-flex__item_1_2 button_sty_yes" disabled="disabled"  style="">
-                                                        <i class="iconfont icon-dianzan"></i>
-                                                        <span class="news-item__tail-text">已赞
-                                                            <span class="praise">
-                                                                {% if comm.praise == 0 %}
-                                                                {% else %}
-                                                                    {{ comm.praise }}
-                                                                {% endif %}
-                                                            </span>
-                                                        </span>
-                                                    </button>
-                                                {% else %}
-                                                    <button href="javascript:;" class="news-item__tail-btn weui-flex__item parise-btn weui-flex__item_1_2 button_sty" punch_id="{{ comm.id }}" sta="0" style="">
-                                                        <i class="iconfont icon-dianzan"></i>
-                                                        <span class="news-item__tail-text">赞
-                                                            <span class="praise">
-                                                                {% if comm.praise == 0 %}
-                                                                {% else %}
-                                                                    {{ comm.praise }}
-                                                                {% endif %}
-                                                            </span>
-                                                        </span>
-                                                    </button>
-                                                {% endif %}
-
-                                                {% if comm.is_no_report == 1 %}
-                                                    <button href="javascript:;" class="news-item__tail-btn weui-flex__item active button_sty_yes" style="color: rgba(182, 193, 200,1);">
-                                                        <i class="iconfont icon-jubao"></i>
-                                                        <span class="news-item__tail-text">已举报</span>
-                                                    </button>
-                                                {% else %}
-                                                    <button href="javascript:;" class="news-item__tail-btn weui-flex__item report-btn button_sty" punch_id="{{ comm.id }}" style="color: rgba(31,162,255,1);">
-                                                        <i class="iconfont icon-jubao"></i>
-                                                        <span class="news-item__tail-text">举报</span>
-                                                    </button>
-                                                {% endif %}
-
-                                                <button href="javascript:;" class="news-item__tail-btn weui-flex__item replyComments button_sty" punch_id="{{ comm.id }}" style="">
-                                                    <i class="iconfont icon-pinglun font_color_1"></i>
-                                                    <span class="news-item__tail-text">回复</span>
-                                                </button>
-                                        </div>
-                                    </div>
-
-
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="weui-cell__ft" style="display: inline-table">
-                            <a class="weui-swiped-btn weui-swiped-btn_warn delete-swipeout bg_red_1" punch_id="{{ comm.id }}" style="display: table-cell;vertical-align: middle;" href="javascript:">删除</a>
-    {#                        <a class="weui-btn_primary weui-swiped-btn weui-swiped-btn_default  close-swipeout" style="display: table-cell;vertical-align: middle;"  href="javascript:">禁止</a>#}
-                        </div>
                     </div>
-                    {% else %}
-                    <ul class="news-list">
-                        <li class="news-item" data-punch="{{ comm.id }}" style="overflow: hidden">
-                            <div class="new-item__content">
-                                <div>
-                                    <img src="{{ comm.headimgurl }}" class="news-item__header-img pictureEnlarge">
-                                    <span class="news-item__header-text">{{ comm.nickname }}</span>
-                                    <span style="color: #B6C1C8;display: inline-block;float: right">{{ comm.c_time }}</span>
-                                </div>
-                                <div style="margin-left: 46px;">
-                                    <p style="">{{ comm.content|default:"" }}</p>
-                                </div>
+                {% endfor %}
+            {% endfor %}
+
+        </div>
 
 
-                                <div class="news-item__content weui-flex" style="">
 
-                                    <div class="news-item__content" style="height: auto;margin-left: 36px;">
-                                        {% for foo in comm.voucher_ref %}
-                                            <div class="uploaderInput_box" style="margin-top: 10px;display: block;float: left;
-                                                background: url({{ foo }}) center;
-                                                background-size: cover;
-                                                background-repeat: no-repeat;
-                                                ">
-                                                    <img class="news-item__content-img box_left voucher_ref_img pictureEnlarge" style="position: absolute;opacity: 0" src="{{ foo }}">
+        <!-- 推荐 分享 区域-->
+        <div class="bd" style="z-index: 0">
+            <div class="page__bd" style="z-index: 0">
+
+            <!-- 推荐 分享 -->
+                <div class="weui-cells" style="margin: 0;">
+
+                {% for comm in datas %}
+                    {% if comm.is_delete == 0 %}
+                        {% if comm.user_id == goal.user_id or goal.user_id == 100259 or goal.user_id == 100267 or goal.user_id == 101077  or goal.user_id == 100274 %}
+                        <div class="weui-cell weui-cell_swiped" id="">
+                            <div class="weui-cell__bd">
+                                <ul>
+                                    <li class="news-item" data-punch="{{ comm.id }}" style="overflow:hidden;">
+                                        <div class="new-item__content">
+                                            <div>
+                                                <img src="{{ comm.headimgurl }}" class="news-item__header-img pictureEnlarge">
+                                                <span class="news-item__header-text">{{ comm.nickname }}</span>
+
+                                                <span style="color: #B6C1C8;display: inline-block;float: right">{{ comm.c_time }}</span>
+                                            </div>
+                                            <div style="margin-left: 46px;">
+                                                <p>{{ comm.content|default:"" }}</p>
+                                            </div>
+                                            <div class="news-item__content" style="height: auto;margin-left: 36px;">
+
+                                                {% for foo in comm.voucher_ref %}
+                                                    <div class="uploaderInput_box_" style="margin-top: 10px;display: block;float: left;
+                                                    background: url({{ foo }}) center;
+                                                    background-size: cover;
+                                                    background-repeat: no-repeat;
+                                                    ">
+                                                        <img class="news-item__content-img box_left  pictureEnlarge" style="position: absolute;opacity: 0" src="{{ foo }}">
+                                                    </div>
+                                                {% endfor %}
+
+                                            </div>
+
+                                            <div class="reply_data clamp_5 reply_data_{{ comm.id }}">
+                                                {% for fooooo in comm.reply_data %}
+                                                    <div style="margin-left: 46px;">
+                                                        <p class="word_break" style="color: #333333;"><span class="news-item__header-text" style="margin-left: 0;color: #0c3654">{{ fooooo.nickname }}</span>：<span style="color: #4a4a4a;">{{ fooooo.content|default:"" }}</span></p>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+
+                                        </div>
+                                        <div class="news-item__horzon"></div>
+                                        <div class="weui-flex news-item__bottom" style="float: right;display: initial;">
+                                            <div class="weui-flex__item" style="padding-left: 50px;display: none">
+                                                <span style="color: #B6C1C8;">{{ comm.c_time|date:"m-d H:i"  }}</span>
+                                            </div>
+                                            <div class="weui-flex__item weui-flex" style="flex: 2;">
+
+                                                    {% if comm.is_no_prise == 1 %}
+                                                        <button href="javascript:;" class="news-item__tail-btn weui-flex__item active weui-flex__item_1_2 button_sty_yes" disabled="disabled"  style="border: 0px;">
+                                                            <i class="iconfont icon-dianzan"></i>
+                                                            <span class="news-item__tail-text">
+                                                                <span class="praise">
+                                                                    {% if comm.prise == 0 %}
+                                                                    {% else %}
+                                                                        {{ comm.prise }}
+                                                                    {% endif %}
+                                                                </span>
+                                                            </span>
+                                                        </button>
+                                                    {% else %}
+                                                        <button href="javascript:;" class="news-item__tail-btn weui-flex__item parise-btn weui-flex__item_1_2 button_sty" punch_id="{{ comm.id }}" sta="{{ comm.prise }}" style="border: 0px;">
+                                                            <i class="iconfont icon-dianzan"></i>
+                                                            <span class="news-item__tail-text">
+                                                                <span class="praise">
+                                                                    {% if comm.prise == 0 %}
+                                                                    {% else %}
+                                                                        {{ comm.prise }}
+                                                                    {% endif %}
+                                                                </span>
+                                                            </span>
+                                                        </button>
+                                                    {% endif %}
+
+                                                    <button href="javascript:;" class="news-item__tail-btn weui-flex__item replyComments button_sty" punch_id="{{ comm.id }}" style="">
+                                                        <i class="iconfont icon-pinglun font_color_1"></i>
+                                                        <span class="news-item__tail-text">回复</span>
+                                                    </button>
+                                            </div>
+                                        </div>
+
+
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="weui-cell__ft" style="display: inline-table">
+                                <a class="weui-swiped-btn weui-swiped-btn_warn delete-swipeout bg_red_1" punch_id="{{ comm.id }}" style="display: table-cell;vertical-align: middle;" href="javascript:">删除</a>
+                            </div>
+                        </div>
+                        {% else %}
+                        <ul class="news-list">
+                            <li class="news-item" data-punch="{{ comm.id }}" style="overflow: hidden">
+                                <div class="new-item__content">
+                                    <div>
+                                        <img src="{{ comm.headimgurl }}" class="news-item__header-img pictureEnlarge">
+                                        <span class="news-item__header-text">{{ comm.nickname }}</span>
+                                        <span style="color: #B6C1C8;display: inline-block;float: right">{{ comm.c_time }}</span>
+                                    </div>
+                                    <div style="margin-left: 46px;">
+                                        <p style="">{{ comm.content|default:"" }}</p>
+                                    </div>
+
+
+                                    <div class="news-item__content weui-flex" style="">
+
+                                        <div class="news-item__content" style="height: auto;margin-left: 36px;">
+                                            {% for foo in comm.voucher_ref %}
+                                                <div class="uploaderInput_box_" style="margin-top: 10px;display: block;float: left;
+                                                    background: url({{ foo }}) center;
+                                                    background-size: cover;
+                                                    background-repeat: no-repeat;
+                                                    ">
+                                                        <img class="news-item__content-img box_left  pictureEnlarge" style="position: absolute;opacity: 0" src="{{ foo }}">
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+
+                                    </div>
+                                    <div class="reply_data clamp_5 reply_data_{{ comm.id }}">
+                                        {% for fooooo in comm.reply_data %}
+                                            <div style="margin-left: 46px;">
+                                                <p class="word_break" style="color: #333333;"><span class="news-item__header-text" style="margin-left: 0;color: #0c3654">{{ fooooo.nickname }}</span> ：<span style="color: #4a4a4a;">{{ fooooo.content|default:"" }}</span></p>
                                             </div>
                                         {% endfor %}
                                     </div>
 
                                 </div>
+                                <div class="news-item__horzon"></div>
+                                <div class="weui-flex news-item__bottom" style="float: right;display: initial;">
+                                    <div class="weui-flex__item" style="padding-left: 50px;display: none">
+                                        <span style="color: #B6C1C8;">{{ comm.c_time|date:"m-d H:i"  }}</span>
+                                    </div>
+                                    <div class="weui-flex__item weui-flex" style="flex: 2;">
 
-                            </div>
-                            <div class="news-item__horzon"></div>
-                            <div class="weui-flex news-item__bottom" style="float: right;display: initial;">
-                                <div class="weui-flex__item" style="padding-left: 50px;display: none">
-                                    <span style="color: #B6C1C8;">{{ comm.c_time|date:"m-d H:i"  }}</span>
-                                </div>
-                                <div class="weui-flex__item weui-flex" style="flex: 2;">
-
-                                    {% if comm.is_no_praise == 1 %}
-                                        <button href="javascript:;" class="news-item__tail-btn weui-flex__item active weui-flex__item_1_2 button_sty_yes" disabled="disabled"  style="color: rgba(182, 193, 200,1);">
-                                            <i class="iconfont icon-dianzan"></i>
-                                            <span class="news-item__tail-text">已赞
-                                                <span class="praise">
-                                                    {% if comm.praise == 0 %}
-                                                    {% else %}
-                                                        {{ comm.praise }}
-                                                    {% endif %}
+                                        {% if comm.is_no_prise == 1 %}
+                                            <button href="javascript:;" class="news-item__tail-btn weui-flex__item active weui-flex__item_1_2 button_sty_yes" disabled="disabled"  style="color: rgba(182, 193, 200,1);border: 0px;">
+                                                <i class="iconfont icon-dianzan"></i>
+                                                <span class="news-item__tail-text">
+                                                    <span class="praise">
+                                                        {% if comm.prise == 0 %}
+                                                        {% else %}
+                                                            {{ comm.prise }}
+                                                        {% endif %}
+                                                    </span>
                                                 </span>
-                                            </span>
-                                        </button>
-                                    {% else %}
-                                        <button href="javascript:;" class="news-item__tail-btn weui-flex__item parise-btn weui-flex__item_1_2 button_sty" punch_id="{{ comm.id }}" sta="0" style="">
-                                            <i class="iconfont icon-dianzan"></i>
-                                            <span class="news-item__tail-text">赞
-                                                <span class="praise">
-                                                    {% if comm.praise == 0 %}
-                                                    {% else %}
-                                                        {{ comm.praise }}
-                                                    {% endif %}
+                                            </button>
+                                        {% else %}
+                                            <button href="javascript:;" class="news-item__tail-btn weui-flex__item parise-btn weui-flex__item_1_2 button_sty" punch_id="{{ comm.id }}" sta="{{ comm.prise }}" style="border: 0px;">
+                                                <i class="iconfont icon-dianzan"></i>
+                                                <span class="news-item__tail-text">
+                                                    <span class="praise">
+                                                        {% if comm.prise == 0 %}
+                                                        {% else %}
+                                                            {{ comm.prise }}
+                                                        {% endif %}
+                                                    </span>
                                                 </span>
-                                            </span>
-                                        </button>
-                                    {% endif %}
-
-                                    {% if comm.is_no_report == 1 %}
-                                        <button href="javascript:;" class="news-item__tail-btn weui-flex__item active button_sty_yes" style="">
-                                            <i class="iconfont icon-jubao"></i>
-                                            <span class="news-item__tail-text">已举报</span>
-                                        </button>
-                                    {% else %}
-                                        <button href="javascript:;" class="news-item__tail-btn weui-flex__item report-btn button_sty" punch_id="{{ comm.id }}" style="">
-                                            <i class="iconfont icon-jubao"></i>
-                                            <span class="news-item__tail-text">举报</span>
-                                        </button>
-                                    {% endif %}
-
+                                            </button>
+                                        {% endif %}
 
                                         <button href="javascript:;" class="news-item__tail-btn weui-flex__item replyComments button_sty" punch_id="{{ comm.id }}" style="">
                                             <i class="iconfont icon-pinglun font_color_1"></i>
                                             <span class="news-item__tail-text">回复</span>
                                         </button>
-                                </div>
-                            </div>
-                        <!---
-
-                            <div class="weui-flex news-item__bottom">
-                                <div class="weui-flex__item" style="padding-left: 20px;flex: 2;">
-                                    <span style="color: #B6C1C8;text-align: right;">{{ comm.c_time|date:"m-d H:i"  }}</span>
-                                </div>
-                                <div class="weui-flex__item weui-flex" style="display: block;flex: 5;">
-
-                                    {% if new.is_no_praise == 1 %}
-                                        <button href="javascript:;" class="news-item__tail-btn weui-flex__item parise-btn active"
-                                                style="color: rgb(182, 193, 200); border: 1px solid rgb(182, 193, 200);" disabled="disabled">
-                                            <i class="iconfont icon-dianzan"></i>
-                                            <span class="news-item__tail-text" style="color: rgb(182, 193, 200);">已赞 <span class="praise">
-                                                {% if new.praise == 0 %}
-                                                {% else %}
-                                                    {{ new.praise }}
-                                                {% endif %}</span>
-                                            </span>
-                                        </button>
-                                    {% else %}
-                                        <button href="javascript:;" class="news-item__tail-btn weui-flex__item parise-btn" punch_id="{{ new.punch_id }}" sta="{{ new.praise }}" style="color: rgba(31,162,255,1);">
-                                            <i class="iconfont icon-dianzan"></i>
-                                            <span class="news-item__tail-text" >赞 <span class="praise">
-                                                    {% if new.praise == 0 %}
-                                                    {% else %}
-                                                        {{ new.praise }}
-                                                    {% endif %}
-                                                </span>
-                                            </span>
-                                        </button>
-                                    {% endif %}
-
-
-                                    {% if new.is_no_report == 1 %}
-                                        <button href="javascript:;" class="news-item__tail-btn weui-flex__item"
-                                                style="margin-left: 5px; border: 1px solid rgb(182, 193, 200);" disabled="disabled">
-                                            <span class="news-item__tail-text" style="color: rgb(182, 193, 200);">已举报</span>
-
-                                        </button>
-                                    {% else %}
-                                        <button href="javascript:;" class="news-item__tail-btn weui-flex__item report-btn" punch_id="{{ new.punch_id }}" style="margin-left: 5px;">
-                                            <span class="news-item__tail-text">举报</span>
-                                        </button>
-                                    {% endif %}
-
-                                    <button href="javascript:;" class="news-item__tail-btn weui-flex__item replyComments"
-                                            style="margin-left: 5px; border: 1px solid rgb(182, 193, 200);" other_id=""  punch_id="{{ comm.id }}">
-                                        <span class="news-item__tail-text" style="color: rgb(182, 193, 200);">回复</span>
-                                    </button>
-                                </div>
-                            </div>
-                        -->
-                        </li>
-                    </ul>
-                    {% endif %}
-
-                {% else %}
-
-                {% endif %}
-
-
-            {% endfor %}
-            </div>
-
-        <!-- 动态加载评论
-            <div  class="weui-cells" style="display: none;">
-
-                <div class="weui-cell weui-cell_swiped" id="">
-                    <div class="weui-cell__bd">
-                        <ul>
-                            <li class="news-item" data-punch="0" style="overflow:hidden;">
-                                <div class="new-item__content">
-                                    <div>
-                                        <img src="/static/images/404@2x.png" class="news-item__header-img pictureEnlarge">
-                                        <span class="news-item__header-text">小明</span>
-                                    </div>
-                                    <div>
-                                        <p style="margin-left: 32px;text-indent:2em;">尝试尝试尝试尝试从菜市场</p>
-                                    </div>
-                                    <div class="news-item__content" style="height: auto;margin-left: 32px;">
-
-                                            <div class="uploaderInput_box" style="margin-top: 10px;display: block;float: left;
-                                            background: url(/static/images/404@2x.png) center;
-                                            background-size: cover;
-                                            background-repeat: no-repeat;
-                                            ">
-                                                <img class="news-item__content-img box_left voucher_ref_img pictureEnlarge" style="position: absolute;opacity: 0" src="/static/images/404@2x.png">
-                                            </div>
-
-                                    </div>
-                                </div>
-                                <div class="news-item__horzon"></div>
-                                <div class="weui-flex news-item__bottom">
-                                    <div class="weui-flex__item" style="padding-left: 20px;">
-                                        <span style="color: #B6C1C8;text-align: right;display: block;">2018-08-19</span>
-                                    </div>
-                                    <div class="weui-flex__item weui-flex" style="display: none">
-
-                                        <button href="javascript:;" class="news-item__tail-btn weui-flex__item parise-btn" punch_id="{{ new.punch_id }}" sta="{{ new.praise }}" style="color: rgba(31,162,255,1);">
-                                            <i class="iconfont icon-dianzan font_color_1"></i>
-                                            <span class="news-item__tail-text" >赞 <span class="praise">
-                                                    100
-                                                </span>
-                                            </span>
-                                        </button>
-
-
-                                        <button href="javascript:;" class="news-item__tail-btn weui-flex__item report-btn" punch_id="{{ new.punch_id }}" style="margin-left: 5px;">
-                                            <span class="news-item__tail-text">举报</span>
-                                        </button>
-
                                     </div>
                                 </div>
                             </li>
                         </ul>
-                    </div>
-                    <div class="weui-cell__ft" style="display: inline-table">
-                        <a class="weui-swiped-btn weui-swiped-btn_warn delete-swipeout bg_red_1" punch_id="{{ comm.id }}" style="display: table-cell;vertical-align: middle;" href="javascript:">删除</a>
-                    </div>
-                </div>
-            </div>
-
--->
-        </div>
-    </div>
-
-
-    <div class="hide">
-        <p>==datesinform=======================</p>
-        {{ datesinform }}
-
-        <P>====================================</P>
-        {% for foo in datesinform %}
-            {{ foo.start_page }}
-
-{#            {{ foo.punch.start_page }}#}
-{#            {{ foo.punch.goal_id }}#}
-{#            {{ foo.punch.user_id }}#}
-        {% endfor %}
-        
-        <br><br>
-
-        <p>==is_start=======================</p>
-        {{ is_start }}
-        <br><br>
-        <p>==readinginfo=======================</p>
-        {{ readinginfo }}
-        <br><br>
-        <p>==goal=======================</p>
-        {{ goal }}
-        <br><br>
-        <p>==time_range=======================</p>
-        {{ time_range }}
-        <br><br>
-        <p>=is_no_confirm========================</p>
-        {{ is_no_confirm }}
-        <br><br>
-        <p>=state========================</p>
-        {{ state }}
-        <br><br>
-    </div>
-
-	<div id="read-popup" class="weui-popup__container popup-bottom">
-		<div class="weui-popup__overlay"></div>
-		<div class="weui-popup__modal">
-			<div class="modal-content">
-                <div class="row-center center" >
-					<div>
-						<span style="font-size: 14px;color: #B6C1C8;">阅读时长</span>
-                        <span style="font-size: 16px;font-weight: 400;color: #1fa2ff;">
-                        <span id="time-hour">1</span>:
-                        <span id="time-min">00</span>:
-                        <span id="time-sec">00</span>
-                        </span>
-					</div>
-                    <div class="row-center center">
-						<span style="font-size: 14px;color: #B6C1C8;">本次阅读&nbsp;</span>
-                        <span style="font-size: 14px;color: #B6C1C8;"> {{ goal.finish_page }} 页至</span>
-                        <div class="mdl-textfield mdl-js-textfield page-input" >
-                            <input class="mdl-textfield__input" type="number" id="page-input" maxlength=20>
-                            <label class="mdl-textfield__label" for="page-input"></label>
-                        </div>
-						<span style="font-size: 14px;color: #B6C1C8;">页</span>
-                    </div>
-                </div>
-                <div style="display: block;">
-                    <button class="weui-btn weui-btn_primary give_up bg_red_1" style="width: 39%;display:block;float: left;border-radius: 0;">
-                        放弃计时
-                    </button>
-
-                    <button class="weui-btn weui-btn_primary" id="reading-confirm-btn" style="width: 60%;display: block;" sta="1">
-                        完成阅读
-                    </button>
-                </div>
-
-			</div>
-		</div>
-	</div>
-
-
-    <!-- 弹窗 -->
-    <div class="hide_content">
-
-        <div class="mask_on" style="display: none"></div>
-        <div class="mask_on_1" style="display: none"></div>
-        <div class="mask_on__1" style=""></div>
-        <div class="prompt__1">
-
-        </div>
-        <div class="mask_on_slow_fast_box">
-
-        </div>
-
-        <!-- 弹窗 阅读 时间太短 -->
-        <div class="reading_sign_in_prompt_box">
-            <div>
-                <img src="/static/images/read/reading_sign_in_prompt_1@2x.png" style="width: 100%">
-            </div>
-            <div class="weui-flex"  style="margin: 0 6%;">
-                <div class="weui-flex__item" style="padding: 25px;">
-                    <img class="reading_sign_in_prompt_yes" src="/static/images/read/reading_sign_in_prompt_yes@2x.png" style="width: 100%">
-                </div>
-                <div class="weui-flex__item" style="padding: 25px;">
-                    <img class="reading_sign_in_prompt_no" src="/static/images/read/reading_sign_in_prompt_no@2x.png" style="width: 100%">
-                </div>
-            </div>
-        </div>
-
-
-        <!-- 弹窗 阅读 太快 -->
-        <div class="reading_sign_in_fast_box">
-            <div>
-                <img src="/static/images/read/read_fast_1@2x.png" style="width: 100%">
-            </div>
-        </div>
-
-        <!-- 弹窗 阅读 太慢 -->
-        <div class="reading_sign_in_slow_box">
-            <div>
-                <img src="/static/images/read/read_slow_1@2x.png" style="width: 100%">
-            </div>
-        </div>
-
-
-    <!--
-
-        <div>
-            <div class="weui-dialog weui-dialog--visible">
-                <div class="weui-dialog__hd">
-                    <strong class="weui-dialog__title">确定提示</strong>
-                </div>
-                <div class="weui-dialog__bd">提前结束仅结算已返还押金</div>
-                <div class="weui-dialog__ft">
-                    <a href="javascript:;" class="weui-dialog__btn default">取消</a>
-                    <a href="javascript:;" class="weui-dialog__btn primary">确定</a>
-                </div>
-            </div>
-        </div>
-    -->
-
-        <div class="activityDescription_box" style="display: none">
-            <div>
-                <h4 style="text-align: center;margin: 5px auto 10px;">#阅读说明#</h4>
-                <div>
-                    <p><b>活动概况：</b></p>
-                    <p>在“读书”活动中，平台每期仅提供一本精选读物。用户需要在一个月内完成阅读，平台将根据用户阅读记录情况返还押金。</p></br>
-                    <p><b>参与方式：</b></p>
-                    <p>
-                        1. 支付后即生成目标<br>
-                        2.生成目标后，在我的订单填写邮寄信息<br>
-                        3.每日18:00发货（假期除外）<br>
-                    </p>
-                    <img src="/static/images/read/read_1.png" style="width: 100%">
-                    <img src="/static/images/read/read_2.png" style="width: 100%">
-                    <p>（偏远地区产生的额外费用将于活动结束后，从保证金中扣除，平台发货前通知予以确认。）</p>
-                    <p>
-                        <b>记录规则：</b>
-                    1.用户在订单页面确认收货即可激活阅读记录；<br/>
-                    2.在我的目标->读书活动中进行记录，每次记录都将根据用户阅读情况返还部分押金。直到记录至最后一页，可结算返还押金（或非全额返还）至余额。（为避免部分用户浪费平台资源，在完成阅读后，并未返还部分将纳入活动补偿）<br/>
-                    3.用户需要在30日内完成阅读记录，或将默认直接结算。<br/>
-                    关于返还押金规则，除不可抗力因素，在正常情况下将不受理。<br/><br/>
-                    ※本平台拥有所有活动的最终解释权，如有疑问请与客服联系，谢谢。<br/>
-                    </p>
-
-                </div>
-                <p style="display: none;">
-                    &#12288;&#12288;在“购书阅读”活动中，用户需要在一个月内完成一本在平台上购买的书的阅读，用户在通过记录阅读情况的过程赚取返还金。（此项活动中的保证金将不会被瓜分，平台已将此费用纳入最高返还金额预算内）。<br/>
-                    1. 生成目标后，用户需要在商城中“我的订单”页面内填写邮寄信息（若未填写），完成後书将在1至3个工作日内送至用户手中，偏远地区产生的额外费用将于活动结束后，从保证金中扣除，平台发货前通知予以确认。（若未送至请联系客服）<br/>
-                    2. 在此活动中平台每期仅提供一本畅销读物，平台每隔一段时间（每一至三周，取决于此活动参与人数）则会更换一本新书。在活动进行的过程中即使更新，也不会影响当前已生成的目标进行。<br/>
-                    3. 用户需要在一个月（30日，从用户收到书本开始计算）内完成此书的阅读记录，完成所有页码的阅读后直接视为活动结束。（在书未到前开始记录，将自行负责）<br/>
-                    4. 记录规则：<br/>
-                    4.1. 用户在订单页面确认收货即可激活阅读记录；<br/>
-                    4.2. 在我的目标->读书活动中进行记录，每次记录都将根据用户阅读情况返还部分押金。直到记录至最后一页，可结算返还押金（或非全额返还）至余额。（为避免部分用户浪费平台资源，在完成阅读后，并未返还部分将纳入活动补偿）<br/>
-                    4.3. 每次记录不小于1页，每次记录最多2小时。<br/>
-                    4.4. 用户需要在30日内完成阅读记录，或将默认直接结算。<br/>
-                    5. 每次记录都将根据用户阅读情况返还一定金额。<br/>
-                    6. 押金=保证金 （仅限该活动）：<br/>
-                    6.1 保证金：在活动中未完成则扣除活动中所提交的全额保证金（此项保证金将不会瓜分给其他用户，平台以将此费用纳入最高返还金额预算内）；<br/>
-                    6.2 在押金为0的情况下视为活动结束（即30日过后）。<br/>
-                    6.3 输入尾页后视为活动结束，并结算累计的返还金至余额。<br/>
-                    7. “购书阅读”活动的每日结算时段为当日23:59，如用户对活动有疑问及争议的户可在每日22:00前联系客服，如有需要用户应被扣除的押金部分将暂时冻结以待解决。（客服只处理因不可抗力因素，如系统问题引起的无法完成的情况。以示公平，在正常情况下将不受理）。<br/>
-                    <br/>※本平台拥有所有活动的最终解释权，如有疑问请与客服联系，谢谢。<br/>
-                </p>
-            </div>
-        </div>
-        <!-- 押金 -->
-        <div class="detailed_box_text"  style="display: none;width: 60%;">
-            <p style="text-align: center;font-size: 16px">押金 <a href="https://mp.weixin.qq.com/s/e7LQzUe6DjaN9Zc9rjafFQ" style="color:rgba(31, 162, 255, 0.8);font-size: 12px;">（了解更多）</a></p>
-            <div class="detailed_box__1">
-                <div class="weui-flex">
-                    <div class="weui-flex__item" style="padding-left: 10px;">
-                        <p>&#12288;</p>
-                        <p style="text-align: center">价&#12288;格</p>
-                        <p style="text-align: center">剩余押金</p>
-
-                    </div>
-                    <div class="weui-flex__item">
-                        <p  class="font_color_1">&#12288;</p>
-                        <p>
-                        {% if goal.price == 0 %}
-                            <span>免费</span>
-                        {% else %}
-                            <span>{{ goal.price }}元</span>
                         {% endif %}
-                        </p>
-                        <p><span class="goal_guaranty">{{ goal.guaranty }} </span>元</p>
+
+                    {% else %}
+
+                    {% endif %}
+
+                {% endfor %}
+                </div>
+
+            <!-- 动态加载分享
+                <div  class="weui-cells" style="display: none;">
+
+                    <div class="weui-cell weui-cell_swiped" id="">
+                        <div class="weui-cell__bd">
+                            <ul>
+                                <li class="news-item" data-punch="0" style="overflow:hidden;">
+                                    <div class="new-item__content">
+                                        <div>
+                                            <img src="/static/images/404@2x.png" class="news-item__header-img pictureEnlarge">
+                                            <span class="news-item__header-text">小明</span>
+                                        </div>
+                                        <div>
+                                            <p style="margin-left: 32px;text-indent:2em;">尝试尝试尝试尝试从菜市场</p>
+                                        </div>
+                                        <div class="news-item__content" style="height: auto;margin-left: 32px;">
+
+                                                <div class="uploaderInput_box" style="margin-top: 10px;display: block;float: left;
+                                                background: url(/static/images/404@2x.png) center;
+                                                background-size: cover;
+                                                background-repeat: no-repeat;
+                                                ">
+                                                    <img class="news-item__content-img box_left voucher_ref_img pictureEnlarge" style="position: absolute;opacity: 0" src="/static/images/404@2x.png">
+                                                </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="news-item__horzon"></div>
+                                    <div class="weui-flex news-item__bottom">
+                                        <div class="weui-flex__item" style="padding-left: 20px;">
+                                            <span style="color: #B6C1C8;text-align: right;display: block;">2018-08-19</span>
+                                        </div>
+                                        <div class="weui-flex__item weui-flex" style="display: none">
+
+                                            <button href="javascript:;" class="news-item__tail-btn weui-flex__item parise-btn" punch_id="{{ new.punch_id }}" sta="{{ new.praise }}" style="color: rgba(31,162,255,1);">
+                                                <i class="iconfont icon-dianzan font_color_1"></i>
+                                                <span class="news-item__tail-text" >赞 <span class="praise">
+                                                        100
+                                                    </span>
+                                                </span>
+                                            </button>
+
+
+                                            <button href="javascript:;" class="news-item__tail-btn weui-flex__item report-btn" punch_id="{{ new.punch_id }}" style="margin-left: 5px;">
+                                                <span class="news-item__tail-text">举报</span>
+                                            </button>
+
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="weui-cell__ft" style="display: inline-table">
+                            <a class="weui-swiped-btn weui-swiped-btn_warn delete-swipeout bg_red_1" punch_id="{{ comm.id }}" style="display: table-cell;vertical-align: middle;" href="javascript:">删除</a>
+                        </div>
+                    </div>
+                </div>
+
+    -->
+            </div>
+        </div>
+
+
+        <!-- 底部弹窗 确定打卡、计时 -->
+        <div id="read-popup" class="weui-popup__container popup-bottom">
+            <div class="weui-popup__overlay"></div>
+            <div class="weui-popup__modal">
+                <div class="modal-content">
+                    <div class="row-center center" >
+                        <div>
+                            <span style="font-size: 14px;color: #B6C1C8;">阅读时长</span>
+                            <span style="font-size: 16px;font-weight: 400;color: #1fa2ff;">
+                            <span id="time-hour">1</span>:
+                            <span id="time-min">00</span>:
+                            <span id="time-sec">00</span>
+                            </span>
+                        </div>
+                        <div class="row-center center">
+                            <span style="font-size: 14px;color: #B6C1C8;">本次阅读&nbsp;</span>
+                            <span style="font-size: 14px;color: #B6C1C8;"> {{ goal.finish_page }} 页至</span>
+                            <div class="mdl-textfield mdl-js-textfield page-input" >
+                                <input class="mdl-textfield__input" type="number" id="page-input" maxlength=20>
+                                <label class="mdl-textfield__label" for="page-input"></label>
+                            </div>
+                            <span style="font-size: 14px;color: #B6C1C8;">页</span>
+                        </div>
+                    </div>
+                    <div style="display: block;">
+                        <button class="weui-btn weui-btn_primary give_up bg_red_1" style="width: 39%;display:block;float: left;border-radius: 0;">
+                            放弃计时
+                        </button>
+
+                        <button class="weui-btn weui-btn_primary" id="reading-confirm-btn" style="width: 60%;display: block;" sta="1">
+                            完成阅读
+                        </button>
                     </div>
 
                 </div>
             </div>
-
         </div>
 
-        <div class="qqGroupCode_box" style="opacity: 0;">
-            <div class="container_on_share_run">
-                <div class="swiper-container_on_share_run" data-space-between='10' data-pagination='.swiper-pagination' data-autoplay="1000">
-                    <div class="swiper-wrapper">
-                        <div class="swiper-slide">
-                            <img src="/static/images/on_share/on_share_read_1.jpg" class="fadeInLeft_1" style="width: 100%;" >
+
+        <!-- 中间 弹窗 -->
+        <div class="hide_content">
+
+            <div class="mask_on" style="display: none"></div>
+            <div class="mask_on_1" style="display: none"></div>
+            <div class="mask_on__1" style=""></div>
+            <div class="prompt__1"></div>
+            <div class="mask_on_slow_fast_box"></div>
+
+            <!-- 弹窗 阅读 时间太短 -->
+            <div class="reading_sign_in_prompt_box">
+                <div>
+                    <img src="/static/images/read/reading_sign_in_prompt_1@2x.png" style="width: 100%">
+                </div>
+                <div class="weui-flex"  style="margin: 0 6%;">
+                    <div class="weui-flex__item" style="padding: 25px;">
+                        <img class="reading_sign_in_prompt_yes" src="/static/images/read/reading_sign_in_prompt_yes@2x.png" style="width: 100%">
+                    </div>
+                    <div class="weui-flex__item" style="padding: 25px;">
+                        <img class="reading_sign_in_prompt_no" src="/static/images/read/reading_sign_in_prompt_no@2x.png" style="width: 100%">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 弹窗 阅读 太快 -->
+            <div class="reading_sign_in_fast_box">
+                <div>
+                    <img src="/static/images/read/read_fast_1@2x.png" style="width: 100%">
+                </div>
+            </div>
+
+            <!-- 弹窗 阅读 太慢 -->
+            <div class="reading_sign_in_slow_box">
+                <div>
+                    <img src="/static/images/read/read_slow_1@2x.png" style="width: 100%">
+                </div>
+            </div>
+
+
+        <!--
+
+            <div>
+                <div class="weui-dialog weui-dialog--visible">
+                    <div class="weui-dialog__hd">
+                        <strong class="weui-dialog__title">确定提示</strong>
+                    </div>
+                    <div class="weui-dialog__bd">提前结束仅结算已返还押金</div>
+                    <div class="weui-dialog__ft">
+                        <a href="javascript:;" class="weui-dialog__btn default">取消</a>
+                        <a href="javascript:;" class="weui-dialog__btn primary">确定</a>
+                    </div>
+                </div>
+            </div>
+        -->
+
+        <!-- 活动说明-->
+            <div class="activityDescription_box" style="display: none">
+                <div>
+                    <h4 style="text-align: center;margin: 5px auto 10px;">#阅读说明#</h4>
+                    <div>
+                        <p><b>活动概况：</b></p>
+                        <p>在“读书”活动中，平台每期仅提供一本精选读物。用户需要在一个月内完成阅读，平台将根据用户阅读记录情况返还押金。</p></br>
+                        <p><b>参与方式：</b></p>
+                        <p>
+                            1. 支付后即生成目标<br>
+                            2.生成目标后，在我的订单填写邮寄信息<br>
+                            3.每日18:00发货（假期除外）<br>
+                        </p>
+                        <img src="/static/images/read/read_1.png" style="width: 100%">
+                        <img src="/static/images/read/read_2.png" style="width: 100%">
+                        <p>（偏远地区产生的额外费用将于活动结束后，从保证金中扣除，平台发货前通知予以确认。）</p>
+                        <p>
+                            <b>记录规则：</b>
+                        1.用户在订单页面确认收货即可激活阅读记录；<br/>
+                        2.在我的目标->读书活动中进行记录，每次记录都将根据用户阅读情况返还部分押金。直到记录至最后一页，可结算返还押金（或非全额返还）至余额。（为避免部分用户浪费平台资源，在完成阅读后，并未返还部分将纳入活动补偿）<br/>
+                        3.用户需要在30日内完成阅读记录，或将默认直接结算。<br/>
+                        关于返还押金规则，除不可抗力因素，在正常情况下将不受理。<br/><br/>
+                        ※本平台拥有所有活动的最终解释权，如有疑问请与客服联系，谢谢。<br/>
+                        </p>
+
+                    </div>
+
+                </div>
+            </div>
+            <!-- 押金 -->
+            <div class="detailed_box_text"  style="display: none;width: 60%;">
+                <p style="text-align: center;font-size: 16px">押金 <a href="https://mp.weixin.qq.com/s/e7LQzUe6DjaN9Zc9rjafFQ" style="color:rgba(31, 162, 255, 0.8);font-size: 12px;">（了解更多）</a></p>
+                <div class="detailed_box__1">
+                    <div class="weui-flex">
+                        <div class="weui-flex__item" style="padding-left: 10px;">
+                            <p>&#12288;</p>
+                            <p style="text-align: center">价&#12288;格</p>
+                            <p style="text-align: center">剩余押金</p>
+
+                        </div>
+                        <div class="weui-flex__item">
+                            <p  class="font_color_1">&#12288;</p>
+                            <p>
+                            {% if goal.price == 0 %}
+                                <span>免费</span>
+                            {% else %}
+                                <span>{{ goal.price }}元</span>
+                            {% endif %}
+                            </p>
+                            <p><span class="goal_guaranty">{{ goal.guaranty }} </span>元</p>
                         </div>
 
                     </div>
                 </div>
-{#                <img src="/static/images/on_share/on_share_run_1.jpg" class="hide fadeInLeft_1" style="width: 100%;" >#}
-{#                <img src="/static/images/on_share/on_share_run_2.jpg" class="fadeInLeft_1" style="width: 100%;" >#}
+
             </div>
-        </div>
 
+            <!-- 阅读活动 微信 二维码 弹窗-->
+            <div class="qqGroupCode_box" style="opacity: 0;">
+                <div class="container_on_share_run">
+                    <div class="swiper-container_on_share_run" data-space-between='10' data-pagination='.swiper-pagination' data-autoplay="1000">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide">
+                                <img src="/static/images/on_share/on_share_read_1.jpg" class="fadeInLeft_1" style="width: 100%;" >
+                            </div>
 
-        <!--评论弹出框-->
-        <!--  上传3 张 图片-->
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <div id="upload-popup" class="weui-popup__container popup-bottom">
-            <div class="weui-popup__overlay"></div>
+            <!--  上传3 张 图片 弹窗-->
+            <div id="upload-popup" class="weui-popup__container popup-bottom">
+                <div class="weui-popup__overlay"></div>
                 <div class="weui-popup__modal">
                     <div class="modal-content">
 
                         <div class="row-center center" id="" style="text-align: center;height: 40px;line-height:40px;overflow: hidden;margin-top: 10px;">
-                            评论
+                            分享
                         </div>
 
                         <div style="overflow: hidden;border-bottom: 1px solid  #ededed;width: 80%;margin: 0 auto;height: 100px;">
@@ -1385,1079 +1296,1104 @@
                         <div id="" style="height:auto;overflow: hidden;margin:10px auto;width: 80%;">
                             <div class="news-item__content" style="height: 120px;">
 
-{#                                <div id="img_sel_template" >#}
-{#                                    <div class="uploaderInput_box" id="sourceNode" style="float: left;">#}
-{#                                        <div class="weui-cell__ft img_remove">#}
-{#                                            <i class="iconfont icon-guanbi font_red_1" style="line-height: 20px;height: 20px;font-size: 20px"></i>#}
-{#                                        </div>#}
-{#                                        <img class="news-item__content-img uploaderInput_img_1 box_content pictureEnlarge" src="/static/media/read/2018-04-21/100274_2018-04-21_LdBGzQaoT6e4n0mI.jpg" style="width: 80%;">#}
-{#                                    </div>#}
-{#                                </div>#}
-
                                 <div class="weui-uploader__bd">
                                     <ul class="weui-uploader__files" id="uploaderFiles">
-                                        <li class="uploaderInput_box" id="sourceNode" style="float: left;width: 60px;height: 60px;background: url(/static/media/read/2018-04-24/100259_2018-04-24_GubXKhHklZa517dq.jpg) center no-repeat;background-size: cover;">
+                                        <li class="uploaderInput_box" id="sourceNode" style="float: left;width: 60px;height: 60px;background: url(/static/order/demo.png) center no-repeat;background-size: cover;">
                                             <div class="weui-cell__ft img_remove">
                                                 <i class="iconfont icon-guanbi font_red_1" style="line-height: 20px;height: 20px;font-size: 20px"></i>
                                             </div>
                                             <img class="news-item__content-img uploaderInput_img_1 box_content pictureEnlarge"
-                                                 src="/static/media/read/2018-04-21/100274_2018-04-21_LdBGzQaoT6e4n0mI.jpg" style="width: 60px;height: 60px;display: block;margin: auto;opacity: 0">
+                                                 src="/static/order/demo.png" style="width: 60px;height: 60px;display: block;margin: auto;opacity: 0">
                                         </li>
                                     </ul>
-                                    <div class="weui-uploader__input-box uploaderInput_input" style="width: 60px;height: 60px;margin-left: 5px;">
+
+                                    <div class="weui-uploader__input-box uploaderInput_input" style="width: 60px;height: 60px;margin-left: 13px;display: block;margin-top: 20px;">
                                         <input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*">
                                     </div>
 
-{#                                <div class="uploaderInput_input" style="">#}
-{#                                    <div class="weui-uploader__input-box box_content" id="upload_img_file_p" style="z-index: 99999999999999999999999;opacity: 1;width: 50px;height: 50px">#}
-{#                                        <input id="uploaderInput" class="weui-uploader__input" type="file" accept="image/*" >#}
-{#                                    </div>#}
-{#                                </div>#}
-
-                                <!--
-                                <div class="weui-flex__item uploaderInput_1"  style="position: relative;display: none">
-
-                                    <div class="weui-cell__ft img_remove img_remove_1">
-                                        <i class="iconfont icon-guanbi font_red_1" style="line-height: 20px;height: 20px;font-size: 20px"></i>
-                                    </div>
-
-                                    <img class="news-item__content-img uploaderInput_img_1 box_content pictureEnlarge" src="/static/media/read/2018-04-21/100274_2018-04-21_LdBGzQaoT6e4n0mI.jpg" style="width: 80%;">
                                 </div>
-
-
-
-                                <div class="weui-flex__item uploaderInput_2" style="position: relative;display: none">
-                                    <div class="weui-cell__ft img_remove img_remove_2">
-                                        <i class="iconfont icon-guanbi font_red_1" style="line-height: 20px;height: 20px;font-size: 20px"></i>
-                                    </div>
-
-                                    <img class="news-item__content-img uploaderInput_img_2 box_content pictureEnlarge" src="/static/media/read/2018-04-21/100274_2018-04-21_LdBGzQaoT6e4n0mI.jpg" style="width: 80%;">
-                                </div>
-                                <div class="weui-flex__item uploaderInput_3" style="position: relative;display: none">
-                                    <div class="weui-cell__ft img_remove img_remove_3">
-                                        <i class="iconfont icon-guanbi font_red_1" style="line-height: 20px;height: 20px;font-size: 20px"></i>
-                                    </div>
-
-                                    <img class="news-item__content-img uploaderInput_img_3 box_content pictureEnlarge" src="/static/media/read/2018-04-21/100274_2018-04-21_LdBGzQaoT6e4n0mI.jpg" style="width: 80%;">
-                                </div>
-                                -->
-
                             </div>
-
                         </div>
-
-                    </div>
 
                         <button class="weui-btn weui-btn_primary" id="read_comment_submit" style="    position: absolute;bottom: 0;height: 40px;line-height: 40px;overflow: hidden">
                             确认
                         </button>
                     </div>
                 </div>
+            </div>
 
         </div>
 
 
-    </div>
+        <div id="goal-id__get" hidden>{{ goal.goal_id|cut:'-' }}</div>
+        <div id="book_id" hidden>{{ readinginfo.id }}</div>
 
-
-
-	<div id="goal-id__get" hidden>{{ goal.goal_id|cut:'-' }}</div>
-    <div id="book_id" hidden>{{ readinginfo.id }}</div>
-
-
-
-	<script type="text/javascript" src="/static/js/jquery-2.1.4.js"></script>
-    <script type="text/javascript" src="/static/js/jquery-weui-2.1.4.js"></script>
-    <script type="text/javascript" src="/static/js/public.js"></script>
-	<script type="text/javascript" src="/static/js/fastclick.js"></script>
-    <script type='text/javascript' src='/static/js/swiper.min.js' charset='utf-8'></script>
-	<script>
-		// fast click binding
-		$(function () {
-			FastClick.attach(document.body);
-			initDateCss();
-			$(".mask_on__1").hide();
-			$(".qqGroupCode_box").hide();
-			$(".qqGroupCode_box").css("opacity","1");
-		});
-		function initDateCss() {
-            var header = $(".header_date");
-            var width =  $(".row-center_1").width();
-            header.css('width',width/8);
-            //header.css('height',width/8);
-            //header.css('lineHeight', width/8 +"px");
-        }
-        var guaranty='{{ goal.guaranty|floatformat:2 }}';
-        var down_payment ='{{ goal.down_payment|floatformat:2 }}'; //底金
-        var goal_bonus ='{{ goal.bonus|default:0.00 }}'; //返回押金
-
-        $(".goal_guaranty").text(parseFloat(Number(guaranty)+Number(down_payment)-Number(goal_bonus)).toFixed(2));
-
-
-		$("iframe").detach();
-	</script>
-{#	<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>#}
-    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
-	<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
-	<script type="text/javascript" src="/static/js/material.min.js"></script>
-    <script>
-        $(".swiper-container_on_share_run").swiper({
-            loop: true,
-            autoplay:true
-        });
-    </script>
-	<!--配置CSRF保护-->
-    <script>
-        $.ajaxSetup({
-            data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
-        });
-        {{ WechatJSConfig|safe}}
-        wx.ready(function() {
-            wx.hideAllNonBaseMenuItem();
-            wx.hideOptionMenu();
-        })
-    </script>
-    <script>
-
-        {% if state|yesno:"1,0" == "0"%}
-            var all = 0;
-        {% else %}
-            //var all = {{ time_range }};
-            var all = 0;
-        {% endif %}
-
-        // 切换天数显示
-		$(".header_date").click(function () {
-			// 如果不能点击，则不处理
-			if($(this).hasClass("notouch")){
-				return;
-			}
-			var num = $(this).attr("num").trim();
-			console.log(num);
-			$(".header_date.active").removeClass("active");
-			$(this).addClass("active");
-			//$(".datespanel").hide();
-            $(".day-index").hide();
-			$(".dayindex_" + num).show();
-		});
-
-		$("#backup-btn").click(function () {
-			window.location.href = 'index';
-		});
-
-		//关闭 弹窗
-		$(".weui-popup__overlay").click(function () {
-			$("body").removeClass("popup-open");
-			$(".reading_sign_in_prompt_box").hide();
-		});
-
-		//提前结束 
-        $(".read_finish").click(function () {
-            console.log('提前结束');
-            var goal_id=$("#goal-id__get").html().trim();
-            console.log(goal_id);
-		    $.confirm({
-                title: '确定结束提示',
-                text: '提前结束仅结算已返还押金（确认结算后，将不再返还剩余押金）',
-                onOK: function () {
-                    //点击
-                    $.post('/api/success_read',{
-                        goal:goal_id
-                    },function (response) {
-                        if(response['status'] == 200){
-                            $.toast('你已结束本期活动！',function () {
-                                window.location.href = "/activity/index";
-                            });
-                        }
-                        else{
-                            $.toast('结束失败<br/>请联系客服', 'cancel');
-                        }
-                    });
-                },
-                onCancel: function () {
-
-                }
+        <script type="text/javascript" src="/static/js/jquery-2.1.4.js"></script>
+        <script type="text/javascript" src="/static/js/jquery-weui-2.1.4.js"></script>
+        <script type="text/javascript" src="/static/js/public.js"></script>
+        <script type="text/javascript" src="/static/js/fastclick.js"></script>
+        <script type='text/javascript' src='/static/js/swiper.min.js' charset='utf-8'></script>
+        <script>
+            // fast click binding
+            $(function () {
+                FastClick.attach(document.body);
+                initDateCss();
+                $(".mask_on__1").hide();
+                $(".qqGroupCode_box").hide();
+                $(".qqGroupCode_box").css("opacity","1");
             });
+            function initDateCss() {
+                var header = $(".header_date");
+                var width =  $(".row-center_1").width();
+                header.css('width',width/8);
+                //header.css('height',width/8);
+                //header.css('lineHeight', width/8 +"px");
+            }
+            var guaranty='{{ goal.guaranty|floatformat:2 }}';
+            var down_payment ='{{ goal.down_payment|floatformat:2 }}'; //底金
+            var goal_bonus ='{{ goal.bonus|default:0.00 }}'; //返回押金
 
-        });
+            $(".goal_guaranty").text(parseFloat(Number(guaranty)*100+Number(down_payment)*100-Number(goal_bonus)*100)/100);
 
-        //放弃 计时
-        $(".give_up").click(function () {
-            console.log('放弃 计时');
-            $(".reading_sign_in_prompt_box").hide();
-		    $.confirm({
-                title: '确定提示',
-                text: '确定要放弃本次计时吗?',
-                onOK: function () {
-                    //点击
-                    $.post('/api/give_up_read',{
 
-                    },function (response) {
-                        if(response['status'] == 200){
-                            $.toast('确定成功',function () {
-                                window.location.reload();
-                                //window.location.href = "/activity/index";
-                            });
-                        }
-                        else{
-                            $.toast('确定失败', 'cancel');
-                        }
-                    });
-                },
-                onCancel: function () {
-
-                }
+            $("iframe").detach();
+        </script>
+        <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+        <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/static/js/material.min.js"></script>
+        <script>
+            $(".swiper-container_on_share_run").swiper({
+                loop: true,
+                autoplay:true
             });
-
-        });
-
-		//点击开始阅读 (已经收货)
-		$(".start-read-btn").click(function () {
-		    console.log("点击开始阅读");
-		    var goal_id=$("#goal-id__get").html().trim();
-            console.log(goal_id);
-		    $.confirm({
-                title: '确定提示',
-                text: '确定书到手了吗？',
-                onOK: function () {
-                    //点击确认
-                    $.post('/api/start_reading',{
-                        goal:goal_id
-                    },function (response) {
-                        if(response['status'] == 200){
-                            $.toast('可以开始阅读了！',function () {
-                                window.location.reload();
-                            });
-                        }
-                        else{
-                            $.toast('开始失败,<br/>请联系客服', 'cancel');
-                        }
-                    });
-                },
-                onCancel: function () {
-
-                }
+        </script>
+        <!--配置CSRF保护-->
+        <script>
+            $.ajaxSetup({
+                data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
             });
+            {{ WechatJSConfig|safe}}
+            var qrcode_url = "http://wechat.onmytarget.cn/static/images/logo/logo.png";
+            //var qrcode_url="http://wechat.onmytarget.cn/static/images/on_logo.jpeg";
+            var title="{{ nickname }}  邀请你参加读书活动";
+            var share_desc="On蜕变 一个好玩的平台";
+            wx.ready(function() {
+                //wx.hideAllNonBaseMenuItem();
+                //wx.hideOptionMenu();
+                wx.showMenuItems({
+                    menuList: ['onMenuShareAppMessage',
+                               'onMenuShareTimeline'] // 要显示的菜单项，所有menu项见附录3
+                });
 
-
-		});
-
-		//点击 可以
-        $(".reading_sign_in_prompt_yes").click(function () {
-            console.log("点击 可以");
-            $(".reading_sign_in_prompt_box").hide();
-        });
-        //点击 不用
-        $(".reading_sign_in_prompt_no").click(function () {
-            console.log("点击 不用");
-            reading_sign_in();
-            $(".reading_sign_in_prompt_box").hide();
-            $("#reading-confirm-btn").attr("sta","2")
-        });
-
-		//点击阅读完成
-		$(".continue-read-btn").click(function () {
-		    clearInterval(j);
-		    var sta = $(this).attr("sta");
-		    console.log(sta);
-		    if(sta=="0"){
-
-                $(this).attr("sta",'2');
-                $(this).text("阅读完成");
-		        // api/start_read
-                $.ajax({
-                    type: "post",
-                    url: "/api/start_read",
-                    data:{
+                //分享到朋友圈
+                wx.onMenuShareTimeline({
+                    title:title, // 分享标题
+                    desc: share_desc,
+                    link: 'http://wechat.onmytarget.cn/activity/fac28454e818458f86639e7d40554597?usid={{ goal.user_id|default:100259 }}', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                    imgUrl:qrcode_url, // 分享图标
+                    success: function () {
+                        $.toast("分享成功");
+                        // 用户确认分享后执行的回调函数
                     },
-                    success: function (res) {
-                        console.log(res);
-                        all = 0;
-                        //countTime(0);
+                    cancel: function () {
+                    }
+                 });
+
+                //分享到朋友
+                wx.onMenuShareAppMessage({
+                    title: title, // 分享标题
+                    desc: share_desc, // 分享描述
+                    link: 'http://wechat.onmytarget.cn/activity/fac28454e818458f86639e7d40554597?usid={{ goal.user_id|default:100259 }}', // 分享链接
+                    imgUrl: qrcode_url, // 分享图标
+                    type: '', // 分享类型,music、video或link，不填默认为link
+                    dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+                    success: function () {
+                        $.toast("分享成功");
+                        // 用户确认分享后执行的回调函数
                     },
-                    error:function(res){
-                        $.hideLoading();
-                        console.log(res)
+                    cancel: function () {
                     }
                 });
-            }else if((sta=="1")){
-		        $(this).attr("sta",'2');
-		        //clearInterval(j);
-		        $.ajax({
-                    type: "post",
-                    url: "/api/finish_read",
-                    data:{
-                    },
-                    success: function (res) {
-                        console.log(res);
-                        all=res.time_range;
-                        //countTime(all);
-                        console.log(all);
-                    },
-                    error:function(res){
-                        $.hideLoading();
-                        console.log(res)
-                    }
-                });
-            }else if((sta=="2")){
-		        $(this).attr("sta",'2');
-		        //clearInterval(j);
-		        $.ajax({
-                    type: "post",
-                    url: "/api/finish_read",
-                    data:{
-                    },
-                    success: function (res) {
-                        console.log(res);
-                        all=res.time_range;
-                        //countTime();
-                        console.log(all);
-                    },
-                    error:function(res){
-                        $.hideLoading();
-                        console.log(res)
-                    }
-                });
+            })
+        </script>
+        <script>
+            var extra_earn=Number({{ goal.extra_earn |default:'0'}});
+            //extra_earn=1000;
+            if(extra_earn==0){
+                $(".invite_num_plus").hide();
             }else{
-		        console.log("本地继续计时")
+                $(".invite_num_plus").show();
+                $("#invite_num_plus_1").text("额外");
+                $("#invite_num_plus_1_1").text("+"+extra_earn);
             }
 
-            j = setInterval(function(){
+            {% if state|yesno:"1,0" == "0"%}
+                var all = 0;
+            {% else %}
+                //var all = {{ time_range }};
+                var all = 0;
+            {% endif %}
+
+            // 切换天数显示
+            var num = $(".today").attr("num").trim();
+            $(".header_date").click(function () {
+                // 如果不能点击，则不处理
+                if($(this).hasClass("notouch")){
+                    return;
+                }
+                var old_num=num;
+                num = $(this).attr("num").trim();
+                $(".day-index").hide();
+                $(".day-index").removeClass("fadeInRight_1");
+                $(".day-index").removeClass("fadeInLeft_1");
+                //console.log("以前的"+old_num);
+                //console.log("现在的"+num);
+
+                if(old_num==num){
+                    //console.log("不滑")
+                }else if(num >old_num){
+
+                    //$(".dayindex_" + old_num).addClass("fadeInLeft_1_hide");
+                    //$(".dayindex_" + old_num).hide(1000);
+                    $(".dayindex_" + num).addClass("fadeInRight_1");
+                    //console.log("右滑")
+                }else if(num<old_num){
+                    //$(".dayindex_" + old_num).addClass("fadeInRight_1_hide");
+                    //$(".dayindex_" + old_num).hide(1000);
+                    $(".dayindex_" + num).addClass("fadeInLeft_1");
+                    //console.log("左滑")
+                }
+
+                console.log(num);
+                $(".header_date.active").removeClass("active");
+                $(this).addClass("active");
+                //$(".datespanel").hide();
+
+                //$(".day-index").removeClass("fadeInRight_1_hide");
+                //$(".day-index").removeClass("fadeInLeft_1_hide");
+                $(".dayindex_" + num).show();
+            });
+
+            //关闭 弹窗
+            $(".weui-popup__overlay").click(function () {
+                $("body").removeClass("popup-open");
+                $(".reading_sign_in_prompt_box").hide();
+            });
+
+            //提前结束
+            $(".read_finish").click(function () {
+                console.log('提前结束');
+                var goal_id=$("#goal-id__get").html().trim();
+                console.log(goal_id);
+                $.confirm({
+                    title: '确定结束提示',
+                    text: '提前结束仅结算已返还押金（确认结算后，将不再返还剩余押金）',
+                    onOK: function () {
+                        //点击
+                        $.post('/api/success_read',{
+                            goal:goal_id
+                        },function (response) {
+                            if(response['status'] == 200){
+                                $.toast('你已结束本期活动！',function () {
+                                    window.location.href = "/activity/index";
+                                });
+                            }
+                            else{
+                                $.toast('结束失败<br/>请联系客服', 'cancel');
+                            }
+                        });
+                    },
+                    onCancel: function () {
+
+                    }
+                });
+
+            });
+
+            //放弃 计时
+            $(".give_up").click(function () {
+                console.log('放弃 计时');
+                $(".reading_sign_in_prompt_box").hide();
+                $.confirm({
+                    title: '确定提示',
+                    text: '确定要放弃本次计时吗?',
+                    onOK: function () {
+                        //点击
+                        $.post('/api/give_up_read',{
+
+                        },function (response) {
+                            if(response['status'] == 200){
+                                $.toast('确定成功',function () {
+                                    window.location.reload();
+                                    //window.location.href = "/activity/index";
+                                });
+                            }
+                            else{
+                                $.toast('确定失败', 'cancel');
+                            }
+                        });
+                    },
+                    onCancel: function () {
+
+                    }
+                });
+
+            });
+
+            //点击开始阅读 (已经收货)
+            $(".start-read-btn").click(function () {
+                //console.log("点击开始阅读");
+                var goal_id=$("#goal-id__get").html().trim();
+                //console.log(goal_id);
+                $.confirm({
+                    title: '确定提示',
+                    text: '确定书到手了吗？',
+                    onOK: function () {
+                        //点击确认
+                        $.post('/api/start_reading',{
+                            goal:goal_id
+                        },function (response) {
+                            if(response['status'] == 200){
+                                $.toast('可以开始阅读了！',function () {
+                                    window.location.reload();
+                                });
+                            }
+                            else{
+                                $.toast('开始失败,<br/>请联系客服', 'cancel');
+                            }
+                        });
+                    },
+                    onCancel: function () {
+
+                    }
+                });
+
+
+            });
+
+            //点击 可以
+            $(".reading_sign_in_prompt_yes").click(function () {
+                //console.log("点击 可以");
+                $(".reading_sign_in_prompt_box").hide();
+            });
+            //点击 不用
+            $(".reading_sign_in_prompt_no").click(function () {
+                //console.log("点击 不用");
+                reading_sign_in();
+                $(".reading_sign_in_prompt_box").hide();
+                $("#reading-confirm-btn").attr("sta","2")
+            });
+
+            //点击阅读完成
+            $(".continue-read-btn").click(function () {
+                clearInterval(j);
+                var sta = $(this).attr("sta");
+                //console.log(sta);
+                if(sta=="0"){
+
+                    $(this).attr("sta",'2');
+                    $(this).text("阅读完成");
+                    // api/start_read
+                    $.ajax({
+                        type: "post",
+                        url: "/api/start_read",
+                        data:{
+                        },
+                        success: function (res) {
+                            //console.log(res);
+                            all = 0;
+                            //countTime(0);
+                        },
+                        error:function(res){
+                            $.hideLoading();
+                            //console.log(res)
+                        }
+                    });
+                }else if((sta=="1")){
+                    $(this).attr("sta",'2');
+                    //clearInterval(j);
+                    $.ajax({
+                        type: "post",
+                        url: "/api/finish_read",
+                        data:{
+                        },
+                        success: function (res) {
+                            //console.log(res);
+                            all=res.time_range;
+                            //countTime(all);
+                            //console.log(all);
+                        },
+                        error:function(res){
+                            $.hideLoading();
+                            //console.log(res)
+                        }
+                    });
+                }else if((sta=="2")){
+                    $(this).attr("sta",'2');
+                    //clearInterval(j);
+                    $.ajax({
+                        type: "post",
+                        url: "/api/finish_read",
+                        data:{
+                        },
+                        success: function (res) {
+                            //console.log(res);
+                            all=res.time_range;
+                            //countTime();
+                            //console.log(all);
+                        },
+                        error:function(res){
+                            $.hideLoading();
+                            //console.log(res)
+                        }
+                    });
+                }else{
+                    //console.log("本地继续计时")
+                }
+
+                j = setInterval(function(){
+                    countTime()
+                },100);
+
+                // 弹出阅读框
+                $("#read-popup").popup();
+                // 开始计时
+            });
+
+            //将秒数 改成 时间
+
+
+            //定时器
+            //setInterval 每隔1000ms执行一次
+            var j = setInterval(function(){
                 countTime()
             },100);
-		    // 弹出阅读框
-			$("#read-popup").popup();
-			// 开始计时
 
-        });
-
-		//将秒数 改成 时间
-
-
-        //定时器
-        //setInterval 每隔1000ms执行一次
-        var j = setInterval(function(){
-            countTime()
-        },100);
-
-        function formatNumber(num) {
-            num = parseInt(num);
-            if(num < 10){
-                return "0"+num;
+            function formatNumber(num) {
+                num = parseInt(num);
+                if(num < 10){
+                    return "0"+num;
+                }
+                else {
+                    return num;
+                }
             }
-            else {
-                return num;
+
+             function countTime() {
+                //console.log(all);
+                all =all+ 0.1;
+                //console.log(all);
+                var t_hour=formatNumber(all/3600);
+                var t_min=formatNumber((all-t_hour*3600)/60);
+                var t_sec=formatNumber(all%60);
+                //console.log("小时");
+                //console.log(t_hour);
+                //console.log("分钟");
+                //console.log(t_hour);
+                //console.log("秒");
+                //console.log(t_hour);
+
+                $("#time-hour").html(t_hour);
+                $("#time-min").html(t_min);
+                $("#time-sec").html(t_sec);
+                //限定最多累计1个小时
+                if(all>=21600){
+                    //t = setTimeout('countTime()', 100);
+                    $("#reading-confirm-btn").addClass("bg_red_1");
+                    $("#reading-confirm-btn").text("本次阅读六个小时");
+                } else {
+                    $("#reading-confirm-btn").removeClass("bg_red_1");
+                    $("#reading-confirm-btn").text("完成阅读");
+                    //t = setTimeout('countTime()', 100);
+                }
             }
-        }
 
-		 function countTime() {
-            //console.log(all);
-            all =all+ 0.1;
-            //console.log(all);
-            var t_hour=formatNumber(all/3600);
-            var t_min=formatNumber((all-t_hour*3600)/60);
-            var t_sec=formatNumber(all%60);
-            //console.log("小时");
-            //console.log(t_hour);
-            //console.log("分钟");
-            //console.log(t_hour);
-            //console.log("秒");
-            //console.log(t_hour);
-
-            $("#time-hour").html(t_hour);
-            $("#time-min").html(t_min);
-            $("#time-sec").html(t_sec);
-            //限定最多累计1个小时
-            if(all>=21600){
-                //t = setTimeout('countTime()', 100);
-                $("#reading-confirm-btn").addClass("bg_red_1");
-                $("#reading-confirm-btn").text("本次阅读六个小时");
-            } else {
-                $("#reading-confirm-btn").removeClass("bg_red_1");
-                $("#reading-confirm-btn").text("完成阅读");
-                //t = setTimeout('countTime()', 100);
-            }
-        }
-
-		//输入打卡 页数
-        $(".page-input").click(function () {
-            $("#page-input").val("");
-            $("#page-input").focus();
-        });
-
-		// 完成本日打卡
-        //打卡
-        function reading_sign_in(){
-            var today_page = parseInt($("#page-input").val());
-            var book_page_num={{ readinginfo.page_num|default:200 }};
-            var _finish_page_={{ goal.finish_page|default:0 }};
-            var book_id=$("#book_id").text().trim();
-            var goal_id=$("#goal-id__get").html().trim();
-            console.log("goal_id");
-            console.log(goal_id);
-            console.log("book_id");
-            console.log(book_id);
-            if(isNaN(today_page) || today_page >book_page_num || today_page <= _finish_page_){
-                //$.toast("请填写有效页数", "cancel");
-                $.toptip('请填写有效页数！', 'error');
+            //输入打卡 页数
+            $(".page-input").click(function () {
                 $("#page-input").val("");
                 $("#page-input").focus();
-                return;
-            }
-            console.log("3");
-            $.ajax({
-                type: "post",
-                url: "/api/reading_sign_in",
-                data:{
-                    goal: goal_id,
-                    page: today_page,
-                    book_id:book_id
-                },
-                success: function (response) {
-                    console.log("4");
-                    console.log(response);
-                    var punch=response.punch;
-                    console.log("punch");
-                    if (response['status'] === 200) {
-                        all=0;
-                        //$("body").removeClass("popup-open");
-                        //$("#read-popup").closePopup();
-
-                        if(punch == 0.1){
-                            $.toast("阅读打卡成功", "success", function () {
-                                $.closePopup();
-                                $(".reading_sign_in_fast_box,.mask_on_slow_fast_box").show()
-                            });
-                        }else if(punch == 0.5){
-                            $.closePopup();
-                            $.toast("阅读打卡成功", "success", function () {
-                                $(".reading_sign_in_slow_box,.mask_on_slow_fast_box").show()
-                            });
-                        }else{
-                            $.closePopup();
-                            $.toast("阅读打卡成功", "success", function () {
-                                window.location.reload();
-                            });
-                        }
-
-                    }
-                    // 如果为400，表示已经结束了
-                    else if (response['status'] === 400) {
-                        $.toast('您已完成本次活动，<br/>所有收益已转入余额!');
-                        setTimeout(function () {
-                            window.location.reload();
-                        }, 2000);
-                    }
-
-                },
-                error:function(res){
-                    $.hideLoading();
-                    console.log(res)
-                }
-            });
-        }
-
-        //点击完成阅读
-		$("#reading-confirm-btn").click(function () {
-		    //console.log("1");
-            var reading_confirm_sta=$("#reading-confirm-btn").attr("sta");
-            console.log(reading_confirm_sta);
-            console.log(all);
-            if(reading_confirm_sta=="2"){
-                console.log("直接打卡");
-                reading_sign_in()
-            }else{
-                if(all<300){
-                    $(".reading_sign_in_prompt_box").show();
-                    return
-                }else{
-                    reading_sign_in()
-                }
-            }
-
-		    try{
-		        //console.log("2");
-
-            }
-            catch(e){
-		        console.log("5");
-		        $.toast("请填写有效页数", "cancel");
-            }
-        });
-
-
-		{% if not notice %}
-		$(document).ready(function () {
-		   $.notification({
-			  title: "修改收货地址",
-			  text: "系统检测到您的收货地址信息不完全，为保证书籍第一时间送至您手上，请尽快填写。<br/><br/>点击本通知即可跳转",
-			  media: "",
-			  data: "",
-			  onClick: function(data) {
-			      window.location.href = '/user/order';
-			  },
-			  onClose: function(data) {
-
-			  }
-			});
-		});
-    	{% endif %}
-
-    </script>
-
-    <script>
-        $(function() {
-            var swiper_1 = new Swiper('.swiper-container_1', {
-                autoplay: false,
-                loop: false,
-                initialSlide: 100
-            });
-            //添加 微信 群
-            $("#qqGroupCode").click(function () {
-                $(".qqGroupCode_box").css("opacity", "1");
-                $(".qqGroupCode_box").show();
-                $(".mask_on").show();
             });
 
-            //打卡说明
-            $("#activityDescription_but").click(function () {
-                $(".activityDescription_box").show();
-                $(".mask_on").show();
-            });
-
-            // 活动规则说明 弹窗
-            $(".rule_box_div").click(function () {
-                $(".activityDescription_box").show();
-                $(".mask_on").show();
-            });
-            //押金弹窗
-            $("#detailed_box_text_but").click(function () {
-                $(".detailed_box_text").show();
-                $(".mask_on").show();
-            });
-
-            //明细弹窗
-            $(".detailed_box_div").click(function () {
-                $(".detailed_box_text").show();
-                $(".mask_on").show();
-            });
-            //关闭弹窗
-            $(".mask_on").click(function () {
-                $(".activityDescription_box").hide();
-                $(".detailed_box_text").hide();
-                $(".qqGroupCode_box").hide();
-                $(this).hide();
-            });
-
-            $(".mask_on__1").click(function () {
-                $(".qqGroupCode_box").hide();
-                $(".qqGroupCode_box").css("opacity", "1");
-                $(this).hide();
-            });
-
-            // 关闭 太快弹窗 太慢弹窗
-            $('.mask_on_slow_fast_box').click(function () {
-                $(this).hide();
-                $(".reading_sign_in_slow_box").hide();
-                $(".reading_sign_in_fast_box").hide();
-
-                setTimeout(function () {
-                    window.location.reload();
-                }, 1000);
-            })
-        });
-    </script>
-
-<script>
-    //删除评论
-    $('.weui-cell_swiped').swipeout();
-    $('.delete-swipeout').click(function () {
-        var punch_id =$(this).attr("punch_id");
-        var that=$(this);
-        console.log(punch_id);
-        console.log("删除评论");
-        $.confirm({
-            title: '删除提示',
-            text: '你确定要删除该评论吗？',
-            onOK: function () {
-                //点击确认
-                $.post('/api/delete_comments',{
-                    id:punch_id
-                },function (response) {
-                    if(response['status'] == 200){
-                        $.toast('删除成功！',function () {
-                            that.parents('.weui-cell').remove();
-                        });
-                    }
-                    else{
-                        $.toast('删除失败,<br/>请联系客服', 'cancel');
-                    }
-                });
-            },
-            onCancel: function () {
-
-            }
-        });
-
-
-    });
-
-    //回复
-    $(".replyComments").click(function () {
-        var replyComments_other_id=$(this).attr("punch_id");
-        console.log(replyComments_other_id);
-        $.modal({
-            title: "回复评论",
-            text: '<textarea class="modalTextarea" id="weui-prompt-input" rows="2"></textarea>',
-            buttons: [
-                {
-                    text: "取消",
-                    className: "default"
-                },
-                {
-                    text: "发送",
-                    onClick: function (e) {
-                        console.log(e)
-                        var text = $(".modalTextarea").val();
-                        //$.alert(text);
-                        //console.log(text);
-                        var len=text.length;
-                        console.log(len);
-                        if (text == "" || text == null) {
-                            $.toptip('请输入回复内容！', 'error');
-                            return
-                        }
-                        if (text.length >100) {
-                            $.hideLoading();
-                            $.toptip("不能超过100字", "error");
-                            $("#document_text").focus();
-                            return
-                        }
-
-                        replyComments_ajax(replyComments_other_id,text);
-                    }
-                }
-            ]
-        })
-    });
-    // 回复 ajax
-    function replyComments_ajax(other_id,text) {
-        $.showLoading();
-        $(".weui-toast_content").text("回复中...");
-        console.log(other_id);
-        console.log(text);
-        //console.log({{ nickname }});
-
-        $.ajax({
-            type: "POST",
-            url: "/api/reply",
-            data:{
-                "other_id":other_id,
-                "r_content":text
-            },
-            success: function (res) {
-                //alert(res);
-                $.hideLoading();
-                console.log(res);
-                setTimeout(function () {
-                    if(res.status=="403"){
-                        $.toast("回复失败", "cancel");
-                        return
-                    }
-                    $.toast("回复成功",function () {
-                        var name='{{ nickname }}';
-
-                        var a='<div style="margin-left: 64px;">' +
-                            '<p class="word_break" style="color: #333333;"><span class="news-item__header-text">'+name+'</span> 回复 ：<span style="color: #4a4a4a;">'+text+'</span></p>' +
-                            '</div>';
-                        $(".reply_data_"+other_id).append(a);
-                    })
-                }, 500);
-            },
-            error:function(res){
-                console.log(res);
-                $.hideLoading();
-                setTimeout(function () {
-                    $.toast("错误", "cancel");
-                }, 500);
-            },
-            complete: function(XMLHttpRequest, textStatus) {
-                console.log("ajax 公用");
-            }
-        });
-    }
-
-    //点赞
-    $(".parise-btn").click(function () {
-            $(this).addClass("active");
-            var sta =Number($(this).attr("sta"))+1;
-            //alert(sta)
-            var parise_btn=$(this);
-            var punch_id=$(this).attr('punch_id');
-            //alert(punch_id);
-            $.post('/api/read_prise',{
-                id:punch_id
-            },function (response) {
-                console.log(response);
-                parise_btn.find(".news-item__tail-text").css("color","#B6C1C8");
-                parise_btn.css("color","rgb(182, 193, 200)");
-                parise_btn.find(".news-item__tail-text").text("已赞"+ sta);
-                parise_btn.css("border","1px #B6C1C8 solid");
-                parise_btn.removeClass("report-btn");
-                parise_btn.attr("disabled","disabled");
-            });
-        });
-
-        //举报
-        $(".report-btn").click(function () {
-            var report_btn = $(this);
-            //console.log(report_btn.parents(".news-item").data('punch'));
-            var punch_id=$(this).attr('punch_id');
-            //alert(punch_id);
-            $.confirm({
-                title: '举报',
-                text: '确认举报该用户评论吗？',
-                onOK: function () {
-                    $.post('/api/read_report',{
-                        id:punch_id
-                    },function (response) {
-                        if(response['status'] === 200){
-                            $.toast("举报成功");
-                            report_btn.find(".news-item__tail-text").css("color","#B6C1C8");
-                            report_btn.find(".news-item__tail-text").text("已举报");
-                            report_btn.css("color","rgb(182, 193, 200)");
-                            report_btn.css("border","1px #B6C1C8 solid");
-                            report_btn.removeClass("report-btn");
-                            report_btn.attr("disabled","disabled");
-
-                        }
-                        else{
-                            $.toast("举报失败<br/>请联系客服","cancel");
-                        }
-                    });
-                }
-            });
-        });
-
-
-    $('.close-swipeout').click(function () {
-        $(this).parents('.weui-cell').swipeout('close')
-    });
-
-
-
-    $("#weui-prompt-input").click(function () {
-        $("#weui-prompt-input").focus();
-    })
-</script>
-
-
-    <!-- 图片上传 改用 base64 -->
-    <script>
-
-        var file_filepath='';
-        var file_refpath='';
-        var file_filepatharrayObject=[];
-        var file_refpatharrayObject=[];
-
-        var img_Number=0;
-        //图片转成base64 方法
-        $("#read_comment").click(function () {
-            //img_Number=0;
-            $(".mask_on__container").show();
-            $("#upload-popup").popup();
-            $("body").addClass("popup-open");
-        });
-
-        function ImgToBase64(file, maxLen, callBack) {
-            var img = new Image();
-
-            var reader = new FileReader();//读取客户端上的文件
-            reader.onload = function () {
-                var url = reader.result;//读取到的文件内容.这个属性只在读取操作完成之后才有效,并且数据的格式取决于读取操作是由哪个方法发起的.所以必须使用reader.onload，
-                img.src = url;//reader读取的文件内容是base64,利用这个url就能实现上传前预览图片
-            };
-            img.onload = function () {
-                //生成比例
-                var width = img.width, height = img.height;
-                //计算缩放比例
-                var rate = 1;
-                if (width >= height) {
-                    if (width > maxLen) {
-                        rate = maxLen / width;
-                    }
-                } else {
-                    if (height > maxLen) {
-                        rate = maxLen / height;
-                    }
-                };
-                img.width = width * rate;
-                img.height = height * rate;
-                //生成canvas
-                var canvas = document.createElement("canvas");
-                var ctx = canvas.getContext("2d");
-                canvas.width = img.width;
-                canvas.height = img.height;
-                ctx.drawImage(img, 0, 0, img.width, img.height);
-                var base64 = canvas.toDataURL('image/jpeg', 0.9);
-                callBack(base64);
-            };
-
-            reader.readAsDataURL(file);
-        }
-
-
-        $(function () {
-            //input 上传图片
-        /* */
-            var sourceNode = document.getElementById("sourceNode");
-
-            function random_string(len) {
-                len = len || 32;
-                var chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
-                var maxPos = chars.length;
-                var pwd = '';
-                for (i = 0; i < len; i++) {
-                    pwd += chars.charAt(Math.floor(Math.random() * maxPos));
-                }
-                return pwd;
-            }
-
-           $("input[accept='image/*']").change(function () {
-               $.showLoading();
-               $(".weui-toast_content").text("图片获取中...");
-                var file = $(this)[0].files[0];//获取input file控件选择的文件
-                ImgToBase64(file, 1080, function (base64) {
-                    console.log(base64);
-                    //$("#result").attr("src",base64)
-                    //预览页面上预留一个img元素，载入base64
-                    //设定宽高，不然会自动按照压缩过的图片宽高设定，有可能超出预想的范围。
-        　　　　　　　　　　　//直接利用ajax上传base64到服务器，完毕
-                    setTimeout(function () {
-
-                       $.ajax({
-                               type: "post",
-                               url: "/api/get_base",
-                               data: {
-                                   "activity":"read/",
-                                   "base64": base64
-                               },
-                               success: function (res) {
-                                   console.log(res);
-                                   if(res.status == 200){
-                                       img_Number=img_Number+1;
-                                       var file_filepath__=res.file_filepath;
-                                       file_filepatharrayObject.push(file_filepath__);
-                                       var file_refpath__ =res.file_refpath;
-                                       file_refpatharrayObject.push(file_refpath__);
-                                       var random_name=random_string(16);
-
-                                        var clonedNode = sourceNode.cloneNode(true); // 克隆节点
-                                        sourceNode.parentNode.appendChild(clonedNode); // 在父节点插入克隆的节点
-
-                                        clonedNode.setAttribute("id", "clone_" + random_name); // 修改一下id 值，避免id 重复
-                                        $targetNode = $('#clone_' + random_name);
-
-                                        clonedNode.setAttribute("class","clone_remove uploaderInput_box img___" +random_name);
-                                        var aa='float: left;width: 60px;height: 60px;background-size: cover; background: url('+file_refpath__+') center no-repeat;background-size: contain;'
-                                        clonedNode.setAttribute("style",aa);
-
-                                        $targetNode.css("backgroundImage","url("+file_refpath__+")");
-
-                                        //$targetNode.css("backgroundImage",url(file_filepath__));
-
-
-                                        $targetNode.find(".news-item__content-img ").attr("src",file_refpath__);
-                                        var onck="case_img_remove('"+random_name+"','"+file_filepath__+"','"+file_refpath__+"')";
-                                        $targetNode.find(".img_remove").attr("onclick", onck);
-
-                                       //console.log(file_filepath);
-                                       //console.log(file_filepatharrayObject);
-                                       //console.log(file_refpath);
-                                       //console.log(file_refpatharrayObject);
-
-
-
-                                       newCaseSubmit();
-
-                                       setTimeout(function () {
-                                           $.hideLoading();
-                                       }, 500);
-                                   }else{
-                                       $.hideLoading();
-                                       $.toast("获取失败！请重试上传图片", "cancel",function () {
-
-                                       });
-                                   }
-                               },
-                               error:function(res){
-                                   $.hideLoading();
-                                   $.toast("请重试上传图片", "cancel",function () {
-
-                                   });
-                                   console.log(res)
-                               }
-                           });
-                    }, 1000);
-                });
-
-           });
-
-            //点击上传 结束
+            // 完成本日打卡
             //打卡
-        });
-
-        $("#read_comment_submit").click(function () {
-            var document_text=$("#document_text").val();
-            if(document_text=="" || document_text==undefined || document_text==null){
-                $.toptip('输入评论！', 'error');
-                    $("#document_text").focus();
-                    $.hideLoading();
-                    return
-            }
-             /*  输入说明 控制长度 和 特殊字符 */
-            if(document_text.length==0){
-
-            }else{
-                if (document_text.length > 200) {
-                    $.hideLoading();
-                    $.toptip("不能超过200字", "error");
-                    $("#document_text").focus();
-                    return
+            function reading_sign_in(){
+                var today_page = parseInt($("#page-input").val());
+                var book_page_num={{ readinginfo.page_num|default:200 }};
+                var _finish_page_={{ goal.finish_page|default:0 }};
+                var book_id=$("#book_id").text().trim();
+                var goal_id=$("#goal-id__get").html().trim();
+                //console.log("goal_id");
+                //console.log(goal_id);
+                //console.log("book_id");
+                //console.log(book_id);
+                if(isNaN(today_page) || today_page >book_page_num || today_page <= _finish_page_){
+                    //$.toast("请填写有效页数", "cancel");
+                    $.toptip('请填写有效页数！', 'error');
+                    $("#page-input").val("");
+                    $("#page-input").focus();
+                    return;
                 }
-
-                var pattern = /^[a-zA-Z-—=+。，!！￥$#、？：“”`~@%^&*(){}【】[ ;|；,.'‘’\d\u4E00-\u9FA5]+$/i;
-                /*
-                if (pattern.test(document_val)){
-                } else{
-                    $.toptip('含有符号，请重试！', 'error',function () {
-                        $("#document_text").focus();
-                    });
-
-                    $.hideLoading();
-                    return
-                }
-                */
-
-            }
-            read_comment_submit(document_text)
-        });
-
-        Array.prototype.indexOf = function(val) {
-            for (var i = 0; i < this.length; i++) {
-                if (this[i] == val) return i;
-            }
-            return -1;
-        };
-
-        Array.prototype.remove = function(val) {
-            var index = this.indexOf(val);
-            if (index > -1) {
-                this.splice(index, 1);
-            }
-        };
-
-        function newCaseSubmit() {
-            console.log(file_refpatharrayObject.length);
-            var len=file_refpatharrayObject.length;
-            if (len < 3){
-                $(".uploaderInput_input").css("display","block");
-            }else{
-                $(".uploaderInput_input").hide();
-            }
-            //console.log(file_refpatharrayObject);
-
-            file_filepath = file_filepatharrayObject.join(",");
-            file_refpath = file_refpatharrayObject.join(",");
-
-            console.log(file_filepath);
-            console.log(file_refpath);
-            $.hideLoading();
-        }
-
-        
-        //点击移除图片
-
-        //移除 图片
-        function case_img_remove(uid,file_filepath__,file_refpath__) {
-            file_filepatharrayObject.remove(file_filepath__);
-            file_refpatharrayObject.remove(file_refpath__);
-            console.log(file_refpatharrayObject);
-            console.log(file_filepatharrayObject);
-            newCaseSubmit();
-            $(".img___"+uid).detach();
-        }
-
-            function read_comment_submit(text) {
-                console.log(text);
-                console.log(file_filepath);
-                console.log(file_refpath);
-                var content =text;
+                //console.log("3");
                 $.ajax({
                     type: "post",
-                    url: "/api/comments",
-                    async: true,
-                    data: {
-                        "content":content,
-                        "voucher_store":"",
-                        "voucher_ref":file_refpath
+                    url: "/api/reading_sign_in",
+                    data:{
+                        goal: goal_id,
+                        page: today_page,
+                        book_id:book_id
                     },
-                    success: function (result) {
-                        console.log(result);
-                        if(result.status== 200){
-                            $.toast("评论成功", function () {
+                    success: function (response) {
+                        //console.log("4");
+                        //console.log(response);
+                        var punch=response.punch;
+                        //console.log("punch");
+                        if (response['status'] === 200) {
+                            all=0;
+                            //$("body").removeClass("popup-open");
+                            //$("#read-popup").closePopup();
+
+                            if(punch == 0.1){
+                                $.toast("阅读打卡成功", "success", function () {
+                                    $.closePopup();
+                                    $(".reading_sign_in_fast_box,.mask_on_slow_fast_box").show()
+                                });
+                            }else if(punch == 0.5){
+                                $.closePopup();
+                                $.toast("阅读打卡成功", "success", function () {
+                                    $(".reading_sign_in_slow_box,.mask_on_slow_fast_box").show()
+                                });
+                            }else{
+                                $.closePopup();
+                                $.toast("阅读打卡成功", "success", function () {
+                                    window.location.reload();
+                                });
+                            }
+
+                        }
+                        // 如果为400，表示已经结束了
+                        else if (response['status'] === 400) {
+                            $.toast('您已完成本次活动，<br/>所有收益已转入余额!');
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 2000);
+                        }
+
+                    },
+                    error:function(res){
+                        $.hideLoading();
+                        //console.log(res)
+                    }
+                });
+            }
+
+            //点击完成阅读
+            $("#reading-confirm-btn").click(function () {
+                //console.log("1");
+                var reading_confirm_sta=$("#reading-confirm-btn").attr("sta");
+                //console.log(reading_confirm_sta);
+                //console.log(all);
+                if(reading_confirm_sta=="2"){
+                    //console.log("直接打卡");
+                    reading_sign_in()
+                }else{
+                    if(all<300){
+                        $(".reading_sign_in_prompt_box").show();
+                        return
+                    }else{
+                        reading_sign_in()
+                    }
+                }
+                try{
+                    //console.log("2");
+                }
+                catch(e){
+                    //console.log("5");
+                    $.toast("请填写有效页数", "cancel");
+                }
+            });
+
+
+            {% if not notice %}
+            $(document).ready(function () {
+               $.notification({
+                  title: "修改收货地址",
+                  text: "系统检测到您的收货地址信息不完全，为保证书籍第一时间送至您手上，请尽快填写。<br/><br/>点击本通知即可跳转",
+                  media: "",
+                  data: "",
+                  onClick: function(data) {
+                      window.location.href = '/user/order';
+                  },
+                  onClose: function(data) {
+
+                  }
+                });
+            });
+            {% endif %}
+
+        </script>
+
+        <script>
+            $(function() {
+                var swiper_1 = new Swiper('.swiper-container_1', {
+                    autoplay: false,
+                    loop: false,
+                    initialSlide: 100
+                });
+                //添加 微信 群
+                $("#qqGroupCode").click(function () {
+                    $(".qqGroupCode_box").css("opacity", "1");
+                    $(".qqGroupCode_box").show();
+                    $(".mask_on").show();
+                    $("body").addClass("popup-open");
+                });
+
+                //打卡说明
+                $("#activityDescription_but").click(function () {
+                    $(".activityDescription_box").show();
+                    $(".mask_on").show();
+                    $("body").addClass("popup-open");
+                });
+
+                // 活动规则说明 弹窗
+                $(".rule_box_div").click(function () {
+                    $(".activityDescription_box").show();
+                    $(".mask_on").show();
+                    $("body").addClass("popup-open");
+                });
+                //押金弹窗
+                $("#detailed_box_text_but").click(function () {
+                    $(".detailed_box_text").show();
+                    $(".mask_on").show();
+                    $("body").addClass("popup-open");
+                });
+
+                //明细弹窗
+                $(".detailed_box_div").click(function () {
+                    $(".detailed_box_text").show();
+                    $(".mask_on").show();
+                    $("body").addClass("popup-open");
+                });
+                //关闭弹窗
+                $(".mask_on").click(function () {
+                    $(".activityDescription_box").hide();
+                    $(".detailed_box_text").hide();
+                    $(".qqGroupCode_box").hide();
+                    $(this).hide();
+                    $("body").removeClass("popup-open");
+                });
+
+                $(".mask_on__1").click(function () {
+                    $(".qqGroupCode_box").hide();
+                    $(".qqGroupCode_box").css("opacity", "1");
+                    $(this).hide();
+                    $("body").removeClass("popup-open");
+                });
+
+                // 关闭 太快弹窗 太慢弹窗
+                $('.mask_on_slow_fast_box').click(function () {
+                    $(this).hide();
+                    $(".reading_sign_in_slow_box").hide();
+                    $(".reading_sign_in_fast_box").hide();
+                    $("body").removeClass("popup-open");
+
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 1000);
+                })
+            });
+        </script>
+
+        <script>
+            //删除分享
+            $('.weui-cell_swiped').swipeout();
+            $('.delete-swipeout').click(function () {
+                var punch_id =$(this).attr("punch_id");
+                var that=$(this);
+                //console.log(punch_id);
+                //console.log("删除分享");
+                $.confirm({
+                    title: '删除提示',
+                    text: '你确定要删除该分享吗？',
+                    onOK: function () {
+                        //点击确认
+                        $.post('/api/delete_comments',{
+                            id:punch_id
+                        },function (response) {
+                            if(response['status'] == 200){
+                                $.toast('删除成功！',function () {
+                                    that.parents('.weui-cell').remove();
+                                });
+                            }
+                            else{
+                                $.toast('删除失败<br/>请联系客服', 'cancel');
+                            }
+                        });
+                    },
+                    onCancel: function () {
+
+                    }
+                });
+
+            });
+
+            //回复
+            $(".replyComments").click(function () {
+                var replyComments_other_id=$(this).attr("punch_id");
+                //console.log(replyComments_other_id);
+                $.modal({
+                    title: "回复分享",
+                    text: '<div class="modalTextarea_box"><textarea class="modalTextarea" id="weui-prompt-input" rows="2"></textarea></div>',
+                    buttons: [
+                        {
+                            text: "取消",
+                            className: "default"
+                        },
+                        {
+                            text: "发送",
+                            onClick: function (e) {
+                                //console.log(e);
+                                var text = $(".modalTextarea").val();
+                                //$.alert(text);
+                                //console.log(text);
+                                var len=text.length;
+                                //console.log(len);
+                                if (text == "" || text == null) {
+                                    $.toptip('请输入回复内容！', 'error');
+                                    return
+                                }
+                                if (text.length >100) {
+                                    $.hideLoading();
+                                    $.toptip("不能超过100字", "error");
+                                    $("#document_text").focus();
+                                    return
+                                }
+
+                                replyComments_ajax(replyComments_other_id,text);
+                            }
+                        }
+                    ]
+                })
+            });
+
+            // 回复 ajax 提交
+            function replyComments_ajax(other_id,text) {
+                $.showLoading();
+                $(".weui-toast_content").text("回复中...");
+                //console.log(other_id);
+                //console.log(text);
+                //console.log({{ nickname }});
+
+                $.ajax({
+                    type: "POST",
+                    url: "/api/reply",
+                    data:{
+                        "other_id":other_id,
+                        "r_content":text
+                    },
+                    success: function (res) {
+                        //alert(res);
+                        $.hideLoading();
+                        //console.log(res);
+                        setTimeout(function () {
+                            if(res.status=="403"){
+                                $.toast("回复失败", "cancel");
+                                return
+                            }
+                            var name=String('{{ nickname }}');
+                            //console.log(name);
+                            var a='<div style="margin-left: 46px;">' +
+                                '<p class="word_break" style="color: #333333;"><span class="news-item__header-text" style="margin-left: 0;;color: #0c3654">'+name+'</span> ：<span style="color: #4a4a4a;">'+text+'</span></p>' +
+                                '</div>';
+                            $(".reply_data_"+other_id).append(a);
+                            $.toast("回复成功",function () {
+
+                            })
+                        }, 500);
+                    },
+                    error:function(res){
+                        //console.log(res);
+                        $.hideLoading();
+                        setTimeout(function () {
+                            $.toast("错误", "cancel");
+                        }, 500);
+                    },
+                    complete: function(XMLHttpRequest, textStatus) {
+                        //console.log("ajax 公用");
+                    }
+                });
+            }
+
+            // 分享区 其他人 回复 展示 限制 切换
+            $("body").on("click", ".reply_data", function () {
+                //console.log("77777");
+                $(this).toggleClass("clamp_5");
+            });
+
+            //点赞
+            $(".parise-btn").click(function () {
+                $(this).removeClass("button_sty");
+                $(this).addClass("button_sty_yes");
+                var sta =Number($(this).attr("sta"))+1;
+                //alert(sta)
+                var parise_btn=$(this);
+                var punch_id=$(this).attr('punch_id');
+                //alert(punch_id);
+                $.post('/api/read_prise',{
+                    id:punch_id
+                },function (response) {
+                    //console.log(response);
+                    parise_btn.find(".news-item__tail-text").css("color","#B6C1C8");
+                    parise_btn.css("color","rgb(182, 193, 200)");
+                    parise_btn.find(".news-item__tail-text").text(""+ sta);
+                    //parise_btn.css("border","1px #B6C1C8 solid");
+                    parise_btn.removeClass("report-btn");
+                    parise_btn.attr("disabled","disabled");
+                });
+            });
+
+            //举报
+            $(".report-btn").click(function () {
+                var report_btn = $(this);
+                //console.log(report_btn.parents(".news-item").data('punch'));
+                var punch_id=$(this).attr('punch_id');
+                //alert(punch_id);
+                $.confirm({
+                    title: '举报',
+                    text: '确认举报该用户分享吗？',
+                    onOK: function () {
+                        $.post('/api/read_report',{
+                            id:punch_id
+                        },function (response) {
+                            if(response['status'] === 200){
+                                $.toast("举报成功");
+                                report_btn.find(".news-item__tail-text").css("color","#B6C1C8");
+                                report_btn.find(".news-item__tail-text").text("已举报");
+                                report_btn.css("color","rgb(182, 193, 200)");
+                                report_btn.css("border","1px #B6C1C8 solid");
+                                report_btn.removeClass("report-btn");
+                                report_btn.attr("disabled","disabled");
+                            }
+                            else{
+                                $.toast("举报失败<br/>请联系客服","cancel");
+                            }
+                        });
+                    }
+                });
+            });
+
+            // 分享弹窗 获取焦点
+            $("#weui-prompt-input").click(function () {
+                $("#weui-prompt-input").focus();
+            })
+        </script>
+
+
+        <!-- 图片上传 改用 base64 -->
+        <script>
+
+            var file_filepath='';
+            var file_refpath='';
+            var file_filepatharrayObject=[];
+            var file_refpatharrayObject=[];
+
+            var img_Number=0;
+            //图片转成base64 方法
+            $("#read_comment").click(function () {
+                //img_Number=0;
+                $(".mask_on__container").show();
+                $("#upload-popup").popup();
+                $("body").addClass("popup-open");
+            });
+
+            function ImgToBase64(file, maxLen, callBack) {
+                var img = new Image();
+
+                var reader = new FileReader();//读取客户端上的文件
+                reader.onload = function () {
+                    var url = reader.result;//读取到的文件内容.这个属性只在读取操作完成之后才有效,并且数据的格式取决于读取操作是由哪个方法发起的.所以必须使用reader.onload，
+                    img.src = url;//reader读取的文件内容是base64,利用这个url就能实现上传前预览图片
+                };
+                img.onload = function () {
+                    //生成比例
+                    var width = img.width, height = img.height;
+                    //计算缩放比例
+                    var rate = 1;
+                    if (width >= height) {
+                        if (width > maxLen) {
+                            rate = maxLen / width;
+                        }
+                    } else {
+                        if (height > maxLen) {
+                            rate = maxLen / height;
+                        }
+                    };
+                    img.width = width * rate;
+                    img.height = height * rate;
+                    //生成canvas
+                    var canvas = document.createElement("canvas");
+                    var ctx = canvas.getContext("2d");
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0, img.width, img.height);
+                    var base64 = canvas.toDataURL('image/jpeg', 0.9);
+                    callBack(base64);
+                };
+                reader.readAsDataURL(file);
+            }
+
+
+            $(function () {
+                //input 上传图片
+                /* 声明 克隆节点 */
+                var sourceNode = document.getElementById("sourceNode");
+
+                // 随机取名方法函数
+                function random_string(len) {
+                    len = len || 32;
+                    var chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+                    var maxPos = chars.length;
+                    var pwd = '';
+                    for (i = 0; i < len; i++) {
+                        pwd += chars.charAt(Math.floor(Math.random() * maxPos));
+                    }
+                    return pwd;
+                }
+                // 选择完成 图片
+               $("input[accept='image/*']").change(function () {
+                   $.showLoading();
+                   $(".weui-toast_content").text("图片获取中...");
+                   var file = $(this)[0].files[0];//获取input file控件选择的文件
+                   ImgToBase64(file, 1080, function (base64) {
+                        //console.log(base64);
+                        //$("#result").attr("src",base64)
+                        //预览页面上预留一个img元素，载入base64
+                        //设定宽高，不然会自动按照压缩过的图片宽高设定，有可能超出预想的范围。
+            　　　　　　//直接利用ajax上传base64到服务器，完毕
+
+                       setTimeout(function () {
+                           $.ajax({
+                                   type: "post",
+                                   url: "/api/get_base",
+                                   data: {
+                                       "activity":"read/",
+                                       "base64": base64
+                                   },
+                                   success: function (res) {
+                                       console.log(res);
+                                       if(res.status == 200){
+                                           img_Number=img_Number+1;
+                                           var file_filepath__=res.file_filepath;
+                                           file_filepatharrayObject.push(file_filepath__);
+                                           var file_refpath__ =res.file_refpath;
+                                           file_refpatharrayObject.push(file_refpath__);
+                                           var random_name=random_string(16);
+
+                                            var clonedNode = sourceNode.cloneNode(true); // 克隆节点
+                                            sourceNode.parentNode.appendChild(clonedNode); // 在父节点插入克隆的节点
+
+                                            clonedNode.setAttribute("id", "clone_" + random_name); // 修改一下id 值，避免id 重复
+                                            $targetNode = $('#clone_' + random_name);
+
+                                            clonedNode.setAttribute("class","clone_remove uploaderInput_box img___" +random_name);
+                                            //var aa='float: left;width: 60px;height: 60px;background-size: cover; background: url('+file_refpath__+') center no-repeat;background-size: contain;margin-top: 20px;margin-right: 10px;';
+                                            var aa='float: left;width: 26%;margin-left:5%;height: 60px;background-size: cover; background: url('+file_refpath__+')  center;background-size: cover;background-repeat: no-repeat;position: relative;margin-top: 20px;';
+                                            clonedNode.setAttribute("style",aa);
+
+                                            $targetNode.css("backgroundImage","url("+file_refpath__+")");
+
+                                            //$targetNode.css("backgroundImage",url(file_filepath__));
+
+
+                                            $targetNode.find(".news-item__content-img ").attr("src",file_refpath__);
+                                            var onck="case_img_remove('"+random_name+"','"+file_filepath__+"','"+file_refpath__+"')";
+                                            $targetNode.find(".img_remove").attr("onclick", onck);
+
+                                           //console.log(file_filepath);
+                                           //console.log(file_filepatharrayObject);
+                                           //console.log(file_refpath);
+                                           //console.log(file_refpatharrayObject);
+
+
+
+                                           newCaseSubmit();
+
+                                           setTimeout(function () {
+                                               $.hideLoading();
+                                           }, 500);
+                                       }else{
+                                           $.hideLoading();
+                                           $.toast("获取失败！请重试上传图片", "cancel",function () {
+
+                                           });
+                                       }
+                                   },
+                                   error:function(res){
+                                       $.hideLoading();
+                                       $.toast("请重试上传图片", "cancel",function () {
+
+                                       });
+                                       //console.log(res)
+                                   }
+                               });
+                        }, 1000);
+                       // 定时结束
+                    });
+               });
+
+                //点击上传 结束
+                //打卡
+            });
+
+            $("#read_comment_submit").click(function () {
+                var document_text=$("#document_text").val();
+                if(document_text=="" || document_text==undefined || document_text==null){
+                    $.hideLoading();
+                    $.toptip('输入分享！', 'error');
+                    $("#document_text").focus();
+                    return
+                }
+                 /*  输入说明 控制长度 和 特殊字符 */
+                if(document_text.length==0){
+
+                }else{
+                    if (document_text.length > 200) {
+                        $.hideLoading();
+                        $.toptip("不能超过200字", "error");
+                        $("#document_text").focus();
+                        return
+                    }
+
+                    var pattern = /^[a-zA-Z-—=+。，!！￥$#、？：“”`~@%^&*(){}【】[ ;|；,.'‘’\d\u4E00-\u9FA5]+$/i;
+                    /*
+                    if (pattern.test(document_val)){
+                    } else{
+                        $.toptip('含有符号，请重试！', 'error',function () {
+                            $("#document_text").focus();
+                        });
+
+                        $.hideLoading();
+                        return
+                    }
+                    */
+
+                }
+                read_comment_submit(document_text)
+            });
+
+            Array.prototype.indexOf = function(val) {
+                for (var i = 0; i < this.length; i++) {
+                    if (this[i] == val) return i;
+                }
+                return -1;
+            };
+
+            Array.prototype.remove = function(val) {
+                var index = this.indexOf(val);
+                if (index > -1) {
+                    this.splice(index, 1);
+                }
+            };
+
+            function newCaseSubmit() {
+                console.log(file_refpatharrayObject.length);
+                var len=file_refpatharrayObject.length;
+                if (len < 3){
+                    $(".uploaderInput_input").css("display","block");
+                }else{
+                    $(".uploaderInput_input").hide();
+                }
+                //console.log(file_refpatharrayObject);
+
+                file_filepath = file_filepatharrayObject.join(",");
+                file_refpath = file_refpatharrayObject.join(",");
+
+                console.log(file_filepath);
+                console.log(file_refpath);
+                $.hideLoading();
+            }
+
+
+            //点击移除图片
+
+            //移除 图片
+            function case_img_remove(uid,file_filepath__,file_refpath__) {
+                file_filepatharrayObject.remove(file_filepath__);
+                file_refpatharrayObject.remove(file_refpath__);
+                //console.log(file_refpatharrayObject);
+                //console.log(file_filepatharrayObject);
+                newCaseSubmit();
+                $(".img___"+uid).detach();
+            }
+
+                function read_comment_submit(text) {
+                    //console.log(text);
+                    //console.log(file_filepath);
+                    //console.log(file_refpath);
+                    var content =text;
+                    $.ajax({
+                        type: "post",
+                        url: "/api/comments",
+                        async: true,
+                        data: {
+                            "content":content,
+                            "voucher_store":"",
+                            "voucher_ref":file_refpath
+                        },
+                        success: function (result) {
+                            //console.log(result);
+                            if(result.status== 200){
+                                $.toast("分享成功", function () {
+                                    $("body").removeClass("popup-open");
+                                    $(".mask_on__container").hide();
+                                    $.closePopup();
+                                    $("body").removeClass("popup-open");
+                                    window.location.reload();
+
+                                });
+                            }else if(result.status== 401){
+                                $.toast("分享失败", "cancel");
+                                window.location.reload();
+                            }
+
+                        },
+                        error: function(XMLHttpRequest, textStatus, errorThrown) {
+                            //console.log("ajax 出错");
+                            //$("body").removeClass("popup-open");
+                            $.hideLoading();
+                            $.toast("分享失败", "cancel",function () {
                                 $("body").removeClass("popup-open");
                                 $(".mask_on__container").hide();
                                 $.closePopup();
                                 $("body").removeClass("popup-open");
                                 window.location.reload();
-
                             });
-                        }else if(result.status== 401){
-                            $.toast("评论失败", "cancel");
-                            window.location.reload();
+                        },
+                        complete: function(XMLHttpRequest, textStatus) {
+                            //console.log("ajax 公用");
                         }
+                    })
 
-                    },
-                    error: function(XMLHttpRequest, textStatus, errorThrown) {
-                        console.log("ajax 出错");
-                        //$("body").removeClass("popup-open");
-                        $.hideLoading();
-                        $.toast("评论失败", "cancel",function () {
-                            $("body").removeClass("popup-open");
-                            $(".mask_on__container").hide();
-                            $.closePopup();
-                            $("body").removeClass("popup-open");
-                            window.location.reload();
-                        });
-                    },
-                    complete: function(XMLHttpRequest, textStatus) {
-                        console.log("ajax 公用");
-                    }
-                })
-
-            }
+                }
 
 
-            //图片放大
-        $("body").on("click", ".pictureEnlarge", function () {
-            var src_img = $(this).attr("sta_url");
-            if(src_img==undefined || src_img=="" || src_img==null){
-                //console.log("console.log(src_img);");
-                //console.log(src_img);
-                src_img = $(this).attr("src");
-            }
-            var ImageData_ = $.photoBrowser({
-                items: [
-                    {
-                        image: src_img,
-                        caption: ""
-                    }
-                ]
+                //图片放大
+            $("body").on("click", ".pictureEnlarge", function () {
+                var src_img = $(this).attr("sta_url");
+                if(src_img==undefined || src_img=="" || src_img==null){
+                    //console.log("console.log(src_img);");
+                    //console.log(src_img);
+                    src_img = $(this).attr("src");
+                }
+                var ImageData_ = $.photoBrowser({
+                    items: [
+                        {
+                            image: src_img,
+                            caption: ""
+                        }
+                    ]
+                });
+                ImageData_.open();
             });
-            ImageData_.open();
-        });
-    </script>
-</body>
-
+        </script>
+    </body>
 </html>

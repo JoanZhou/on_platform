@@ -1,11 +1,15 @@
 import json
 import requests
+from redis import StrictRedis
+from on.settings.local import DEBUG
 
 # from .wechatconfig import getToken
 WECHAT_APPID = "wx4495e2082f63f8ac"
 
 WECHAT_APPSECRET = "23f0462bee8c56e09a2ac99321ed9952"
 
+
+# conn = StrictRedis(host='119.29.191.32',port=6379,db=1)
 
 # 获取accessToken
 def getToken():
@@ -14,26 +18,27 @@ def getToken():
     token_str = requests.post(url).content.decode()
     token_json = json.loads(token_str)
     token = token_json['access_token']
+    # conn.set("token",token)
     return token
 
 
 # 开始推送
 def do_push(data):
     try:
-        print("Began to push")
 
         json_template = json.dumps(data)
 
-        print("成功将模板data转化成json")
+        # token = conn.get('token').decode()
         token = getToken()
-        print("成功获取token")
         requst_url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(token)
         # 发送post请求并且返回数据{"errcode":0,"errmsg":"ok","msgid":133338823307411456}
-        content = requests.post(requst_url, json_template).content.decode()
+        if DEBUG:
+            return
+        else:
+            content = requests.post(requst_url, json_template).content.decode()
         # 读取json数据
         json_response = json.loads(content)
         errmsg = json_response['errmsg']
-        print("发送结果{}".format(errmsg))
         return errmsg
     except Exception as e:
         print(e)

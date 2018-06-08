@@ -1,0 +1,2508 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+	<meta charset="UTF-8">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0 minimum-scale=0.5, user-scalable=no" />
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<title>步行</title>
+	<link rel="stylesheet" href="/static/css/bootstrap.min.css"/>
+	<link rel="stylesheet" href="/static/css/weui.min.css" />
+	<link rel="stylesheet" href="/static/css/material.min.css">
+	<link rel="stylesheet" href="/static/css/jquery-weui.min.css">
+	<link rel="stylesheet" href="/static/css/share.css" />
+	<link rel="stylesheet" href="/static/css/activity.css" />
+{#	<link rel="stylesheet" href="/static/css/running.css" />#}
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_591099_buombulqh8kkpgb9.css"/>
+    <link rel="stylesheet" href="/static/css/public.css">
+    <style>
+        html, body{
+            width: 100%;
+            background: #f5f6f9;
+        }
+
+        .setting-mode__background{
+            width: 45vw;
+            height: 5vh;
+            border-radius: 5vh;
+            background: #f5f7f9;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .setting-mode__button{
+            width: 50%;
+            height: 5vh;
+            background: #f5f7f9;
+            color: #B6C1C8;
+            border-radius: 5vh;
+            border-width: 0;
+            -webkit-transition: background-color 0.3s;
+            transition: background-color 0.3s;
+        }
+
+        .setting-mode__button:active{
+            border: 0;
+        }
+
+        .weui-picker-modal{
+            background: #ffffff;
+        }
+
+        .weui-picker-modal .toolbar .title{
+            background: transparent;
+            color: #545c64;
+        }
+        .weui-picker-modal .toolbar {
+            background: #fefefe;
+        }
+
+        .close-picker{
+            color:#1fa2ff !important;
+        }
+
+        .setting-mode__button-active{
+            color: #ffffff;
+            background: #1fa2ff;
+        }
+
+        .setting-item > div{
+            margin-left: 0.8rem;
+        }
+
+        .setting-item__right{
+            flex: 1;
+        }
+
+        #free__timeSetButton, #discipline__timeSetButton{
+            padding: 0 0.5rem;
+            color: #1fa2ff;;
+            background: #ffffff;
+            margin-right: 0;
+            border: 1px solid #f5f6f9;
+            width: 80px;
+            height: 32px;
+            margin-top: 0;
+        }
+
+        #free__statusSetButton, #discipline__statusSetButton,#discipline__avoidSetButton{
+            padding: 0 0.5rem;
+            color: #1fa2ff;;
+            background: #ffffff;
+            margin-right: 0;
+            border: 1px solid #f5f6f9;
+            width: 80px;
+            height: 32px;
+            margin-top: 0;
+        }
+        .fixed-panel{
+            position: fixed;
+            background-color: #ffffff;
+            bottom: 0px;
+            width: 100%;
+        }
+
+        .position-right{
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        .popup-open{
+            overflow: hidden;
+        }
+
+
+        h1{
+            margin: 0px;
+        }
+
+        /*新的CSS样式*/
+
+        input[type=range]::-webkit-slider-thumb {
+            height: 12px;
+            width: 44px;
+            border-radius: 20px;
+            border-color: #1fa2ff;
+            -webkit-box-shadow: 1px 1px 3px rgba(31, 162, 255, 0.8);
+            background-image: url("/static/images/activity_run_slide_icon.svg");
+            -webkit-background-size: 20px;
+            background-size: 20px;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-color: #1fa2ff;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -2.5px;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 2px;
+            cursor: pointer;
+            background: transparent;
+            border-radius: 0px;
+            border: 0px solid #010101;
+        }
+        input[type=range]::-moz-range-track {
+            width: 100%;
+            height: 2px;
+            cursor: pointer;
+            border-radius: 0px;
+            background: transparent;
+        }
+
+        input[type=range]::-ms-track {
+            width: 100%;
+            height: 2px;
+            cursor: pointer;
+            background: transparent;
+            border-color: transparent;
+            color: transparent;
+        }
+
+        .setting-list{
+            margin-top: 15px;
+            list-style: none;
+        }
+
+        .setting-item{
+            display: flex;
+            flex-direction:row;
+            justify-content: flex-start;
+            margin-top: 8px;
+        }
+
+        .image-header{
+            background: url(/static/images/index/run_tubar_1@3x.png) center / cover;
+            overflow: hidden;
+        }
+
+        #upload-panel .upload-card .row-center{
+            margin-bottom: 20px;
+        }
+
+        .iconfont{
+
+        }
+        .weui-btn:after{
+            border: none;
+        }
+
+        .weui-btn::after{
+            border: none;
+        }
+    </style>
+    <style>
+        html,body,p,*{
+            margin: 0;
+            padding: 0;
+        }
+        .patternSelection{
+            margin-top: 0;
+        }
+
+        .setting-mode__background{
+            {#border-radius: 5vh;#}
+            width: 50vw;
+            height: 1.8rem;
+            position: relative;
+            background-color: rgba(0,0,0,0);
+            border:1px solid rgba(31,162,255,1);
+
+        }
+        .setting-mode__button-active{
+            z-index: 2;
+        }
+
+        .setting-mode__button{
+            width: 55%;
+            height: 1.7rem;
+        }
+        #discipline-mode{
+            position: absolute;
+            right: 0vw;
+            {#border:1px solid rgba(31,162,255,1);#}
+        }
+        #free-mode{
+            position: absolute;
+            left: 0vw;
+            text-align: center;
+            padding: 0 15px;
+            {#border:1px solid rgba(31,162,255,1);#}
+        }
+        #discipline-panel,#free-panel{
+            display: block;
+            overflow: hidden;
+            width: 100%;
+        }
+        #discipline-panel .p_1,#free-panel .p_1{
+            text-align: center;
+            color: rgba(31,162,255,1);
+            font-size: 12px;
+            line-height: 20px;
+            margin:5px 10px  auto;
+        }
+        .setting-item{
+
+        }
+
+        .detailed_box_div,.detailed_box_div span{
+            margin-left: 0.8rem;
+            color: rgba(31,162,255,1);
+        }
+
+        .mask_on{
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            background: rgba(0,0,0,.6);
+        }
+        .mask_on__1{
+            position: fixed;
+            z-index: 9990;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            background: rgba(0,0,0,.0);
+        }
+        .rule_box_text,.detailed_box_text,.qqGroupCode_box{
+            position: fixed;
+            z-index: 5000;
+            width: 80%;
+            max-width: 300px;
+            top: 50%;
+            left: 50%;
+            -webkit-transform: translate(-50%,-50%);
+            transform: translate(-50%,-50%);
+            background-color: #fff;
+            text-align: left;
+            overflow: hidden;
+            padding: 15px;
+            font-size: 10px;
+            border-radius: 10px;
+            color:rgba(0,0,0,0.5)
+        }
+        .detailed_box__2{
+            margin-top: 22px;
+        }
+        .detailed_box__1 p,.detailed_box__2 p{
+            font-size: 9px;
+        }
+        .detailed_box__1,.detailed_box__2{
+            width: 100%;
+            border-radius: 10px;
+            border: 1px solid rgba(0,171,255,1);
+            background-color: rgba(246,255,250,1);
+            text-align: left;
+        }
+        .font_color_1{
+            color: rgba(10,182,247,1);
+        }
+
+        .detailed__info_moneyUp{
+            text-align: center;
+        }
+
+        .block-panel{
+            margin-top: 5px;
+        }
+        .mdl-card{
+            min-height: 0;
+            max-height: 250px;
+            height: 190px;
+        }
+
+        .challenger_deposit{
+            font-family:"Microsoft YaHei";
+            background-color: white;
+            width: 15px;
+            text-align: center;
+            color: black;
+            border: 1px solid rgba(0,0,0,0.4);
+            display: inline-block;
+            font-size: 19px;
+            position: relative;
+            overflow: hidden;
+
+        }
+
+        .challenger_deposit_{
+            font-family:"Microsoft YaHei";
+            width: 15px;
+            text-align: center;
+            color: white;
+            display: inline-block;
+            font-size: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        .challenger_deposit__{
+            position: absolute;
+            color: white;
+            width: 15px;
+            font-weight:bold;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            top: 0;
+            line-height: 23px;
+            height: 25px;
+        }
+
+    </style>
+
+    <style>
+        .bg__1 {
+            background: url("/static/images/sleeping/a_bg_1@2x.png") no-repeat;
+            background-size: cover;
+        }
+        .show_box {
+            font-size: 12px;
+            margin: 20px;
+            line-height: 40px;
+            height: 70px;
+            border-radius: 5px;
+            position: relative;
+            color: white;
+        }
+        .triangle_1, .triangle_2 {
+            position: absolute;
+            top: -20px;
+            border-top: 10px solid rgba(0,131,215,0);
+            border-bottom: 10px solid rgba(0,131,215,1);
+            border-left: 10px solid rgba(0,131,215,0);
+            border-right: 10px solid rgba(0,131,215,0);
+            left: 85%;
+        }
+        .detailed_box_div{
+            margin:10px 20px;height: 32px;line-height: 32px;border-radius:16px; -webkit-appearance:none;overflow: hidden;
+        }
+
+        .detailed_box_div .weui-flex__item {
+            line-height: 30px;
+            height: 30px;
+            text-align: center;
+
+            {#border-radius: 15px;#}
+        }
+
+        .detailed_box_div .getUpEarly_active {
+            background-color: rgba(31,162,255,1);
+            color: white;
+            {#border: 1px solid rgba(255, 255, 255, 1);#}
+            position: relative;
+        }
+
+        .detailed_box_div .free_active {
+            background-color: rgba(31,162,255,1);
+            color: white;
+            {#border: 1px solid rgba(255, 255, 255, 1);#}
+            position: relative;
+        }
+
+    </style>
+    <style>
+        .weui-navbar__item.weui-bar__item--on{
+            background-color: #00a3ff;
+            color: white;
+        }
+        .weui-navbar__item{
+            padding: 10px 0;
+        }
+    </style>
+
+    <style>
+        .news-list {
+            border-top: 1px solid #e5e5e5;
+            margin-bottom: 0;
+        }
+        .news-list {
+            list-style: none;
+            background: #F5F5F5;
+        }
+        .news-list .news-item:last-child {
+            margin-bottom: 0px;
+        }
+        .news-item:nth-child(1) {
+            border-top: none;
+        }
+        .new-item__content {
+            padding-top: 20px;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+        .news-item__header-img {
+            width: 32px;
+            height: 32px;
+            box-sizing: border-box;
+            border-radius: 50%;
+            background-color: white;
+        }
+        .news-item__header-text {
+            margin-left: 10px;
+            font-size: 0.7rem;
+        }
+        .news-item__content {
+            position: relative;
+            max-height: 100px;
+            height: auto;
+            overflow: hidden;
+        }
+
+        .reply_data {
+            margin-top: 10px;
+        }
+        .news-item__horzon {
+            width: 100%;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            background: #B6C1C8;
+        }
+        .news-item__bottom {
+            margin-bottom: 10px;
+        }
+         /*
+        点赞，举报，回复
+         */
+        .button_sty{
+            margin-left: 5px;
+            min-width: 60px;
+            max-width: 120px;
+            padding: 1px 5px;
+            height: 22px;
+            line-height: 18px;
+            color: rgba(31,162,255,1);
+            background-color: rgba(0,0,0,0);
+            /*
+            border: 1px #1fa2ff solid;
+            */
+            border: none;
+        }
+
+        .button_sty_yes{
+            margin-left: 5px;
+            min-width: 60px;
+            max-width: 120px;
+            padding: 1px 5px;
+            height: 22px;
+            line-height: 18px;
+            color: rgba(182, 193, 200,1);
+            background-color: rgba(0,0,0,0);
+            border: none;
+        }
+        .button_sty_yes > span{
+            color: rgba(182, 193, 200,1);
+        }
+
+        .icon-dianzan{
+            font-size: 14px;
+        }
+        .modalTextarea_box {
+            width: 96%;
+            height: 150px;
+            font-size: 17px;
+            border: 1px #f6f1f1 solid;
+            padding: 2%;
+        }
+        .modalTextarea{
+            height: 150px;
+            font-size: 17px;
+            border: none;
+            text-indent: 2em;
+            width: 100%;
+        }
+        input,button,select,textarea{outline:none}
+        textarea{resize:none}
+        .news-item__content-img {
+            width: 32%;
+            height: 100%;
+        }
+        .uploaderInput_box_ {
+            width: 31%;
+            margin-left: 2%;
+            height: 100px;
+        }
+        .weui-navbar+.weui-tab__bd{
+            padding-top: 36px;
+        }
+        .down_payment{
+            color: #B6C1C8
+        }
+        .down_payment_active{
+            color: white;
+            background-color:rgba(255,171,24,1)
+        }
+        .coefficient{
+            color: #B6C1C8
+        }
+        .coefficient_active{
+            color: white;
+            background-color:rgba(255,171,24,1)
+        }
+        .user-agreement__text{
+            font-size: 0.6rem;
+        }
+        #pay-btn{
+            margin-bottom: 5px;
+        }
+        #gen-popup .modal-content{
+            padding-top: 10px;
+        }
+        .weui-switch-cp__input:checked ~ .weui-switch-cp__box, .weui-switch:checked{
+            border-color: rgba(255,171,24,1);
+            background-color: rgba(255,171,24,1);
+        }
+        .weui-cell::before{
+            border-top:none;
+        }
+        .weui-switch, .weui-switch-cp__box{
+            height: 25px;
+            width: 45px;
+        }
+        .weui-switch-cp__box:before, .weui-switch:before{
+            height: 23px;
+            width: 43px;
+        }
+        .weui-switch-cp__box:after, .weui-switch:after{
+            width: 23px;
+            height: 23px;
+        }
+    </style>
+</head>
+
+<body>
+	<!--页面上方的活动信息栏-->
+	<div class="image-header mdl-card mdl-shadow--2dp" style="position: fixed;top: 0;z-index: 3;">
+		<div class="header-title" style="display: none">跑步</div>
+		<div class="header-mask"></div>
+		<div class="header-desc mdl-card__supporting-text">
+			<!--跑步页首-->
+			<div class="row-center between">
+                <div class="coloum-space" style="width: 30%">
+                    <div class="header_avatar-text">
+                        {{ app.active_participants }}人参与
+                    </div>
+                    <div class="header__avatars">
+                        {% for person in persons %}
+                        <img class="img-circle" src="{{ person.headimgurl }}">
+                        {% endfor %}
+                    <!--
+                        <img class="img-circle" src="/static/fake/running_1.jpg">
+                        <img class="img-circle" src="/static/fake/running_2.jpg">
+                        <img class="img-circle" src="/static/fake/running_3.jpg">
+                        <img class="img-circle" src="/static/fake/running_4.jpg">
+                        <img class="img-circle" src="/static/fake/running_5.jpg">
+                        -->
+				    </div>
+                </div>
+				<div class="coloum-space" style="position: absolute;left: 50%;transform: translate(-50%,0%);">
+                    <div class="header_avatar-text center">总系数</div>
+					<div class="header__text">
+                        <span style="color: #1fa2ff; font-weight: 500;">{{ app.coefficient }}</span>
+                    </div>
+				</div>
+				<div class="coloum-space">
+                    <div class="header_avatar-text center">奖金池</div>
+                    <div class="header__text">
+                        <span style="color: #ff931f; font-weight: 500;" id="app_bonus_all">{{ app.bonus_all|floatformat:"0" }}</span>
+                        <span>元</span>
+                    </div>
+				</div>
+			</div>
+		</div>
+
+        <div style="position: absolute;right: 20px;color: white;top:10px;font-size: 16px;height: 20px;line-height: 20px;display:none">
+
+            <div class="challenger_deposit_" style="width: auto;">
+                <span class="" style="width: 60px">擂主押金</span>
+            </div>
+            <div class="challenger_deposit">
+                <span class="challenger_deposit_0" style="">1</span>
+                <span class="challenger_deposit__">一</span>
+            </div>
+            <div class="challenger_deposit">
+                <span class="challenger_deposit_1" style="">1</span>
+                <span class="challenger_deposit__">一</span>
+            </div>
+            <div class="challenger_deposit">
+                <span class="challenger_deposit_2" style="">1</span>
+                <span class="challenger_deposit__">一</span>
+            </div>
+            <div class="challenger_deposit">
+                <span  class="challenger_deposit_3"  style="">1</span>
+                <span class="challenger_deposit__">一</span>
+            </div>
+            <div class="challenger_deposit">
+                <span class="challenger_deposit_4" style="">1</span>
+                <span class="challenger_deposit__">一</span>
+            </div>
+            <div class="challenger_deposit">
+                <span class="challenger_deposit_5" style="">1</span>
+                <span class="challenger_deposit__">一</span>
+            </div>
+            <div class="challenger_deposit">
+                <span class="challenger_deposit_6" style="">1</span>
+                <span class="challenger_deposit__">一</span>
+            </div>
+
+        </div>
+
+        <!-- 二维码 -->
+        <div id="qqGroupCode" style="position: absolute;right:20px;top: 20px;width: 30px;">
+           <img src="/static/images/user/share@2x.png" style="width: 100%;">
+        </div>
+
+        <!-- 规则说明 -->
+        <div id="activityDescription_but" class="rule_box_div" style="position: absolute;right:20px;top: 55px;width: 30px;">
+            <img src="/static/images/user/doubt@2x.png" style="width: 100%;">
+        </div>
+
+	</div>
+    <div style="height: 190px;width: 100%">
+
+    </div>
+
+    <div style="display: block;">
+        <div class="block-panel patternSelection">
+            <ul class="setting-list">
+                <li class="setting-item" style="justify-content: center;">
+                    <div class="setting-mode__background">
+                        <button id="discipline-mode" class="setting-mode__button setting-mode__button-active">
+                            日常模式
+                        </button>
+                        <button id="free-mode" class="setting-mode__button">
+                            自由模式
+                        </button>
+                    </div>
+                </li>
+
+                <!-- 日常模式 -->
+                <div class="panel-layout fadeInRight_1" id="discipline-panel">
+                    <p class="p_1">每周至少完成4次跑步目标</p>
+                    <!-- 目标周数 -->
+
+                    <div class="weui-flex detailed_box_div border_T"  style="">
+                        <div class="weui-flex__item getUpEarly_chenge_click border_T_R" data-sta="1" data-coefficient="10" data-deposit="10" style="text-align: center">
+                            1周
+                        </div>
+                        <div class="weui-flex__item getUpEarly_chenge_click border_T_R" data-sta="2" data-coefficient="15" data-deposit="20" style="text-align: center">
+                            2周
+                        </div>
+                        <div class="weui-flex__item getUpEarly_chenge_click border_T_R" data-sta="3" data-coefficient="20" data-deposit="30" style="text-align: center">
+                            3周
+                        </div>
+                        <div class="weui-flex__item getUpEarly_chenge_click getUpEarly_chenge_click_4 getUpEarly_active"  data-sta="4" data-coefficient="20" data-deposit="50" style="text-align: center">
+                            无限
+                        </div>
+                    </div>
+
+                    <div  class="show_box bg__1"  style="">
+                        <div class="triangle_1" style="">
+
+                        </div>
+                        <div class="weui-flex" style="height: 40px;">
+                            <div class="weui-flex__item" style="text-align: center">
+                                <div style="display: block;width: 20px;height: 20px;margin: auto;margin-top: 10px">
+                                    <img src="/static/images/sleeping/a_i_1@2x.png" style="width: 100%;display: block">
+                                </div>
+                                <div>
+                                    系数：<span class="getUpEarly_coefficient" style="display: none">20</span><span class="getUpEarly_coefficient_4">20+1/天（最高50）</span>
+                                </div>
+
+                            </div>
+                            <div class="weui-flex__item" style="text-align: center;-webkit-flex: 1;flex:1;">
+                                <div style="display: block;width: 20px;height: 20px;margin: auto;margin-top: 10px">
+                                    <img src="/static/images/sleeping/a_i_2@2x.png" style="width: 100%;display: block">
+                                </div>
+                                <div>
+                                    保证金：<span class="getUpEarly_deposit">50</span>元
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="setting-item__right" style="margin-top:20px;">
+                        <div class="font_size_6" style="text-align: center;">
+                            每日完成<span class="font_color_1"><span id="getUpEarly__distance-desc">1km</span></span>&nbsp;
+                            系数<span class="font_color_1">+<span class="getUpEarly__add_coefficient">0</span></span>
+                        </div>
+
+{#                        <div class="setting-item__right">#}
+{#                            <div style="display: flex;flex-direction: row;justify-content: space-between;color: #B6C1C8; font-size: 16px;">#}
+{#                                <span  style="color: #1fa2ff;"><span id="distance-min">1</span>km</span>#}
+{#                                <span style="color: #1fa2ff;"><span id="free__distance-desc">6km</span></span>#}
+{#                                <span  style="color: #1fa2ff;"><span id="distance-max">5</span>km</span>#}
+{#                            </div>#}
+{#                            <div class="mdl-slider__container">#}
+{#                                <input class="mdl-slider" type="range" min="0" max="4" value="0" tabindex="0">#}
+{#                                <div class="mdl-slider__background-flex">#}
+{#                                    <div class="mdl-slider__background-upper" style="flex:110%;">#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        </div>#}
+
+                        <div class="weui-row weui-no-gutter" style="margin:10px 20px">
+                            <div class="weui-col-15 font_color_1 font_size_6" style="text-align: center">1km</div>
+                            <div class="weui-col-70" style="">
+                                <div class="setting-item__right" style="">
+                                    <div class="mdl-slider__container">
+                                        <input class="mdl-slider" type="range" min="0" max="4" value="0" tabindex="0">
+                                        <div class="mdl-slider__background-flex">
+                                            <div class="mdl-slider__background-upper" style="flex: 110%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="weui-col-15 font_color_1 font_size_6"  style="text-align: center">5km</div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- 自由模式 -->
+                <div class="panel-layout fadeInLeft_1" id="free-panel" style="display: none;">
+                    <p class="p_1">在目标天数内完成目标距离</p>
+                    <!-- 目标周数 -->
+                    <div class="weui-flex detailed_box_div border_T"  style="">
+                        <div class="weui-flex__item free_chenge_click border_T_R" data-sta="1" data-coefficient="10" data-deposit="10" style="text-align: center">
+                            1周
+                        </div>
+                        <div class="weui-flex__item free_chenge_click border_T_R" data-sta="2" data-coefficient="15" data-deposit="20" style="text-align: center">
+                            2周
+                        </div>
+                        <div class="weui-flex__item free_chenge_click border_T_R" data-sta="3" data-coefficient="20" data-deposit="30" style="text-align: center">
+                            3周
+                        </div>
+                        <div class="weui-flex__item free_chenge_click free_chenge_click_4 free_active"  data-sta="4" data-coefficient="20" data-deposit="50" style="text-align: center">
+                            无限
+                        </div>
+                    </div>
+
+                    <div  class="show_box bg__1"  style="">
+                        <div class="triangle_2" style="">
+
+                        </div>
+                        <div class="weui-flex" style="height: 40px;">
+                            <div class="weui-flex__item" style="text-align: center">
+                                <div style="display: block;width: 20px;height: 20px;margin: auto;margin-top: 10px">
+                                    <img src="/static/images/sleeping/a_i_1@2x.png" style="width: 100%;display: block">
+                                </div>
+                                <div>
+                                    系数：<span class="free_coefficient" style="display: none">20</span><span class="free_coefficient_4">20+1/天（最高50）</span>
+                                </div>
+
+                            </div>
+                            <div class="weui-flex__item" style="text-align: center;-webkit-flex: 1;flex:1;">
+                                <div style="display: block;width: 20px;height: 20px;margin: auto;margin-top: 10px">
+                                    <img src="/static/images/sleeping/a_i_2@2x.png" style="width: 100%;display: block">
+                                </div>
+                                <div>
+                                    保证金：<span class="free_deposit">50</span>元
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="setting-item__right" style="margin-top: 20px;">
+                        <div class="font_size_6" style="text-align: center;">
+
+                            每周完成<span class="font_color_1"><span id="free__distance-desc">5km/周</span></span>&nbsp;
+                            系数<span class="font_color_1">+<span class="free__add_coefficient">0</span></span>
+                        </div>
+
+{#                        <div class="setting-item__right">#}
+{#                            <div style="display: flex;flex-direction: row;justify-content: space-between;color: #B6C1C8; font-size: 16px;">#}
+{#                                <span  style="color: #1fa2ff;"><span id="free_distance-min">5</span>km</span>#}
+{#                                <span style="color: #1fa2ff;"><span id="free__distance-desc">6km</span></span>#}
+{#                                <span  style="color: #1fa2ff;"><span id="free_distance-max">25</span>km</span>#}
+{#                            </div>#}
+{#                            <div class="mdl-slider__container">#}
+{#                                <input class="mdl-slider" type="range" min="0" max="4" value="0" tabindex="0">#}
+{#                                <div class="mdl-slider__background-flex">#}
+{#                                    <div class="mdl-slider__background-upper" style="flex: 110%;">#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        </div>#}
+                        <div class="weui-row weui-no-gutter" style="margin:10px 20px">
+                            <div class="weui-col-15 font_color_1 font_size_6" style="text-align: center">
+                                <span  style="color: #1fa2ff;"><span id="free_distance-min">5</span>km</span>
+                            </div>
+                            <div class="weui-col-70" style="">
+                                <div class="setting-item__right" style="">
+                                    <div class="mdl-slider__container">
+                                        <input class="mdl-slider" type="range" min="0" max="4" value="0" tabindex="0">
+                                        <div class="mdl-slider__background-flex">
+                                            <div class="mdl-slider__background-upper" style="flex: 110%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="weui-col-15 font_color_1 font_size_6" style="text-align: center">
+                                <span  style="color: #1fa2ff;"><span id="free_distance-max">25</span>km</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 进阶按钮 -->
+                <div class="" style="margin-top:0px;height: 30px;line-height: 30px;">
+                    <div class="moreSettings" style="display: block;float: right;height: 30px;line-height: 30px;color:#B6C1C8;background-color: rgba(255,255,255,0) ">
+                        <a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_default"  style=";color:#B6C1C8;background-color: rgba(255,255,255,0)">[+进阶设置]</a>
+                    </div>
+                </div>
+
+                <!-- 进阶设置 -->
+                <div class="weui-cells moreSettings_box hide fadeInUp" style="font-size: inherit;margin-top: 0">
+
+                    <!--  添加底金 -->
+                    <div class="weui-cell down_payment_box" style="height: 40px;line-height: 23px;padding-bottom: 0">
+                        <div class="weui-cell__hd font_size_5">
+                            <i class="iconfont icon-zhangdanfeiyongmingxi font_orange_2" style="padding: 0 3px"></i>添加底金
+                        </div>
+                        <div class="weui-cell__bd font_size_5">
+                            <div class="weui-flex border_orange_1 borderRadius_10" style="text-align: center;overflow: hidden;margin: 0 5px;">
+                                <div class="weui-flex__item down_payment_0 down_payment down_payment_active p_overflow" data-down_payment="0">
+                                    无底价
+                                </div>
+                                <div class="weui-flex__item border_O_L_R down_payment p_overflow" data-down_payment="1">
+                                    +1次（10元）
+                                </div>
+                                <div class="weui-flex__item  down_payment p_overflow" data-down_payment="2">
+                                    +2次（20元）
+                                </div>
+                            </div>
+                        </div>
+                        <div class="weui-cell__ft"></div>
+                    </div>
+                    <div class="weui-cell down_payment_explain" style="margin-top: 0;margin-bottom: 0;padding-top: 0;padding-bottom: 0;display: none">
+                        <div class="weui-cell__hd" style="opacity: 0">
+                            &#12288;&#12288;&#12288;&#12288;&#12288;&#12288;
+                        </div>
+                        <div class="weui-cell__bd font_size_4">
+                            扣除保证金后，依旧有<span class="font_orange_2 down_payment_Number">1次</span>机会完成目标
+                        </div>
+                    </div>
+
+                    <!--  系数翻倍 -->
+                    <div class="weui-cell" style="height: 40px;line-height: 23px;padding-bottom: 0">
+                        <div class="weui-cell__hd font_size_5">
+                            <i class="iconfont icon-xitonggongju font_orange_2" style="padding: 0 3px"></i>系数翻倍
+                        </div>
+                        <div class="weui-cell__bd font_size_5">
+                            <div class="weui-flex border_orange_1 borderRadius_15" style="text-align: center;overflow: hidden;margin: 0 5px;">
+                                <div class="weui-flex__item coefficient_0 coefficient coefficient_active" data-multiple="1">
+                                    1倍
+                                </div>
+                                <div class="weui-flex__item border_O_L_R coefficient" data-multiple="2">
+                                    2倍
+                                </div>
+                                <div class="weui-flex__item  coefficient" data-multiple="3">
+                                    3倍
+                                </div>
+                            </div>
+                        </div>
+                        <div class="weui-cell__ft"></div>
+                    </div>
+                    <div class="weui-cell coefficient_explain" style="margin-top: 0;margin-bottom: 0;padding-top: 0;padding-bottom: 0;display: none;">
+                        <div class="weui-cell__hd" style="opacity: 0">
+                            &#12288;&#12288;&#12288;&#12288;&#12288;&#12288;
+                        </div>
+                        <div class="weui-cell__bd font_size_4">
+                            系数保证金翻倍<span class="font_orange_2 coefficient_multiple">2倍</span>（系数越高收益越高）
+                        </div>
+                    </div>
+
+
+                    <!--  打卡提醒 -->
+                    <div class="weui-cell weui-cell_switch" style="height: 40px;line-height: 25px;display: none">
+                        <div class="weui-cell__hd font_size_5">
+                            <i class="iconfont icon-daqia font_orange_2" style="padding: 0 3px"></i>打卡提醒
+                        </div>
+                        <div class="weui-cell__bd font_size_3 p_overflow">（注意：关闭后，将不再收到打卡提示）</div>
+                        <div class="weui-cell__ft" style="height: 25px;">
+                            <label for="switch_remind" class="weui-switch-cp">
+                                <input id="switch_remind" class="weui-switch-cp__input" type="checkbox"
+                                       checked="checked"
+                                >
+                                <div class="weui-switch-cp__box"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!--  积分抵扣 -->
+                    <div class="weui-cell weui-cell_switch" style="height: 40px;line-height:25px;display: none">
+                        <div class="weui-cell__hd font_size_5">
+                            <i class="iconfont icon-yezi font_orange_2" style="padding: 0 3px"></i>积分抵扣
+                        </div>
+                        <div class="weui-cell__bd font_size_3 p_overflow" ><span class="deduction_point_box" style="display: none">（使用<span class="deduction_point">100</span>积分抵扣<span class="deduction_guaranty">10</span>元押金）</span></div>
+                        <div class="weui-cell__ft" style="height: 25px;">
+                            <label for="switch_score" class="weui-switch-cp">
+                                <input id="switch_score" class="weui-switch-cp__input" type="checkbox">
+                                <div class="weui-switch-cp__box"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+            </ul>
+        </div>
+
+    </div>
+
+	<div class="" style="z-index: 1;margin-top: 10px;">
+		<div class="row-center" style="justify-content: space-between;">
+			<div class="fixed-text">
+				系数:
+				<span id="all-coefficient-value" class="fixed-text__bold" style="color: #565c66;">20</span>
+			</div>
+			<div class="fixed-text">
+				押金:
+				<span style="color: #ff931f;" id="guarantee-cash" class="fixed-text__bold">
+					50
+				</span>
+				元
+			</div>
+		</div>
+		<button class="weui-btn weui-btn_primary" id="gen-btn">
+			生成目标
+		</button>
+	</div>
+
+    <!-- 动态 -->
+    <div class="bg_white hide" style="margin-top: 20px;">
+        <div class="weui-tab" style="z-index: 0;">
+            <div class="weui-navbar">
+                <a class="weui-navbar__item weui-bar__item--on" href="#tab1">
+                    排行榜
+                </a>
+
+                <a class="weui-navbar__item" href="#tab2">
+                    动态
+                </a>
+            </div>
+
+            <div class="weui-tab__bd">
+                <div id="tab1" class="weui-tab__bd-item weui-tab__bd-item--active">
+                    <!-- 排行榜 -->
+
+                </div>
+
+                <div id="tab2" class="weui-tab__bd-item">
+                    <!-- 动态 -->
+                    <!--跑步记录朋友圈-->
+
+                    <div style="margin-top: 5px;">
+                        <ul class="news-list">
+                            <li class="news-item" data-punch="123">
+                                <div class="new-item__content">
+                                    <div>
+                                        <img src="/static/images/goal/11@2x.jpg" class="news-item__header-img pictureEnlarge">
+                                        <span class="news-item__header-text">我问问</span>
+                                        <span style="margin-left: 10px;color: #B6C1C8;">完成</span>
+                                        <span style="margin-left: 2px;">10</span>
+                                        <span style="margin-left: 2px; color: #B6C1C8;">km</span>
+                                    </div>
+                                    <div>
+                                        <p style="margin-left: 46px;">wwww</p>
+                                    </div>
+
+                                    <div class="news-item__content" style="height: auto;margin-left: 36px;">
+
+                                        <div class="uploaderInput_box_" style="margin-top: 10px;display: block;float: left;
+                                            background: url(http://img.zcool.cn/community/01080755c1edaf32f87528a18e9840.jpg@900w_1l_2o_100sh.jpg) center;
+                                            background-size: cover;
+                                            background-repeat: no-repeat;
+                                            ">
+                                            <img class="news-item__content-img box_left voucher_ref_img pictureEnlarge" style="position: absolute;opacity: 0" src="http://img.zcool.cn/community/01080755c1edaf32f87528a18e9840.jpg@900w_1l_2o_100sh.jpg">
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div class="reply_data clamp_5 reply_data_123">
+                                    <div style="margin-left: 46px;">
+                                        <p class="word_break" style="color: #333333;">
+                                            <span class="news-item__header-text" style="margin-left: 0;color: #0c3654">1111</span>：<span style="color: #4a4a4a;">2222</span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="news-item__horzon"></div>
+                                <div class="weui-flex news-item__bottom">
+                                    <div class="weui-flex__item" style="padding-left: 46px;">
+                                        <span style="color: #B6C1C8;">上午 10:10</span>
+                                    </div>
+
+                                    <div class="weui-flex__item weui-flex" style="flex: 2;overflow: hidden;">
+                                        <button href="javascript:;" class="news-item__tail-btn weui-flex__item active button_sty_yes"
+                                                style="" disabled="disabled">
+                                            <i class="iconfont icon-dianzan"></i>
+                                            <span class="news-item__tail-text" style="margin-left: 10px;">
+                                                <span class="praise">
+                                                10
+                                                </span>
+                                            </span>
+                                        </button>
+
+                                        <button href="javascript:;" class="news-item__tail-btn weui-flex__item report-btn button_sty" punch_id="{{ new.punch_id }}" style="">
+                                            <i class="iconfont icon-jubao"></i>
+                                            <span class="news-item__tail-text" style="margin-left: 10px;">举报</span>
+                                        </button>
+
+                                        <button href="javascript:;" class="news-item__tail-btn weui-flex__item replyComments button_sty" punch_id="{{ new.punch_id }}" style="">
+                                            <i class="iconfont icon-pinglun font_color_1"></i>
+                                            <span class="news-item__tail-text" style="margin-left: 10px;">回复</span>
+                                        </button>
+
+
+                                    <!--
+                                        {% if new.is_no_praise == 1 %}
+                                            <button href="javascript:;" class="news-item__tail-btn weui-flex__item active button_sty_yes"
+                                                    style="" disabled="disabled">
+                                                <i class="iconfont icon-dianzan"></i>
+                                                <span class="news-item__tail-text" style="margin-left: 10px;">
+                                                    <span class="praise">
+                                                    {% if new.praise == 0 %}
+                                                    {% else %}
+                                                        {{ new.praise }}
+                                                    {% endif %}
+                                                    </span>
+                                                </span>
+                                            </button>
+                                        {% else %}
+                                            <button href="javascript:;" class="news-item__tail-btn weui-flex__item parise-btn button_sty" punch_id="{{ new.punch_id }}" sta="{{ new.praise }}" style="">
+                                                <i class="iconfont icon-dianzan"></i>
+                                                <span class="news-item__tail-text" style="margin-left: 10px;" >
+                                                    <span class="praise">
+                                                        {% if new.praise == 0 %}
+                                                        {% else %}
+                                                            {{ new.praise }}
+                                                        {% endif %}
+                                                    </span>
+                                                </span>
+                                            </button>
+                                        {% endif %}
+
+
+                                        {% if new.is_no_report == 1 %}
+                                            <button href="javascript:;" class="news-item__tail-btn weui-flex__item active button_sty_yes"
+                                                    style="" disabled="disabled">
+                                                <i class="iconfont icon-jubao"></i>
+                                                <span class="news-item__tail-text" style="margin-left: 10px;">已举报</span>
+
+                                            </button>
+                                        {% else %}
+                                            <button href="javascript:;" class="news-item__tail-btn weui-flex__item report-btn button_sty" punch_id="{{ new.punch_id }}" style="">
+                                                <i class="iconfont icon-jubao"></i>
+                                                <span class="news-item__tail-text" style="margin-left: 10px;">举报</span>
+                                            </button>
+                                        {% endif %}
+
+                                        <button href="javascript:;" class="news-item__tail-btn weui-flex__item replyComments button_sty" punch_id="{{ new.punch_id }}" style="">
+                                            <i class="iconfont icon-pinglun font_color_1"></i>
+                                            <span class="news-item__tail-text" style="margin-left: 10px;">回复</span>
+                                        </button>
+
+
+                                        -->
+
+                                    </div>
+                                </div>
+                            </li>
+
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 支付弹窗 -->
+	<div id="gen-popup" class="weui-popup__container popup-bottom">
+		<div class="weui-popup__overlay"></div>
+		<div class="weui-popup__modal">
+			<div class="modal-content">
+				<div class="gen-title" style="margin-bottom: 10px;">
+					<div class="title-line"></div>
+					<span class="title-text">
+						<span style="font-weight: 600;">跑步</span>
+						<span id="free-gen-title" class="gen-title-text" style="display: none;">自由模式</span>
+                        <span id="discipline-gen-title" class="gen-title-text" >日常模式</span>
+					</span>
+				</div>
+
+				<div class="weui-cell">
+                    <div class="weui-cell__bd">
+                        <span class="gen_title">总价</span>
+                    </div>
+                    <div class="weui-cell__ft" style="margin-right: 20px;">
+                        <span id="pay-count" style="color: #565c66;font-size: 1.4rem;font-weight: 600;">
+                            50
+                        </span>
+                        元
+                    </div>
+                </div>
+
+				<div class="weui-cell no-before">
+                    <div class="weui-cell__hd">
+                        <span class="gen_title">使用余额</span>
+                    </div>
+                    <div class="weui-cells_checkbox weui-cell__bd">
+                        <label class="weui-cell weui-check__label" for="weuiAgree">
+                            <div class="weui-cell__bd">
+                                <p>{{ balance }} 元</p>
+                            </div>
+                            <div class="weui-cell__hd">
+                                <input type="checkbox" id="weuiAgree" class="weui-check" name="checkbox1" >
+                                <i class="weui-icon-checked"></i>
+                            </div>
+                      </label>
+                    </div>
+                </div>
+
+                <div class="weui-cell">
+                    <div class="weui-cell__bd">
+                    <span class="gen_title">应付</span>
+                    </div>
+                    <div class="weui-cell__ft" style="margin-right: 20px;">
+                        <span id="reality_price" style="color: #565c66;font-size: 1.4rem;font-weight: 600;">
+                            50.00
+                        </span>
+                        元
+                    </div>
+                </div>
+
+				<button class="weui-btn weui-btn_primary" id="pay-btn"
+                        data-reality="50"
+                        data-deserve="50"
+                        data-down_num="0"
+                        data-guaranty="50"
+                        data-down_payment="0"
+                        data-average="10"
+                        data-activate_deposit="50"
+                        data-coefficient="20"
+                        data-goal_day="9999"
+                        data-goal_type="1"
+                        data-punch_attention="0"
+                        data-is_no_use_point="0"
+                        data-distance="5"
+                        data-kilos_day="1"
+                        data-use_point="100"
+                        data-deduction_point="0"
+                        data-deduction_guaranty="0"
+                        data-coefficient_multiple="1"
+                >
+                    <i class="iconfont icon-ai-weixin"></i>微信支付
+				</button>
+                <p class="user-agreement__text">进入下一步即代表同意<a  href="/user/userAgreement" class="font_color_1">用户协议</a></p>
+			</div>
+		</div>
+	</div>
+
+    <div id="activity-get__id" hidden>{{ app.activity_id }}</div>
+
+    <div class="hide_content">
+        <div class="mask_on" style="display: none"></div>
+        <div class="mask_on__1" ></div>
+
+        <!-- 活动规则 -->
+        <div class="rule_box_text" style="display: none">
+            <p style="text-align: center;font-size: 14px">#活动规则#</p>
+            1. 设置个人目标，支付押金报名参加。<br>
+            2. 完成自己所设置的目标，并以打卡或上传图片等方式进行记录。<br>
+            3. 在活动进行期间,未完成时则扣除<u>部分押金</u>纳入当日活动瓜分池。并根据<u>系数</u>瓜分给当日参与此活动的<u>所有用户</u>。被扣除的押金在被瓜分前会扣除1%的服务费，并取整瓜分。（预学金另外计算。）（押金、系数等更多平台元素说明，<a href="https://mp.weixin.qq.com/s/e7LQzUe6DjaN9Zc9rjafFQ" style="color:rgba(31, 162, 255, 0.8)">请点击此处</a> 。）<br>
+            4. 支付完押金后，在活动结束前不可申请退出。完成目标天数或押金为0的情况下，即活动结束，并可退回剩余押金及累计的瓜分的奖励。<br>
+        </div>
+
+        <!-- 明细 -->
+        <div class="detailed_box_text"  style="display: none">
+            <p style="text-align: center;font-size: 14px">明细</p>
+            <div class="detailed_box__1">
+                <div class="weui-flex">
+                    <div class="weui-flex__item" style="padding-left: 10px;">
+                        <p>&#12288;</p>
+                        <p>保证金</p>
+                        <p>底&#12288;金</p>
+                    </div>
+                    <div class="weui-flex__item">
+                        <p  class="font_color_1 detailed__info_timeSet">一 周</p>
+                        <p><span class="detailed__info_deposit">20</span>元</p>
+                        <p><span class="detailed__info_excess">10</span>元X<span class="detailed__info_excess_number">3</span>次</p>
+                    </div>
+                    <div class="weui-flex__item" style="text-align: center;">
+                        <p  class="font_color_1 detailed__info_moneyUp">普 通</p>
+                        <p>X<span class="detailed__info_moneyUp_money">1</span></p>
+                        <p>X<span class="detailed__info_moneyUp_money">1</span></p>
+                    </div>
+                    <div class="weui-flex__item" style="text-align: center">
+                        <p class="font_color_1">合 计</p>
+                        <p><span class="detailed__info_depositTotals">20</span>元</p>
+                        <p><span class="detailed__info_excessTotals">30</span>元</p>
+                    </div>
+                </div>
+            </div>
+            <div class="detailed_box__2">
+                <div class="weui-flex">
+                    <div class="weui-flex__item" style="padding-left: 10px;">
+                        <p>&#12288;</p>
+                        <p>系&#12288;数</p>
+                    </div>
+                    <div class="weui-flex__item">
+                        <p class="font_color_1 detailed__info_timeSet">一 周</p>
+                        <p><span class="detailed__info_base_coeff">12</span></p>
+                    </div>
+                    <div class="weui-flex__item detailed__info_avoid_box">
+                        <p class="font_color_1">免 签</p>
+                        <p>-<span class="detailed__info_avoid_coeff">0</span></p>
+                    </div>
+                    <div class="weui-flex__item" style="text-align: center">
+                        <p class="font_color_1 detailed__distance_desc">1km/天</p>
+                        <p>X<span class="detailed__distance-coeff">1</span></p>
+                    </div>
+                    <div class="weui-flex__item">
+                        <p class="font_color_1 detailed__info_moneyUp">普 通</p>
+                        <p style="text-align: center;">X<span class="detailed__info_moneyUp_coeff">1</span></p>
+                    </div>
+                    <div class="weui-flex__item" style="text-align: center">
+                        <p class="font_color_1">合 计</p>
+                        <p><span class="detailed__info_all_coefficient">12</span></p></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="qqGroupCode_box" style="opacity: 0;">
+            <div class="container_on_share_run">
+                <div class="swiper-container_on_share_run" data-space-between='10' data-pagination='.swiper-pagination' data-autoplay="1000">
+                    <div class="swiper-wrapper">
+                        <!--
+                        <div class="swiper-slide">
+                            <img src="/static/images/on_share/on_share_run_1.jpg" class="fadeInLeft_1" style="width: 100%;" >
+                        </div>
+                        -->
+                        <div class="swiper-slide">
+                            <img src="/static/images/on_share/on_share_run_2.jpg" class="fadeInLeft_1" style="width: 100%;" >
+                        </div>
+
+                    </div>
+                </div>
+{#                <img src="/static/images/on_share/on_share_run_1.jpg" class="hide fadeInLeft_1" style="width: 100%;" >#}
+{#                <img src="/static/images/on_share/on_share_run_2_1.jpg" class="fadeInLeft_1" style="width: 100%;" >#}
+            </div>
+        </div>
+    </div>
+
+
+
+	<script type="text/javascript" src="/static/js/jquery-2.1.4.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-weui-2.1.4.js"></script>
+    <script type="text/javascript" src="/static/js/public.js"></script>
+	<script type="text/javascript" src="/static/js/fastclick.js"></script>
+    <script type='text/javascript' src='/static/js/swiper.min.js' charset='utf-8'></script>
+	<script>
+		// fast click binding
+		$(function() {
+			FastClick.attach(document.body);
+			$(".mask_on__1").hide();
+			$(".qqGroupCode_box").hide();
+			$(".qqGroupCode_box").css("opacity","1");
+		});
+
+		$("iframe").detach();
+
+	</script>
+	<script type="text/javascript" src="/static/js/jquery-weui.min.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/static/js/material.min.js"></script>
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+     <script>
+          $(".swiper-container_on_share_run").swiper({
+              loop: true,
+              autoplay:true
+          });
+    </script>
+    <!--配置CSRF保护-->
+    <script>
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
+        });
+
+        <!--注入Config信息-->
+
+	    {{ WechatJSConfig|safe}}
+
+        var qrcode_url = "http://wechat.onmytarget.cn/static/images/logo/logo.png";
+        //var qrcode_url="http://wechat.onmytarget.cn/static/images/on_logo.jpeg";
+        var title="{{ nickname }}  邀请你参加跑步活动";
+        var share_desc="On蜕变 一个好玩的平台";
+        wx.ready(function() {
+            //wx.hideAllNonBaseMenuItem();
+            //wx.hideOptionMenu();
+            wx.showMenuItems({
+                menuList: ['onMenuShareAppMessage',
+                           'onMenuShareTimeline'] // 要显示的菜单项，所有menu项见附录3
+            });
+
+            //分享到朋友圈
+            wx.onMenuShareTimeline({
+                title:title, // 分享标题
+                desc: share_desc,
+                link: 'http://wechat.onmytarget.cn/activity/32f2a8dbe89d43c7b9ecfea19947b057?usid={{ user_id|default:100259 }}', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                imgUrl:qrcode_url, // 分享图标
+                success: function () {
+                    $.toast("分享成功");
+                    // 用户确认分享后执行的回调函数
+                },
+                cancel: function () {
+                }
+             });
+
+            //分享到朋友
+            wx.onMenuShareAppMessage({
+                title: title, // 分享标题
+                desc: share_desc, // 分享描述
+                link: 'http://wechat.onmytarget.cn/activity/32f2a8dbe89d43c7b9ecfea19947b057?usid={{ user_id|default:100259 }}', // 分享链接
+                imgUrl: qrcode_url, // 分享图标
+                type: '', // 分享类型,music、video或link，不填默认为link
+                dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+                success: function () {
+                    $.toast("分享成功");
+                    // 用户确认分享后执行的回调函数
+                },
+                cancel: function () {
+                }
+            });
+        })
+	</script>
+    <script>
+        //添加QQ 群
+        $("#qqGroupCode").click(function () {
+            $(".qqGroupCode_box").css("opacity","1");
+            $(".qqGroupCode_box").show(600);
+            $(".mask_on").show(300);
+            $("body").addClass("popup-open");
+        });
+
+        // 活动规则说明 弹窗
+        $(".rule_box_div").click(function () {
+            $(".rule_box_text").show(600);
+            $(".mask_on").show(300);
+            $("body").addClass("popup-open");
+        });
+
+         //关闭弹窗
+        $(".mask_on").click(function () {
+            $(".rule_box_text").hide();
+            $(".detailed_box_text").hide();
+            $(".qqGroupCode_box").hide();
+            $(this).hide();
+            $("body").removeClass("popup-open");
+        });
+
+        //图片放大
+        $("body").on("click", ".pictureEnlarge", function () {
+            var src_img = $(this).attr("sta_url");
+            if(src_img==undefined || src_img=="" || src_img==null){
+                //console.log("console.log(src_img);");
+                //console.log(src_img);
+                src_img = $(this).attr("src");
+            }
+            var ImageData_ = $.photoBrowser({
+                items: [
+                    {
+                        image: src_img,
+                        caption: ""
+                    }
+                ]
+            });
+            ImageData_.open();
+        });
+
+        $(".mask_on__1").click(function () {
+            $(".qqGroupCode_box").hide();
+            $(".qqGroupCode_box").css("opacity","1");
+            $(this).hide();
+            $("body").removeClass("popup-open");
+        });
+
+        //关闭 签到 弹出
+        $(".weui-popup__overlay").click(function () {
+            //console.log("关闭");
+            $("body").removeClass("popup-open");
+        });
+
+    </script>
+
+    <script>
+        // 判断是否处于自由模式
+        function is_free_mode(){
+            return $("#free-mode").hasClass("setting-mode__button-active");
+        }
+
+        //设置 全局变量
+        //是否打卡提醒，0不提醒，1提醒
+        var _punch_attention_=0;
+
+        //是否使用积分抵扣
+        var _is_no_use_point_=0;
+        //底金次数
+        var _down_num_=0;
+        //平均每次扣除的金额数
+        var _average_=10;
+
+        //系数 倍数
+        var coefficientTimes=1;
+
+        //距离系数 加成
+        var distance_coefficient=0;
+
+        // 获取 支付 按钮 节点
+        var $pay_btn=$("#pay-btn");
+
+
+        //积分 抵扣 方法
+        function is_no_use_point() {
+            //console.log("积分 抵扣 方法");
+            //console.log(_is_no_use_point_);
+            console.log("系数翻倍:"+coefficientTimes);
+            _is_no_use_point_=$pay_btn.attr("data-is_no_use_point");
+            //console.log(_is_no_use_point_);
+
+            //保证金
+            var guaranty = $pay_btn.attr("data-guaranty");
+            if(is_free_mode()) {
+                //console.log("自由模式");
+                guaranty=Number($(".free_deposit").text())*coefficientTimes;
+            }else{
+                //console.log("日常模式");
+                guaranty=Number($(".getUpEarly_deposit").text())*coefficientTimes;
+            }
+            console.log("guaranty：保证金 :"+guaranty);
+            // 保证金----end
+
+            //系数翻倍
+            //原系数
+            var coefficient_=$pay_btn.attr("data-coefficient");
+            if(is_free_mode()) {
+                //console.log("自由模式");
+                coefficient_=Number($(".free_coefficient").text())*coefficientTimes;
+                distance_coefficient=Number($(".free__add_coefficient").text())*coefficientTimes;
+            }else{
+                //console.log("日常模式");
+                coefficient_=Number($(".getUpEarly_coefficient").text())*coefficientTimes;
+                distance_coefficient=Number($(".getUpEarly__add_coefficient").text())*coefficientTimes;
+            }
+            console.log("原系数 :"+coefficient_);
+
+            var coefficient__=Number(coefficient_+distance_coefficient);
+            $pay_btn.attr("data-coefficient",coefficient__);
+            //$pay_btn.attr("data-coefficient_multiple",coefficientTimes);
+            $("#all-coefficient-value").text(coefficient__);
+
+            // 系数翻倍 ---------end
+
+            if(_is_no_use_point_==0){
+                $pay_btn.attr("data-deduction_point",0);
+                $pay_btn.attr("data-deduction_guaranty",0);
+                $(".deduction_point").text(0);
+                $(".deduction_guaranty").text(0);
+                $(".deduction_point_box").hide();
+
+                $pay_btn.attr("data-guaranty",guaranty);
+
+                var m=Number(guaranty+_average_*_down_num_);
+                $pay_btn.attr("data-reality",m);
+                $pay_btn.attr("data-deserve",m);
+                $pay_btn.attr("data-activate_deposit",m);
+                $("#guarantee-cash").text(m);
+
+                test();
+                return
+            }
+            //减少的积分
+            var deduction_point=0;
+
+            //获取 当前 用户的积分
+            var use_point =$pay_btn.attr("data-use_point");
+            console.log("当前 用户的积分:"+use_point);
+
+            //最大抵扣的积分
+            var max_deduction_point=guaranty*0.5*10;
+            console.log("最大抵扣的积分:"+max_deduction_point);
+            if(max_deduction_point<=use_point){
+                //console.log("最大抵扣的积分 小于等于 用户的积分");
+                deduction_point=max_deduction_point;
+            }else if(max_deduction_point>use_point){
+                //console.log("最大抵扣的积分 大于 用户的积分");
+                deduction_point=use_point;
+            }
+
+            console.log("抵扣的积分："+deduction_point);
+
+            var deduction_guaranty=Number(deduction_point/10);
+            console.log("抵扣的保证金："+deduction_guaranty);
+
+            guaranty=Number(guaranty-(deduction_point/10));
+
+            $pay_btn.attr("data-guaranty",guaranty);
+            $pay_btn.attr("data-deduction_point",deduction_point);
+            $pay_btn.attr("data-deduction_guaranty",deduction_guaranty);
+            $(".deduction_point").text(deduction_point);
+            $(".deduction_guaranty").text(deduction_guaranty);
+
+            var m=Number(guaranty+_average_*_down_num_);
+            $pay_btn.attr("data-reality",m);
+            $pay_btn.attr("data-deserve",m);
+            $pay_btn.attr("data-activate_deposit",m);
+            $("#guarantee-cash").text(m);
+            $(".deduction_point_box").show();
+            test()
+            //guaranty=guaranty-use_point*
+
+        }
+
+        // 传参 打印
+
+        function test() {
+            console.log("-- 参数 -----------------------------------------------------------------------------")
+            var reality = $pay_btn.attr("data-reality");
+            console.log("reality：实付金额 :"+reality);
+
+            var deserve = $pay_btn.attr("data-deserve");
+            console.log("deserve：应付金额 :"+deserve);
+
+            var down_num = $pay_btn.attr("data-down_num");
+            console.log("down_num：底金次数 :"+down_num);
+
+            var guaranty = $pay_btn.attr("data-guaranty");
+            console.log("guaranty：保证金 :"+guaranty);
+
+            var down_payment = $pay_btn.attr("data-down_payment");
+            console.log("down_payment：总底金金额"+down_payment);
+
+            var average = $pay_btn.attr("data-average");
+            console.log("average：平均每次扣除的金额数 :"+average);
+
+            var activate_deposit = $pay_btn.attr("data-activate_deposit");
+            console.log("activate_deposit(down_payment+guaranty)：活动押金 :"+activate_deposit);
+
+            var coefficient = $pay_btn.attr("data-coefficient");
+            console.log("coefficient：基本系数 :"+coefficient);
+
+            var goal_day = $pay_btn.attr("data-goal_day");
+            console.log("goal_day：目标天数（7，14，21）:"+goal_day);
+
+            var goal_type = $pay_btn.attr("data-goal_type");
+            console.log("goal_type：活动类型（自由0，日常1）:"+goal_type);
+
+            var punch_attention = $pay_btn.attr("data-punch_attention");
+            console.log("punch_attention:是否打卡提醒，0不提醒，1提醒 :"+punch_attention);
+
+            var is_no_use_point = $pay_btn.attr("data-is_no_use_point");
+            console.log("is_no_use_point:是否使用积分抵扣 :"+is_no_use_point);
+
+            var distance = $pay_btn.attr("data-distance");
+            console.log("distance：自由模式的总距离数 :"+distance);
+
+            var kilos_day = $pay_btn.attr("data-kilos_day");
+            console.log("kilos_day:日常模式每日目标距离 :"+kilos_day);
+
+            var deduction_guaranty = $pay_btn.attr("data-deduction_guaranty");
+            console.log("deduction_guaranty：抵扣保证金 :"+deduction_guaranty);
+
+            var deduction_point = $pay_btn.attr("data-deduction_point");
+            console.log("deduction_point：抵扣积分 :"+deduction_point);
+
+            var coefficient_multiple= $pay_btn.attr("data-coefficient_multiple");
+            console.log("coefficient_multiple：系数倍数 :"+coefficient_multiple);
+
+        }
+
+        //jq 加载
+        $(function(){
+            // 选择模式
+            $(".setting-mode__button").click(function () {
+                // 将当前按钮设置为活动按钮
+                var active_btn = $(".setting-mode__button-active");
+                active_btn.removeClass("setting-mode__button-active");
+                $(this).addClass("setting-mode__button-active");
+
+                // 隐藏所有布局
+                $(".panel-layout").hide(); //自由模式
+                $(".gen-title-text").hide();
+                // 根据选择的种类打开不同的类别
+                //console.log(is_free_mode()); //自由模式 true ;日常模式 false
+
+                //重置 距离
+                distance_coefficient=0;
+                $(".mdl-slider").val(0);
+                $(".getUpEarly__add_coefficient").text(0);
+                $(".free__add_coefficient").text(0);
+
+                //重置 底金
+                $(".down_payment").removeClass("down_payment_active");
+                $(".down_payment_0").addClass("down_payment_active");
+                $(".down_payment_explain").hide();
+                _down_num_=0;
+
+                //重置 系数 倍数
+                $(".coefficient").removeClass("coefficient_active");
+                $(".coefficient_0").addClass("coefficient_active");
+                $(".coefficient_explain").hide();
+                coefficientTimes=1;
+                $pay_btn.attr("data-coefficient_multiple",coefficientTimes);
+
+
+                //重置 总系数
+                $("#all-coefficient-value").text(20);
+
+                //重置 总押金
+                $("#guarantee-cash").text(50);
+
+                //重置 积分 抵扣 保证金
+                $("#switch_score").removeAttr("checked");
+                _is_no_use_point_=0;
+
+                ////重置 打卡提醒
+                //$("#switch_remind").removeAttr("checked");
+                //_punch_attention_=0;
+
+
+                if(is_free_mode()){
+                    console.log("自由模式");
+                    //$(".down_payment_box").hide();
+                    $("#free-explain").show();
+                    $("#free-panel").show();
+                    $("#free-gen-title").show();
+
+                    // 重置 距离
+                    $("#free__distance-desc").text("5km/周");
+
+                    $pay_btn.attr("data-goal_type","0");
+                    $(".triangle_1").css("left","85%");
+                    $(".free_chenge_click").removeClass("active");
+                    $(".free_chenge_click_4").addClass("active");
+
+                    $pay_btn.attr("data-goal_type",0);
+                    $pay_btn.attr("data-goal_day",9999);
+                    var reality__=Number(50+_average_*_down_num_);
+                    var activate_deposit__=reality__;
+                    $pay_btn.attr("data-reality",reality__);
+                    $pay_btn.attr("data-deserve",reality__);
+                    $pay_btn.attr("data-activate_deposit",activate_deposit__);
+                    $pay_btn.attr("data-guaranty",50);
+
+                    $pay_btn.attr("data-distance",5);
+                    $pay_btn.attr("data-kilos_day",0);
+
+                    $pay_btn.attr("data-down_num",_down_num_);
+                    $pay_btn.attr("data-is_no_use_point",_is_no_use_point_);
+                    //$pay_btn.attr("data-punch_attention",_punch_attention_);
+                    console.log(distance_coefficient);
+                    var coefficient__=Number(coefficientTimes*20+distance_coefficient);
+                    $pay_btn.attr("data-coefficient",coefficient__);
+
+                    $("#guarantee-cash").text(reality__);
+
+                }
+                else{
+
+                    console.log("日常模式");
+                    $(".down_payment_box").show();
+                    $("#discipline-explain").show();
+                    $("#discipline-panel").show();
+                    $("#discipline-gen-title").show();
+                    $("#getUpEarly__distance-desc").text("1km");
+                    $pay_btn.attr("data-goal_type",1);
+                    $pay_btn.attr("data-goal_day",9999);
+
+                    $pay_btn.attr("data-kilos_day",1);
+                    $pay_btn.attr("data-distance",0);
+
+                    //_average_ 固定 10
+                    var reality__=50+_average_*_down_num_;
+                    var activate_deposit__=reality__;
+                    $pay_btn.attr("data-reality",reality__);
+                    $pay_btn.attr("data-deserve",reality__);
+                    $pay_btn.attr("data-activate_deposit",activate_deposit__);
+                    $pay_btn.attr("data-guaranty",50);
+
+                    $pay_btn.attr("data-down_num",_down_num_);
+                    $pay_btn.attr("data-is_no_use_point",_is_no_use_point_);
+                    //$pay_btn.attr("data-punch_attention",_punch_attention_);
+                    var coefficient__=Number(coefficientTimes*20+distance_coefficient);
+                    $pay_btn.attr("data-coefficient",coefficient__);
+
+                    $("#guarantee-cash").text(reality__);
+                }
+                test()
+            });
+
+
+            //进阶设置（更多设置）
+            $(".moreSettings").click(function () {
+                $(".moreSettings_box").toggleClass("hide");
+                $(this).find("a").toggleClass("font_orange_2")
+            });
+
+            // 点击 生成 目标
+            $("#gen-btn").click(function () {
+                $("#gen-popup").popup();
+                $("body").addClass("popup-open");
+                //$("#reality_price").text(parseFloat($("#pay-count").html().trim()).toFixed(2));
+
+                console.log("点击 生成 目标");
+                var chk = document.getElementById('weuiAgree');
+                chk.removeAttribute("checked");
+                $("#weuiAgree").removeAttr("checked");
+                console.log(chk.checked);
+
+                //var c=Number($("#all-coefficient-value").text()).toPrecision(2);
+                var m=Number($("#guarantee-cash").text()).toFixed(2);
+                $("#pay-count").text(m);
+                $("#reality_price").text(m);
+
+                /*
+                var chk = document.getElementById('weuiAgree');
+
+
+                var deserve_price=parseFloat($("#pay-count").html().trim()).toFixed(2);
+                var reality_price=deserve_price;
+
+                if (chk.checked) {
+                    //使用余额
+                    balance_price = Number(balance_price);
+                    if(deserve_price > balance_price){
+                        reality_price = deserve_price-balance_price;
+                    }else{
+                        reality_price=0.01;
+                    }
+
+                } else {
+                    //不使用余额
+                    reality_price=deserve_price;
+                }
+                $("#reality_price").text(parseFloat(reality_price).toFixed(2));
+                */
+            });
+
+            //是否使用 余额 切换
+            $("#weuiAgree").click(function () {
+                //console.log("点击");
+                var chk = document.getElementById('weuiAgree');
+                //var balance_price = Number("100");
+                var balance_price = Number("{{ balance }}");
+                console.log(balance_price);
+                var deserve_price=parseFloat($("#pay-count").html().trim()).toFixed(2);
+                var reality_price=deserve_price;
+
+                if (chk.checked) {
+                    //使用余额
+                    balance_price = Number(balance_price);
+                    if(deserve_price > balance_price){
+                        reality_price = deserve_price-balance_price;
+                    }else{
+                        reality_price=0.01;
+                    }
+
+                } else {
+                    //不使用余额
+                    reality_price=deserve_price;
+                }
+                $("#reality_price").text(parseFloat(reality_price).toFixed(2));
+
+            });
+            $("#pay-btn").click(function () {
+                    $.showLoading();
+
+                    $(".weui-toast_content").text("提交中...");
+
+                    var ccc="";
+                    var ddd="";
+                    if(is_free_mode()){
+                        ccc=$("#free__status-text").html().trim();
+                        ddd=$("#free__time-text").html().trim();
+                    }else{
+                        ccc=$("#discipline__status-text").html().trim();
+                        ddd=$("#discipline__time-text").html().trim();
+                    }
+                    var down_num=moneytimes_map[ddd];
+
+                    var moneyTimes = money_time_map[ccc];
+
+                    if(ccc == "尝 新"){
+                        //alert(ccc);
+                        if(ddd == "一 周"){
+                            moneyTimes=1;
+                            down_num =1;
+                        }else if (ddd == "二 周"){
+                            moneyTimes=2;
+                            down_num =2;
+                        }else if (ddd == "三 周"){
+                            moneyTimes=3;
+                            down_num =3;
+                        }
+                    }else{
+
+                    }
+
+
+                    //alert("金钱系数："+moneyTimes);
+
+                    // 底金
+                    var excess = parseFloat($("#discipline__excess-value").html()) * moneyTimes;
+
+
+                    // 保证金
+                    var deposit = parseFloat($("#discipline__deposit-value").html()) * moneyTimes;
+
+
+                    // 总系数
+                    var coefficient = parseFloat($("#all-coefficient-value").html());
+
+                    // 跑步类型
+                    var runningtype = "DES";
+                    // 目标天数
+                    var goalday = day__map[$("#discipline__time-text").html().trim()];
+
+                    // 模式
+                    var mode = mode_map[$("#discipline__status-text").html().trim()];
+
+                    // 目标距离
+                    var distance = parseFloat($("#discipline__distance-desc").html());
+                    // 免签卡
+                    //var avoid = parseInt($("#discipline__avoid-value").html());
+                    var option_docum = $("#discipline__avoid-text").html().trim();
+                    var avoid = parseInt(avoid_number_map[option_docum]);
+
+                    var price=parseInt($("#guarantee-cash").html());
+
+                    //实付金额 （扣除之后）
+                    var reality_price=parseFloat($("#pay-count").html());
+
+                    //应付金额 （）
+                    var deserve_price=parseFloat(reality_price);
+
+
+                    if(is_free_mode()){
+                        excess = parseFloat($("#free__excess-value").html())* moneyTimes;
+                        deposit = parseFloat($("#free__deposit-value").html())* moneyTimes;
+                        runningtype = "FREE";
+                        goalday = day__map[$("#free__time-text").html().trim()];
+                        mode = mode_map[$("#free__status-text").html().trim()];
+                        distance = parseFloat($("#free__distance-desc").html());
+                        avoid=0;
+                    }
+
+
+                    var chk = document.getElementById('weuiAgree');
+
+                    var balance_price = "{{ balance }}";
+                    var rem = 1;
+                    if (chk.checked) {
+                        //使用余额
+                        rem = 1;
+                        balance_price = parseFloat(Number(balance_price));
+                        if(deserve_price > balance_price){
+                            reality_price = parseFloat(Number(deserve_price*100-balance_price*100)/100);
+                        }else{
+                            reality_price=parseFloat(0.01);
+                        }
+                        //console.log("使用余额");
+                    } else {
+                        //不使用余额
+                        rem = 0;
+                        reality_price = deserve_price;
+                        //console.log("不使用余额");
+                    }
+
+
+
+                    //alert("底金次数"+down_num);
+
+                    console.log("保证金");
+                    console.log(deposit);
+
+                    //alert("保证金"+deposit);
+
+                    console.log("底金");
+                    console.log(excess);
+                    //alert("底金"+excess);
+
+
+                    console.log("总系数");
+                    console.log(coefficient);
+
+                    console.log("目标天数");
+                    console.log(goalday);
+                    //alert(goalday);
+
+                    console.log("模式");
+                    console.log(mode);
+
+                    console.log("距离");
+                    console.log(distance);
+                    //alert(distance);
+
+                    //实付金额 （扣除之后）
+                    console.log("实付金额 （扣除之后）");
+                    console.log(reality_price);
+
+                    //应付金额 （）
+                    console.log("应付金额");
+                    console.log(deserve_price);
+
+                    console.log($("#activity-get__id").html().trim());
+                    //$.hideLoading();
+                    console.log(avoid);
+                    //alert("免签数量："+avoid);
+
+                    //alert("实付金额 （扣除之后）："+reality_price);
+                    //alert("应付金额："+deserve_price);
+                    //alert("底金："+excess);
+                    //alert("保证金："+deposit);
+
+                    $.ajax({
+                        type: "post",
+                        url: "/api/create_goal",
+                        data:{
+                            activity : $("#activity-get__id").html().trim(),
+                            goal_type: runningtype,
+                            down_payment: excess,
+                            guaranty: deposit,
+                            coefficient: coefficient,
+                            mode: mode,
+                            goal_day: goalday,
+                            distance: distance,
+                            nosign: avoid,
+                            reality:reality_price,
+                            deserve:deserve_price,
+                            down_num:down_num
+                        },
+                        success: function (reponse) {
+                            //alert(reponse.rem);
+                            $.hideLoading();
+                            if(reponse.rem== "0"){
+                                $.toast("已参加活动！", "forbidden", function() {
+                                  //do something
+                                    //window.location.reload();
+                                    window.location.href = "/activity/index"
+                                });
+                                return
+                            }
+                            //console.log(reponse)
+                            //alert(reponse);
+                            //alert("实付金额 （扣除之后）"+reality_price);
+                            //alert("rem:"+rem);
+                            $.post('/wechatpay', {
+                                'goal': reponse['goal'],
+                                'reality':reality_price,
+                                'deserve':deserve_price,
+                                'rem':rem
+                            },function (response) {
+                                {% if DEBUG %}
+                                // 唤起微信支付接口
+                                    $.post('/payback', {
+                                        'goal':reponse['goal']
+                                    },function (res) {
+                                            // 重定向到分享页面
+                                        //alert("3");
+                                        //alert(reponse);
+                                        window.location.href = "/goal/share/" + reponse['goal'];
+                                    });
+                                {% else %}
+                                wx.chooseWXPay({
+                                    timestamp: response['timeStamp'], // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+                                    nonceStr: response['nonceStr'], // 支付签名随机串，不长于 32 位
+                                    package: response['package'], // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
+                                    signType: response['signType'], // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+                                    paySign: response['paySign'], // 支付签名
+                                    success: function (res) {
+                                        // 重定向到分享页面
+                                        window.location.href = "/goal/share/" + reponse['goal'];
+                                    }
+                                });
+                                {% endif %}
+                            })
+                        },
+                        error:function(reponse){
+                            //alert("错误");
+                            //alert(reponse);
+
+                            $.hideLoading();
+                            //console.log(reponse)
+                        }
+                    })
+                });
+
+        });
+
+
+        //点击目标距离
+        $(".mdl-slider").change(function () {
+            var min_dis = 1;
+            var max_dis = 5;
+            if(is_free_mode()){
+                min_dis = parseInt($("#free_distance-min").text().trim());
+                console.log(min_dis);
+                max_dis = min_dis * 5;
+            }
+
+            //以 0.5 为单位
+            var delta = (max_dis - min_dis) / 4;
+            //console.log($(this).val());
+            var dis = delta * parseInt($(this).val()) + min_dis;
+            console.log(dis);
+            var cofficient_value = (dis-1)*2.5.toFixed(1);
+            console.log(cofficient_value);
+            if(is_free_mode()) {
+                console.log("自由模式");
+                //dis=dis*5;
+                var free_distance_min=$("#free_distance-min").text();
+                console.log(dis);
+
+                cofficient_value = (dis/5-1)*2.5.toFixed(1);
+
+                console.log("系数："+cofficient_value);
+                $("#distance-max").text(max_dis);
+                $("#free__distance-desc,.detailed__distance_desc").text(dis+'km/周');
+                $(".free__add_coefficient").text(cofficient_value);
+
+                $pay_btn.attr("data-kilos_day",0);
+                $pay_btn.attr("data-distance",dis);
+
+            } else{
+                $("#getUpEarly__distance-desc").text(dis+'km/天');
+                $(".getUpEarly__add_coefficient").html(cofficient_value);
+
+                $pay_btn.attr("data-kilos_day",dis);
+                $pay_btn.attr("data-distance",0);
+            }
+
+            is_no_use_point();
+        });
+
+        //添加底金 切换
+        $(".down_payment").click(function () {
+            $(".down_payment").removeClass("down_payment_active");
+            $(this).addClass("down_payment_active");
+            //var data_down_payment=Number(0);
+            var data_reality=Number(0);
+            var data_down_payment=Number($(this).attr("data-down_payment"));
+            //var data_reality=Number($pay_btn.attr("data-reality"));
+            if(is_free_mode()) {
+                console.log("自由模式");
+                data_reality=Number($(".free_deposit").text())*coefficientTimes;
+
+            }else{
+                console.log("日常模式");
+                data_reality=Number($(".getUpEarly_deposit").text())*coefficientTimes;
+            }
+
+            console.log("保证金："+data_reality);
+            if(data_down_payment==0){
+                $(".down_payment_explain").hide();
+                $pay_btn.attr("data-down_payment",0);
+                $pay_btn.attr("data-down_num",0);
+                _down_num_=0;
+            }else if(data_down_payment==1){
+                $(".down_payment_explain").show();
+                $(".down_payment_Number").text("1次");
+                $pay_btn.attr("data-down_payment",10);
+                $pay_btn.attr("data-down_num",1);
+                _down_num_=1;
+            }else if(data_down_payment==2){
+                $(".down_payment_explain").show();
+                $(".down_payment_Number").text("2次");
+                $pay_btn.attr("data-down_payment",20);
+                $pay_btn.attr("data-down_num",2);
+                _down_num_=2;
+            }
+            var add_m=Number(_down_num_*10);
+            var a=Number(add_m+data_reality);
+            $pay_btn.attr("data-reality",a);
+            $pay_btn.attr("data-deserve",a);
+            $pay_btn.attr("data-activate_deposit",a);
+            $("#guarantee-cash").text(a);
+            is_no_use_point()
+        });
+
+        //添加系数 翻倍 切换
+        $(".coefficient").click(function () {
+            $(".coefficient").removeClass("coefficient_active");
+            $(this).addClass("coefficient_active");
+            coefficientTimes=$(this).attr("data-multiple");
+            $pay_btn.attr("data-coefficient_multiple",coefficientTimes);
+            console.log(coefficientTimes);
+
+            is_no_use_point()
+        });
+
+        //自由模式 周数选择
+        $(".free_chenge_click").click(function () {
+            $(".free_chenge_click").removeClass("free_active");
+            $(this).addClass("free_active");
+            var sta=$(this).attr("data-sta");
+            $(".free_coefficient").show();
+            $(".free_coefficient_4").hide();
+            if(sta=="4"){
+                console.log("选择无限");
+                $(".triangle_2").css("left","85%");
+                $pay_btn.attr("data-goal_day",9999);
+                $(".free_coefficient_4").show();
+                $(".free_coefficient").hide();
+                $(".down_payment_box").show();
+            }else if(sta=="1"){
+                console.log("7天");
+                $(".triangle_2").css("left","10%");
+                $pay_btn.attr("data-goal_day",7);
+                //重置 底金
+                $(".down_payment_box").hide();
+                $(".down_payment").removeClass("down_payment_active");
+                $(".down_payment_0").addClass("down_payment_active");
+                $(".down_payment_explain").hide();
+                $pay_btn.attr("data-down_payment",0);
+                $pay_btn.attr("data-down_num",0);
+                _down_num_=0;
+            }else if(sta=="2"){
+                console.log("14天");
+                $(".triangle_2").css("left","35%");
+                $pay_btn.attr("data-goal_day",14);
+                //重置 底金
+                $(".down_payment_box").hide();
+                $(".down_payment").removeClass("down_payment_active");
+                $(".down_payment_0").addClass("down_payment_active");
+                $(".down_payment_explain").hide();
+                $pay_btn.attr("data-down_payment",0);
+                $pay_btn.attr("data-down_num",0);
+                _down_num_=0;
+            }else if(sta=="3"){
+                console.log("21天");
+                $(".down_payment_box").hide();
+                $(".triangle_2").css("left","60%");
+                $pay_btn.attr("data-goal_day",21);
+                //重置 底金
+                $(".down_payment").removeClass("down_payment_active");
+                $(".down_payment_0").addClass("down_payment_active");
+                $(".down_payment_explain").hide();
+                _down_num_=0;
+                $pay_btn.attr("data-down_payment",0);
+                $pay_btn.attr("data-down_num",0);
+
+            }
+
+            var coefficient_=Number($(this).attr("data-coefficient"));
+            $pay_btn.attr("data-coefficient",coefficient_);
+            var deposit_=Number($(this).attr("data-deposit"));
+            var reality__=Number(deposit_+_average_*_down_num_);
+            var activate_deposit__=reality__;
+            $pay_btn.attr("data-reality",reality__);
+            $pay_btn.attr("data-deserve",reality__);
+            $pay_btn.attr("data-activate_deposit",activate_deposit__);
+            $pay_btn.attr("data-guaranty",deposit_);
+
+            var coefficient__=Number(coefficientTimes*(coefficient_+distance_coefficient));
+            $pay_btn.attr("data-coefficient",coefficient__);
+
+            $(".free_coefficient").text(coefficient_);
+            $(".free_deposit").text(deposit_);
+
+            $("#guarantee-cash").text(activate_deposit__);
+            $("#all-coefficient-value").text(coefficient__);
+
+            is_no_use_point()
+
+        });
+
+        //日常模式 周数选择
+        $(".getUpEarly_chenge_click").click(function () {
+            $(".getUpEarly_chenge_click").removeClass("getUpEarly_active");
+            $(this).addClass("getUpEarly_active");
+            var sta=$(this).attr("data-sta");
+            $(".getUpEarly_coefficient").show();
+            $(".getUpEarly_coefficient_4").hide();
+            if(sta=="4"){
+                console.log("选择无限");
+                $(".triangle_1").css("left","85%");
+                $pay_btn.attr("data-goal_day",9999);
+                $(".getUpEarly_coefficient_4").show();
+                $(".getUpEarly_coefficient").hide();
+            }else if(sta=="1"){
+                console.log("7天");
+                $(".triangle_1").css("left","10%");
+                $pay_btn.attr("data-goal_day",7);
+            }else if(sta=="2"){
+                console.log("14天");
+                $(".triangle_1").css("left","35%");
+                $pay_btn.attr("data-goal_day",14);
+            }else if(sta=="3"){
+                console.log("21天");
+                $(".triangle_1").css("left","60%");
+                $pay_btn.attr("data-goal_day",21);
+            }
+
+
+
+            var coefficient_=Number($(this).attr("data-coefficient"));
+
+
+            $pay_btn.attr("data-coefficient",coefficient_);
+            var deposit_=Number($(this).attr("data-deposit"));
+            var reality__=Number(deposit_+_average_*_down_num_);
+            var activate_deposit__=reality__;
+            $pay_btn.attr("data-reality",reality__);
+            $pay_btn.attr("data-deserve",reality__);
+            $pay_btn.attr("data-activate_deposit",activate_deposit__);
+            $pay_btn.attr("data-guaranty",deposit_);
+
+            var coefficient__=Number(coefficientTimes*(coefficient_+distance_coefficient));
+            $pay_btn.attr("data-coefficient",coefficient__);
+
+            $(".getUpEarly_coefficient").text(coefficient_);
+            $(".getUpEarly_deposit").text(deposit_);
+
+            $("#guarantee-cash").text(activate_deposit__);
+            $("#all-coefficient-value").text(coefficient__);
+            is_no_use_point()
+        });
+
+        //切换 打卡 提醒
+        $("#switch_remind").click(function () {
+            //console.log("切换 打卡 提醒");
+            var switch_remind = document.getElementById('switch_remind');
+            console.log(switch_remind.checked);
+            if(switch_remind.checked){
+                console.log("使用 打卡 提醒");
+                //是否打卡提醒，0不提醒，1提醒
+                _punch_attention_=1;
+                $pay_btn.attr("data-punch_attention",_punch_attention_);
+            }else{
+                _punch_attention_=0;
+                $pay_btn.attr("data-punch_attention",_punch_attention_);
+            }
+            //console.log("使用 打卡 提醒:"+_punch_attention_)
+        });
+
+        //切换 积分 抵扣
+        $("#switch_score").click(function () {
+            //console.log("切换 积分 抵扣");
+            var switch_score = document.getElementById('switch_score');
+            console.log(switch_score.checked);
+            if(switch_score.checked){
+                console.log("使用 积分 抵扣");
+                _is_no_use_point_=1;
+                $pay_btn.attr("data-is_no_use_point",_is_no_use_point_);
+            }else{
+                _is_no_use_point_=0;
+                $pay_btn.attr("data-is_no_use_point",_is_no_use_point_);
+                $pay_btn.attr("data-deduction_point",0);
+                $pay_btn.attr("data-deduction_guaranty",0);
+                $(".deduction_point_box").hide();
+            }
+
+            is_no_use_point()
+
+            //console.log("切换 积分 抵扣:"+_is_no_use_point_);
+
+        })
+
+    </script>
+    <script>
+        // 微信支付
+        //wx.ready(function() {
+            $("#pay-btn").click(function () {
+                $.showLoading();
+
+                $(".weui-toast_content").text("提交中...");
+
+
+
+                //实付金额 （扣除之后）
+                var reality_price=parseFloat($("#pay-count").html());
+
+                //应付金额 （）
+                var deserve_price=parseFloat(reality_price);
+
+                var chk = document.getElementById('weuiAgree');
+
+                //var balance_price = Number("100");
+                var balance_price = Number("{{ balance }}");
+                console.log(balance_price);
+                var rem = 1;
+                if (chk.checked) {
+                    //使用余额
+                    rem = 1;
+                    balance_price = parseFloat(Number(balance_price));
+                    if(deserve_price > balance_price){
+                        reality_price = parseFloat(Number(deserve_price*100-balance_price*100)/100);
+                    }else{
+                        reality_price=parseFloat(0.01);
+                    }
+                    //console.log("使用余额");
+                } else {
+                    //不使用余额
+                    rem = 0;
+                    reality_price = deserve_price;
+                    //console.log("不使用余额");
+                }
+
+                console.log("实付金额 （扣除之后）:"+reality_price);
+                console.log("应付金额:"+deserve_price);
+                console.log("rem:"+rem);
+
+                var down_num = $pay_btn.attr("data-down_num");
+                console.log("down_num：底金次数 :"+down_num);
+
+                var guaranty = $pay_btn.attr("data-guaranty");
+                console.log("guaranty：保证金 :"+guaranty);
+
+                var down_payment = $pay_btn.attr("data-down_payment");
+                console.log("down_payment：总底金金额"+down_payment);
+
+                var average = $pay_btn.attr("data-average");
+                console.log("average：平均每次扣除的金额数 :"+average);
+
+                var activate_deposit = $pay_btn.attr("data-activate_deposit");
+                console.log("activate_deposit(down_payment+guaranty)：活动押金 :"+activate_deposit);
+
+                var coefficient = $pay_btn.attr("data-coefficient");
+                console.log("coefficient：基本系数 :"+coefficient);
+
+                var goal_day = $pay_btn.attr("data-goal_day");
+                console.log("goal_day：目标天数（7，14，21）:"+goal_day);
+
+                var goal_type = $pay_btn.attr("data-goal_type");
+                console.log("goal_type：活动类型（自由0，日常1）:"+goal_type);
+
+                var punch_attention = $pay_btn.attr("data-punch_attention");
+                console.log("punch_attention:是否打卡提醒，0不提醒，1提醒 :"+punch_attention);
+
+                var is_no_use_point = $pay_btn.attr("data-is_no_use_point");
+                console.log("is_no_use_point:是否使用积分抵扣 :"+is_no_use_point);
+
+                var distance = $pay_btn.attr("data-distance");
+                console.log("distance：自由模式的总距离数 :"+distance);
+
+                var kilos_day = $pay_btn.attr("data-kilos_day");
+                console.log("kilos_day:日常模式每日目标距离 :"+kilos_day);
+
+                var deduction_guaranty = $pay_btn.attr("data-deduction_guaranty");
+                console.log("deduction_guaranty：抵扣保证金 :"+deduction_guaranty);
+
+                var deduction_point = $pay_btn.attr("data-deduction_point");
+                console.log("deduction_point：抵扣积分 :"+deduction_point);
+
+                var coefficient_multiple= $pay_btn.attr("data-coefficient_multiple");
+                console.log("coefficient_multiple：系数倍数 :"+coefficient_multiple);
+
+
+
+                var activity_id=$("#activity-get__id").html().trim();
+
+                $.ajax({
+                    type: "POST",
+                    url: "/api/create_run",
+                    data:{
+                        activity :activity_id,
+                        activity_type:"1",
+                        goal_type: goal_type,
+                        guaranty: guaranty,
+                        coefficient: coefficient,
+                        mode: "new",
+                        goal_day: goal_day,
+                        reality_price:reality_price,
+                        deserve_price:deserve_price,
+                        down_num:down_num,
+                        down_payment:down_payment,
+                        average:average,
+                        deduction_point:deduction_point,
+                        deduction_guaranty:deduction_guaranty,
+                        kilos_day:kilos_day,
+                        distance: distance,
+                        activate_deposit:activate_deposit,
+                        is_no_use_point:is_no_use_point,
+                        punch_attention:punch_attention,
+                        multiple:coefficient_multiple
+                    },
+                    success: function (reponse) {
+                        //alert(reponse.rem);
+                        $.hideLoading();
+                        if(reponse.rem== "0"){
+                            $.toast("已参加活动！", "forbidden", function() {
+                              //do something
+                                //window.location.reload();
+                                window.location.href = "/activity/index"
+                            });
+                            return
+                        }
+                        //console.log(reponse)
+                        //alert(reponse);
+                        //alert("实付金额 （扣除之后）"+reality_price);
+                        //alert("rem:"+rem);
+                        $.post('/wechatpay', {
+                            'goal': reponse['goal'],
+                            'reality_price':reality_price,
+                            'deserve_price':deserve_price,
+                            'rem':rem
+                        },function (response) {
+                            {% if DEBUG %}
+                            // 唤起微信支付接口
+                                $.post('/payback', {
+                                    'goal':reponse['goal']
+                                },function (res) {
+                                        // 重定向到分享页面
+                                    //alert("3");
+                                    //alert(reponse);
+                                    window.location.href = "/goal/share/" + reponse['goal'];
+                                });
+                            {% else %}
+                            wx.chooseWXPay({
+                                timestamp: response['timeStamp'], // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+                                nonceStr: response['nonceStr'], // 支付签名随机串，不长于 32 位
+                                package: response['package'], // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=\*\*\*）
+                                signType: response['signType'], // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+                                paySign: response['paySign'], // 支付签名
+                                success: function (res) {
+                                    // 重定向到分享页面
+                                    window.location.href = "/goal/share/" + reponse['goal'];
+                                }
+                            });
+                            {% endif %}
+                        })
+                    },
+                    error:function(reponse){
+                        //alert("错误");
+                        //alert(reponse);
+
+                        $.hideLoading();
+                        //console.log(reponse)
+                    }
+                })
+
+            });
+
+       // });
+        // 微信支付
+    </script>
+
+</body>
+
+</html>

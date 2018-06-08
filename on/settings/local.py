@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'on',
+    "celerytask"
+    # 'celery'
     # 'comments'
 
 ]
@@ -85,39 +87,20 @@ WSGI_APPLICATION = 'on.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'newdeploy',
-#         # 'NAME': 'deploy',
-#         'USER': 'root',
-#         'PASSWORD': 'wang',
-#         'HOST': '119.29.191.32',
-#         'PORT': '3306',
-#     }
-# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
+        # 'NAME': 'ridintest',
         'NAME': 'newdeploy',
         # 'NAME': 'deploy',
-
         'USER': 'root',
-        'PASSWORD': 'wang',
-        'HOST': '119.29.191.32',
+        'PASSWORD': 'Wei123..',
+        'HOST': '193.112.209.134',
         'PORT': '3306',
     }
 }
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'newdeploy',
-#         'USER': 'root',
-#         'PASSWORD': 'test',
-#         'HOST': '127.0.0.1',
-#         'PORT': '3306',
-#     }
-# }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
@@ -181,16 +164,8 @@ LANGUAGES = (
     ('zh-tw', u'繁體中文'),  # instead of 'zh-TW'
 )
 
-
-
-# BROKER_URL = 'amqp://'
-# CELERY_RESULT_BACKEND = 'amqp://'
 #
 # CELERY_TASK_SERIALIZER = 'json'
 # CELERY_RESULT_SERIALIZER = 'json'
-# CELERY_TIMEZONE = 'America/Los_Angeles'
-# CELERY_ENABLE_UTC = True
 #
-# CELERY_IMPORTS = ("tasks",)
-
-
+# CELERY_IMPORTS = ("celery",)

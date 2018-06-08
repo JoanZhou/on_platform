@@ -3770,7 +3770,7 @@ if (typeof define === 'function' && define.amd) {
       scrollTop = container.scrollTop()
     }
     var offset = container.scrollHeight() - ($(window).height() + scrollTop)
-    console.log(offset)
+    //console.log(offset)
     return offset
   }
 

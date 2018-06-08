@@ -150,14 +150,14 @@ LOGGING = {
             'formatter': 'verbose',
             # 'filename': '/home/ubuntu/weblog/error.log',
 
-            'filename': '/home/ws/weblog/error.log',
+            'filename': '/home/linux/weblog/error.log',
         },
         'infohandler': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
             'formatter': 'standard',
-            'filename': '/home/ws/weblog/info.log',
-
+            # 'filename': '/root/weblog/info.log',
+            'filename': '/home/linux/weblog/info.log',
             # 'filename': '/home/ubuntu/weblog/info.log',
         },
         'moneyhandler': {
@@ -165,8 +165,17 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'formatter': 'standard',
             # 'filename': '/home/ubuntu/weblog/money.log',
+            # /root/weblog
+            'filename': '/home/linux/weblog/money.log',
+            # 'filename': '/root/weblog/money.log',
+        },
+        'readtimerecord': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'formatter': 'standard',
+            # 'filename': '/home/ubuntu/weblog/read.log',
             #
-            'filename': '/home/ws/weblog/money.log',
+            'filename': '/home/linux/weblog/read.log',
         }
     },
     'loggers': {
@@ -188,6 +197,11 @@ LOGGING = {
             'handlers': ['moneyhandler'],
             'level': 'DEBUG',
             'propagate': True
+        },
+        'read': {
+            'handlers': ['readtimerecord'],
+            'level': 'DEBUG',
+            'propagate': True
         }
     },
 }
@@ -197,6 +211,4 @@ AVATAR_ROOT = '/static/avatar/'
 AVATAR_DIR = os.path.join(BASE_DIR, "../static/avatar")
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
-SESSION_COOKIE_AGE=60*60*2
-
-
+SESSION_COOKIE_AGE = 60 * 30

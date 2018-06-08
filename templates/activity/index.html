@@ -134,7 +134,42 @@
             left: 10%;
             display: none;
         }
+
+        .end_read {
+            transform:rotate(45deg);
+            -ms-transform:rotate(45deg); 	/* IE 9 */
+            -moz-transform:rotate(45deg); 	/* Firefox */
+            -webkit-transform:rotate(45deg); /* Safari 和 Chrome */
+            -o-transform:rotate(45deg); 	/* Opera */
+            position: absolute;
+            height: 20px;
+            right: -25px;
+            top: 10px;
+        }
+        .new_activity{
+            position: absolute;
+            width: 60px;
+            left:0px;
+            bottom:0px;
+        }
+        .activity .nav-card{
+            overflow: hidden;
+        }
+        .weui-navbar__item.weui-bar__item--on{
+            color: #666;
+            background-color: rgba(136,136,136,0);
+        }
+        .weui-navbar__item{
+            padding: 10px 0;
+        }
+        .weui-navbar__item {
+            color: #888;
+        }
+        .weui-navbar+.weui-tab__bd {
+            padding-top: 40px;
+        }
     </style>
+
 
 </head>
 
@@ -147,19 +182,38 @@
                 <div class="swiper-slide" data-link="#">
                     <img src="/static/images/swiper/swiper-1@2x.png" alt="https://mp.weixin.qq.com/cgi-bin/appmsg?begin=0&count=10&type=10&action=list_card&token=1726753336&lang=zh_CN">
                 </div>
+
                 <!--
                 <div class="swiper-slide" data-link="https://mp.weixin.qq.com/s?__biz=MzI2Mjc4OTU4Ng==&mid=2247483817&idx=1&sn=6855ad2314c6775f1d93aeed0814b9a7&chksm=ea448114dd33080228d4fd03d2d6756c708402146c09ed4be2b45d242d99cc53d87a3287f811#rd">
                     <img src="/static/images/swiper/lei@2x_1.jpg" alt="">
                 </div>
                 -->
+
+                <!--
                 <div class="swiper-slide" data-link="https://mp.weixin.qq.com/s?__biz=MzI2Mjc4OTU4Ng==&mid=2247483823&idx=1&sn=8c1bd6a19c8b7d52af2c6028f662ca5a&chksm=ea448112dd330804f1edc6876ca60b5fa93ed247805e398598d086efb19365e8eff3e15eff43#rd">
                     <img src="/static/images/swiper/InvitingFriends@2x.png" alt="">
                 </div>
-                <!--
-
                 -->
-                <div class="swiper-slide" data-link="https://mp.weixin.qq.com/s/EeqEBNizhRHBG2pI0oGnWw" style="">
-                    <img src="/static/images/swiper/swiper_read@2x.png" alt="">
+
+
+                <div class="swiper-slide" data-link="https://mp.weixin.qq.com/s/QDP2bsESexC_SFWXlOgSMw" style="">
+                    <img src="/static/images/swiper/swiper_5_29.jpg" alt="">
+                </div>
+
+
+                <!--
+                <div class="swiper-slide" data-link="#" style="">
+                    <img src="/static/images/ride/ride_banner@2x.png" alt="">
+                </div>
+
+                <div class="swiper-slide" data-link="#" style="">
+                    <img src="/static/images/walking/walking_banner@2x.png" alt="">
+                </div>
+                -->
+
+
+                <div class="swiper-slide" data-link="https://mp.weixin.qq.com/s/VdME4a_vVOEBvt3Q7u-1ow" style="">
+                    <img src="/static/images/sleeping/sleeping_banner@2x.png" alt="">
                 </div>
 
 
@@ -171,8 +225,8 @@
                 <span class="swiper-pagination-bullet"></span>
             </div>
         </div>
-        <!--标签页-->
 
+        <!--标签页-->
         <div class="tabpage-panel">
             <div class="weui-tab">
                 <div class="weui-navbar">
@@ -234,26 +288,46 @@
                                     -->
 
                                     {% for app in activities %}
-                                    <div class="col-xs-6 {% if app.is_no_start or user_id == 100259 or user_id == 100274 or user_id == 100267 or user_id == 100192 %}
+                                    <div class="col-xs-6 {% if app.is_no_start or user_id == 100259 or user_id == 100274 or user_id == 100267 or user_id == 100192 or user_id == 101077 %}
                                     activity {% else %} comingSoon
                                     {% endif %}
 
                                     {% if app.activity_type == "0" %}
                                          activity_type_0
-                                     {% elif app.activity_type == "1" %}
+                                    {% elif app.activity_type == "1" %}
                                          activity_type_1
-                                     {% elif app.activity_type == "2" %}
-                                         activity_type_2
-                                     {% else %}
+                                    {% elif app.activity_type == "2" %}
+                                         activity_type_2 hide
+                                    {% elif app.activity_type == "3" %}
+                                         activity_type_3
+                                    {% elif app.activity_type == "4" %}
+                                         activity_type_4
+                                    {% else %}
                                          activity_type__
                                     {% endif %}"
-                                            {% if app.is_no_start or user_id == 100259 or user_id == 100274 or user_id == 100267 or user_id == 100192 %} data-link="{{ app.activity_id|cut:'-' }}" data-sat=""{% else %}{% endif %}>
+                                            {% if app.is_no_start or user_id == 100259 or user_id == 100274 or user_id == 100267 or user_id == 100192 or user_id == 101077 %} data-link="{{ app.activity_id|cut:'-' }}" data-sat=""{% else %}{% endif %}>
+                                        <!--
+                                        goal.activity_type == "0"   作息
+                                        goal.activity_type == "1"   跑步
+                                        goal.activity_type == "2"   读书
+                                        goal.activity_type == "3"   步行
+                                        goal.activity_type == "4"   骑行
+                                        -->
                                         {% if app.activity_type == "0" %}
                                         <div class="nav-card"
-                                         style="background-image: url(/static/images/sleep_activity_bar.jpg);">
+                                         style="background-image: url(/static/images/sleeping/sleep_activity_bar@2x.png);">
                                         {% elif app.activity_type == "1" %}
                                         <div class="nav-card"
                                          style="background-image: url(/static/images/run_activity_bar.jpg);">
+                                        {% elif app.activity_type == "2" %}
+                                        <div class="nav-card"
+                                         style="background-image: url(/static/images/read/read_activity_bar@2x.png);">
+                                        {% elif app.activity_type == "3" %}
+                                        <div class="nav-card"
+                                         style="background-image: url(/static/images/walking/walking_activity_bar.jpg);">
+                                        {% elif app.activity_type == "4" %}
+                                        <div class="nav-card"
+                                         style="background-image: url(/static/images/ride/ride_activity_bar.jpg);">
                                         {% else %}
                                         <div class="nav-card"
                                          style="background-image: url(/static/images/read/read_activity_bar@2x.png);">
@@ -261,7 +335,27 @@
                                             <div>
                                                 <img src="/static/images/sleep_activity_bar.jpg" style="visibility: hidden;width: 100%">
                                             </div>
+
+
+                                        {% if app.activity_type == "0" %}
+
+                                            <div  class="new_activity hide" style="">
+                                                <img src="/static/images/sleeping/new_activity.png" style="width: 100%">
+                                            </div>
+                                        {% elif app.activity_type == "1" %}
+
+                                        {% elif app.activity_type == "2" %}
+                                            <div  class="end_read" style="">
+                                                <img src="/static/images/read/end_read@2x.png" style="height: 100%">
+                                            </div>
+                                        {% elif app.activity_type == "3" %}
+                                        {% elif app.activity_type == "4" %}
+                                        {% else %}
+
+                                        {% endif %}
+
                                         </div>
+
                                         <div class="card-progress">
                                             <div class="card-name">{{ app.description }}</div>
                                             <div class="card-tag">
@@ -293,37 +387,57 @@
                                 <div class="row row-eq-height">
                                     {% for app in activities %}
 
-                                    <!-- 显示作息活动 -->
-                                        {% if app.activity_type != "1" %}
+                                    <!-- 显示作息活动 、阅读活动-->
+                                        {% if app.activity_type == "0" or app.activity_type == "2"%}
                                         <div class="col-xs-6 {% if app.is_no_start %}activity {% else %} comingSoon{% endif %}" {% if app.is_no_start %} data-link="{{ app.activity_id|cut:'-' }}" data-sat=""{% else %}{% endif %} >
-                                            {% if app.activity_type == "0" %}
-                                                <div class="nav-card" href="#"
-                                                     style="background-image: url(/static/images/sleep_activity_bar.jpg);">
-                                            {% elif app.activity_type == "2" %}
-                                                <div class="nav-card" href="#"
-                                                     style="background-image: url(/static/images/read/read_activity_bar@2x.png);">
-                                            {% endif %}
+
+                                            <div class="nav-card" href="#" style="background-image:
+                                                {% if app.activity_type == "0" %}
+                                                         url(/static/images/sleeping/sleep_activity_bar@2x.png);
+                                                {% elif app.activity_type == "2" %}
+                                                         url(/static/images/read/read_activity_bar@2x.png);
+                                                {% endif %}">
                                                     <div>
                                                         <img src="/static/images/sleep_activity_bar.jpg" style="visibility: hidden;width: 100%">
                                                     </div>
+
+
+                                                    {% if app.activity_type == "0" %}
+                                                        <div  class="new_activity" style="display: none">
+                                                            <img src="/static/images/sleeping/new_activity.png" style="width: 100%">
+                                                        </div>
+
+                                                    {% elif app.activity_type == "1" %}
+
+                                                    {% elif app.activity_type == "2" %}
+                                                        <div  class="end_read" style="">
+                                                            <img src="/static/images/read/end_read@2x.png" style="height: 100%">
+                                                        </div>
+                                                    {% elif app.activity_type == "3" %}
+                                                    {% elif app.activity_type == "4" %}
+                                                    {% else %}
+
+                                                    {% endif %}
                                                 </div>
 
                                             <div class="card-progress">
                                                 <div class="card-name">{{ app.description }}</div>
                                                 <div class="card-tag">
                                                     {% if app.is_no_start %}
-                                                        <span><span class="span-text">{{ app.active_participants }}</span> 人参与  |</span>
+                                                        <span><span class="span-text">{{ app.active_participants }}</span> 人参与 </span>
                                                         {% if app.activity_type == "2" %}
-                                                        <span>累计节省 <span class="span-text">{{ app.bonus_all|floatformat:"0" }}</span> 元</span>
+{#                                                         | <span>累计节省 <span class="span-text">{{ app.bonus_all|floatformat:"0" }}</span> 元</span>#}
                                                         {% else %}
                                                         <span>奖金池 <span class="span-text">{{ app.bonus_all|floatformat:"0" }}</span> 元</span>
                                                         {% endif %}
                                                     {% else %}
                                                         <span>即将上线</span>
                                                     {% endif %}
-
                                                 </div>
+
+
                                             </div>
+
 
                                         </div>
                                         {% endif %}
@@ -370,11 +484,18 @@
                                 <div class="row row-eq-height">
 
                                     {% for app in activities %}
-                                    <!-- 显示跑步活动 -->
-                                        {% if app.activity_type == "1" %}
-                                        <div class="col-xs-6 activity" data-link="{{ app.activity_id|cut:'-' }}">
-                                            <div class="nav-card" href="#"
-                                                 style="background-image: url(/static/images/run_activity_bar.jpg);">
+                                    <!-- 显示跑步活动 步行 骑行-->
+                                        {% if app.activity_type == "1" or app.activity_type == "3" or app.activity_type == "4" %}
+                                        <div class="col-xs-6 {% if app.is_no_start %}activity {% else %} comingSoon{% endif %}" data-link="{{ app.activity_id|cut:'-' }}">
+                                            <div class="nav-card" href="#" style="background-image:
+                                            {% if app.activity_type == "1" %}
+                                                url(/static/images/run_activity_bar.jpg);
+                                            {% elif app.activity_type == "3" %}
+                                                url(/static/images/walking/walking_activity_bar.jpg);
+                                            {% elif app.activity_type == "4" %}
+                                                url(/static/images/ride/ride_activity_bar.jpg);
+                                            {% endif %}
+                                            ">
                                                 <div>
                                                     <img src="/static/images/sleep_activity_bar.jpg" style="visibility: hidden;width: 100%">
                                                 </div>
@@ -489,12 +610,14 @@
         <div class="hide_content">
             <div class="mask_on" style="display: none"></div>
             <div class="mask_on_1" style="display: none"></div>
-            <div class="mask_on__1" style=""></div>
+            <div class="mask_on__1" style="display: none"></div>
 
             {% if times == 0 %}
-                <div class="prompt_read">
+                <!--
+                <div class="prompt_read" style="">
                     <img src="/static/images/read/prompt_read_index_1@2x.png" style="width: 50%;">
                 </div>
+                -->
             {% endif %}
         </div>
 
@@ -503,19 +626,80 @@
     <script type="text/javascript" src="/static/js/fastclick.js"></script>
     <script type="text/javascript" src="/static/js/public.js"></script>
 
+
     <script>
         // fast click binding
         $(function () {
             FastClick.attach(document.body);
         });
         $("iframe").detach();
+        //登入记录
+        ajax_api_login_record();
+        function ajax_api_login_record() {
+            console.log("登入记录");
+            $.ajax({
+                type: "POST",
+                url: "/api/login_record",
+                data:{
+                   // "c_num":1
+                },
+                success: function (res) {
+                    //alert(res);
+                },
+                error:function(res){
+
+                },
+                complete: function(XMLHttpRequest, textStatus) {
+
+                }
+            });
+        }
     </script>
+    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+        <!--配置CSRF保护-->
+    <script>
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
+        });
+    </script>
+    <!--注入Config信息-->
+	<script>
+        {{ WechatJSConfig|safe}}
+        wx.ready(function() {
+            wx.hideAllNonBaseMenuItem();
+            wx.hideOptionMenu();
+        })
 
-
+	</script>
 
     <script>
+        $(".mask_on").click(function () {
+            $(this).hide();
+            $(".prompt_read").hide();
+            prompt_init_1()
+        });
+
+        $(".prompt_read").hide();
+        prompt_init_1();
+        function prompt_init_1() {
+            console.log("prompt_init_1");
+            $.ajax({
+                type: "POST",
+                url: "/api/in_homepage",
+                data:{},
+                success: function (res) {
+                    console.log(res);
+                    $.hideLoading();
+                    //console.log(res.winner.toString(0));
+                },
+                error:function(res){
+                    $.hideLoading();
+                }
+            })
+        }
 
         {% if times == 0 %}
+            /*
             $("body").addClass("overflow_hidden");
             $(".mask_on").show();
             $(".prompt_read").show();
@@ -528,6 +712,7 @@
             //console.log(H_swiper);
             var prompt_read_top=H_swiper+H_navbar+H_activity_type_2;
             $(".prompt_read").css("top",prompt_read_top);
+            */
 
 
             /*
@@ -565,8 +750,6 @@
 
     </script>
 
-{#    <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>#}
-{#    <script type="text/javascript" src="/static/js/material.min.js"></script>#}
     <script type="text/javascript" src="/static/js/index.js"></script>
     <script type='text/javascript' src='/static/js/swiper.min.js' charset='utf-8'></script>
 
@@ -614,69 +797,14 @@
             //weui-icon-warn weui-icon_toast
 
         });
+
         
-        $(".mask_on").click(function () {
-            $(this).hide();
-            $(".prompt_read").hide();
-            prompt_init_1()
-        })
-        function prompt_init_1() {
-            console.log("prompt_init_1");
-            $.ajax({
-                type: "POST",
-                url: "/api/in_homepage",
-                data:{},
-                success: function (res) {
-                    console.log(res);
-                    $.hideLoading();
-                    //console.log(res.winner.toString(0));
-                },
-                error:function(res){
-                    $.hideLoading();
-                }
-            })
-        }
+
 
     </script>
 
-<!--
-    <script>
 
-    {% if fools == 1 %}
-        {% if join == 1 %}
-            $("#aprilFool_1").attr("data-link","/foolsday/rank");
-        {% else %}
-            $("#aprilFool_1").attr("data-link","/foolsday/go");
-        {% endif %}
-        //获取日期
-        var date_=getNowFormatDate();
-        function getNowFormatDate() {
-            var date = new Date();
-            var month = String(date.getMonth() + 1);
-            var strDate = String(date.getDate());
-            var currentdate = month+"-"+strDate;
-            if(currentdate=="4-1" ){
-                return true
-            }else{
-                return false
-            }
-        }
-        console.log(date_);
-        if(date_){
-            console.log("是4月1号");
-            $("#aprilFool_1").show();
-        }else{
-            console.log("不是4月1号");
-            $("#aprilFool_1").attr("data-link","#");
-            $("#aprilFool_2").hide();
-        }
-    {% else %}
 
-    {% endif %}
-
-    </script>
-
-    -->
 
 </body>
 

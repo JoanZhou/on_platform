@@ -18,7 +18,7 @@
         <div class="box_content" style="background: url('/static/images/running/finish/success_bg@2x.png') no-repeat;background-size: cover;">
             <div class="head_img_box" style="height: 24%;display: block;
             background: url('/static/images/running/finish/success_head_img@2x.png') no-repeat;
-            background-size: cover;border-radius: 50%;margin:auto">
+            background-size: contain;border-radius: 50%;margin:auto">
                 <img src="{{ headimg }}" style="width: 86%;border-radius: 50%;margin-top:7%;margin-left: 7%;">
             </div>
 
@@ -42,7 +42,7 @@
         <div class="box_content" style="background: url('/static/images/running/finish/fail_bg@2x.png') no-repeat;background-size: cover;">
             <div class="head_img_box" style="height: 24%;display: block;
             background: url('/static/images/running/finish/fail_head_img@2x.png') no-repeat;
-            background-size: cover;border-radius: 50%;margin:auto">
+            border-radius: 50%;margin:auto;background-size: contain;">
                 <img src="{{ headimg }}" style="width: 86%;border-radius: 50%;margin-top:7%;margin-left: 7%;">
             </div>
 
@@ -217,6 +217,55 @@
                     $.ajax({
                         type: "POST",
                         url: "/api/delete_run_goal",
+                        data:{
+                            goal:$("#goal-id__get").html().trim(),
+                            goal_type:$("#goal-type__get").html().trim()
+                        },
+                        success: function (response) {
+                            if(response['status'] === 403){
+                                $.hideLoading();
+                                $.toast("结算失败<br/>请联系客服", 'cancel');
+                                setTimeout('window.location.href = \'/activity/index\';', 2000)
+                            }
+                            else if(response['status'] === 200){
+                                $.hideLoading();
+                                $.toast("结算成功!");
+                                setTimeout('window.location.href = \'/activity/index\';', 2000)
+                            }
+                        },
+                        error:function(response){
+                            $.hideLoading();
+                            $.toast("结算失败<br/>请联系客服", 'cancel');
+                            setTimeout('window.location.href = \'/activity/index\';', 2000)
+                        }
+                    });
+                    /*
+
+                    $.post('/api/delete_run_goal', {
+                        goal:$("#goal-id__get").html().trim(),
+                        goal_type:$("#goal-type__get").html().trim()
+                    },function (response) {
+                        if(response['status'] === 403){
+                            $.toast("结算失败,<br/>请联系客服", 'cancel');
+                            setTimeout('window.location.href = \'/activity/index\';', 2000)
+                        }
+                        else if(response['status'] === 200){
+                            $.toast("结算成功!");
+                            setTimeout('window.location.href = \'/activity/index\';', 2000)
+                        }
+                    });
+
+                    */
+                }else if(activities_type=="0"){
+
+                    /*
+                    $.toast("结算维护中<br/>请今天后重试", 'cancel');
+                    return
+                    */
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/delete_sleep_goal",
                         data:{
                             goal:$("#goal-id__get").html().trim(),
                             goal_type:$("#goal-type__get").html().trim()

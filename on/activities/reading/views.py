@@ -1,6 +1,4 @@
 from django.shortcuts import render
-from django.shortcuts import render
-from django.http import HttpResponse
 from on.user import UserInfo, UserTicket, UserAddress, UserOrder
 from on.models import Activity, ReadingGoal
 from on.activities.reading.models import BookInfo, ReadingGoal, ReadTime, ReadingPunchRecord, Saying, \
@@ -9,9 +7,19 @@ from on.errorviews import page_not_found
 from datetime import timedelta
 import django.utils.timezone as timezone
 from on.wechatconfig import get_wechat_config
-from on.views import fake_data
 import random
 import math
+
+
+# def activity_say(goal):
+# 	'''
+# 	1 通过goal 得到 activity_type
+# 	2 通过 activity_type 得到 Saying
+# 	'''
+# 	print('activity_type, ', str(goal.activity_type))
+# 	a_type = goal.activity_type
+# 	saying = Saying.objects.filter(activity_type=a_type).filter(id=random.randint(1, 4))
+# 	return saying
 
 
 def get_days(goal, goal_id):
@@ -30,8 +38,8 @@ def get_days(goal, goal_id):
     for i in range(day_index):
         # 开始的日期
         last = (goal.start_time + timedelta(days=i)).strftime("%Y-%m-%d")
-        saying = Saying.objects.filter(id=random.randint(1, 4))
-
+        saying = Saying.objects.filter(activity_type=2,id=random.randint(1, 30))
+        # saying = activity_say(goal)
         last_date = first_day + timedelta(days=i)
         # 从那天开始到那一天结束的时间
         # end = last_date + timedelta(days=1)
@@ -44,10 +52,7 @@ def get_days(goal, goal_id):
 
             # is_no_sign_in = goal.use_no_sign_in_date(i)
         # 判断是否是当天，格式是月份
-        if last_date == timezone.now().date():
-            is_day_now = True
-        else:
-            is_day_now = False
+        is_day_now = True if last_date == timezone.now().date() else False
         # 判断当天是否开始
         # dates.append({
         #         #     "weekday": days_set[last_date.weekday()],
@@ -146,7 +151,7 @@ def show_reading_goal(request, pk):
             person_goals = ReadingGoal.objects.filter(status="ACTIVE")[:5]
             persons = set()
             # TODO:FAKE
-            app = fake_data([app])[0]
+            # app = fake_data([app])[0]
             confirm = UserOrder.objects.filter(user_id=user.user_id, goal_id=goal_id)
             if confirm:
                 is_no_confirm = confirm[0].is_no_confirm
@@ -158,11 +163,11 @@ def show_reading_goal(request, pk):
                 persons.add(UserInfo.objects.get(user_id=person_goal.user_id))
 
             owen = Comments.objects.filter(user_id=user.user_id).order_by("-c_time")
-            comment_obj = Comments.objects.filter(is_delete=0).order_by("-c_time")
+            comment_obj = Comments.objects.filter(is_delete=0,is_top=1).order_by("-c_time")
             datas = []
             for comment in comment_obj:
                 report = ReadingPunchReport.objects.filter(punch_id=comment.id,user_id=user.user_id)
-                reply = Reply.objects.filter(other_id=comment.id)
+                reply = Reply.objects.filter(other_id=comment.id).order_by('id')
                 response = [{"content": i.r_content, "other_id": i.user_id, "nickname": i.get_user_message.nickname} for
                             i in reply] if len(reply) > 0 else ""
                 is_no_report = 1 if len(report) > 0 else 0
@@ -213,14 +218,14 @@ def show_reading_goal(request, pk):
             person_goals = ReadingGoal.objects.filter(status="ACTIVE")[:5]
             persons = set()
             # TODO:FAKE
-            app = fake_data([app])[0]
             for person_goal in person_goals:
                 persons.add(UserInfo.objects.get(user_id=person_goal.user_id))
             context = {
                 "WechatJSConfig": get_wechat_config(request),
                 "readinginfo": readinginfo,
                 "app": app,
-                "balance": user.balance
+                "balance": user.balance,
+                "user_id":user.user_id
             }
             return render(request, "activity/reading.html", context)
     else:
@@ -230,7 +235,6 @@ def show_reading_goal(request, pk):
         person_goals = ReadingGoal.objects.filter(status="ACTIVE")[:5]
         persons = set()
         # TODO:FAKE
-        app = fake_data([app])[0]
         for person_goal in person_goals:
             persons.add(UserInfo.objects.get(user_id=person_goal.user_id))
 

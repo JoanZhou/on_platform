@@ -1,33 +1,41 @@
+import base64
+import decimal
+import json
+import os
 import time
-import re
-import requests
-from django.shortcuts import render
 from datetime import timedelta
+from logging import getLogger
+
+import requests
 from django.conf import settings
-from django.http import HttpResponse, JsonResponse, HttpResponseNotFound
+from django.http import JsonResponse, HttpResponseNotFound
+from django.shortcuts import render
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
 from wechatpy.utils import random_string
-from selenium import webdriver
-from on.models import RunningGoal, RunningPunchRecord, SleepingGoal, SleepingPunchRecord, ReadingGoal, \
-    ReadingPunchRecord
 
 from on.activities.reading.models import ReadTime, BookInfo
-
+from on.models import SleepingGoal, ReadingGoal
+from on.activities.running.models import RunningPunchRecord, RunReply, RunningGoal, RunningPunchPraise, \
+    RunningPunchReport
+from on.activities.sleeping.models import SleepingPunchRecord, SleepingPunchPraise, ReplySleep, CommentSleep
+from on.activities.reading.models import ReadingPunchRecord, ReadingPunchPraise, Reply, Comments
+from on.activities.sleeping.models import SleepingPunchRecord, SleepingPunchPraise, ReplySleep
+from on.activities.reading.models import ReadingPunchRecord, ReadingPunchPraise, Reply
+from on.models import RunningGoal, RunningPunchRecord, SleepingGoal, SleepingPunchRecord, ReadingGoal, \
+    ReadingPunchRecord #, RidingGoal, RidingPunchRecord
+from on.settings.local import DEBUG
+from on.task import send_img
 from on.temp.push_template import do_push
-from on.temp.template_map import template
 from on.user import UserTicket, UserRecord, UserInfo, UserOrder
-from on.wechatconfig import mediaApiClient
-import os
-from django.views.decorators.csrf import csrf_exempt
-import base64
-from .QR_invite import user_qrcode
-import requests
-import json
-import decimal
-
+from .task import send_img_test
+# from on.activities.riding.punchrecord import RidingPunchRecord
+# from on.activities.riding.model import RidingGoal
 
 AppSecret = "23f0462bee8c56e09a2ac99321ed9952"
 AppId = "wx4495e2082f63f8ac"
+
+logger = getLogger("app")
 
 
 # 获取用户的access_token
@@ -135,7 +143,6 @@ def get_base(request):
 @csrf_exempt
 def running_sign_in_api(request):
     user = request.session["user"]
-    token = get_token()
 
     """
     跑步签到后端 API
@@ -144,11 +151,17 @@ def running_sign_in_api(request):
     """
     """获取随机数"""
     random = request.POST["random"]
-    print("第{}张图片".format(random))
-    # request.session['img_random'] = random
+    try:
+        resp = send_img.delay(user.user_id, random, user.wechat_id, "1")
+        print("第{}张图片的发送结果{}".format(random, resp))
+    except Exception as e:
+        print(e)
+        logger.error(e)
+
     """获取对应的目标的goal id"""
     goal_id = request.POST.get('goal', ' ')
     distance = float(request.POST.get('distance', 0))
+    print(distance, "从前端获取传递的距离")
     goal = RunningGoal.objects.get(goal_id=goal_id)
     """获取前端传递的两个路径"""
     file_filepath = request.POST.get("file_filepath")
@@ -158,8 +171,8 @@ def running_sign_in_api(request):
     """存储一段话"""
     document = request.POST.get("document", " ")
     # 如果是日常模式打卡，则规定distance必须为日常距离
-    if goal.goal_type:
-        distance = goal.kilos_day
+    # if goal.goal_type:
+    #     distance = goal.kilos_day
     """将打卡记录存储到数据库中,增加一段话"""
     punch = RunningPunchRecord.objects.create(goal=goal, voucher_ref=file_refpath, voucher_store=file_filepath,
                                               distance=distance,
@@ -196,16 +209,57 @@ def running_sign_in_api(request):
             data = punch_success(user.wechat_id, url, first, punch_time, punch_day, days)
             print("{}用户开始打卡".format(user.user_id))
             do_push(data)
-            screen_time = timezone.now().strftime("%Y%m%d")
-            random_str = random_string(9)
-            user_id = user.user_id
-            openid = user.wechat_id
-            # print("任务开始")
-            from on.celerytask.tasks import send_img
-            send_img.delay(user_id, openid, screen_time, random_str, token)
         except Exception as e:
             print(e)
+            logger.error(e)
     return JsonResponse({"status": 200})
+
+
+@csrf_exempt
+def run_test(request):
+    print("开始打卡")
+    """
+        跑步签到后端 API
+        :param request:
+        :return:
+        """
+    """获取随机数"""
+    user = request.session.get("user")
+    random = request.POST.get("random")
+    try:
+        resp = send_img.delay(user.user_id, random, user.wechat_id, "1")
+        print("第{}张图片的发送结果{}".format(random, resp))
+    except Exception as e:
+        print(e)
+        logger.error(e)
+    """获取对应的目标的goal id"""
+    goal_id = request.POST.get('goal', ' ')
+    distance = float(request.POST.get('distance', 0))
+    print(distance, user.user_id)
+    goal = RunningGoal.objects.get(goal_id=goal_id)
+    """获取前端传递的两个路径"""
+    file_filepath = request.POST.get("file_filepath")
+
+    file_refpath = request.POST.get("file_refpath")
+    document = request.POST.get("document", " ")
+    """获取当前的时间"""
+    punch_time = timezone.now()
+    print("获取参数完成")
+    try:
+        punch = RunningPunchRecord.objects.create_run_redord(goal=goal,
+                                                             user_id=user.user_id,
+                                                             voucher_ref=file_refpath,
+                                                             voucher_store=file_filepath,
+                                                             distance=distance,
+                                                             record_time=punch_time,
+                                                             document=document)
+        if punch:
+            goal.punch_day += 1
+            goal.save()
+        return JsonResponse({"status": 200})
+    except Exception as e:
+        logger.error(e)
+        return JsonResponse({"status": 405})
 
 
 # 重新上传打卡图片
@@ -247,7 +301,7 @@ def upload_again(request):
         return HttpResponseNotFound
 
 
-# 跑步面签api
+# 跑步免签api
 def running_no_sign_in_handler(request):
     if request.POST:
         goal = request.POST['goal']
@@ -322,52 +376,85 @@ def sleeping_delay_handler(request):
 
 
 # 作息睡觉打卡
+@csrf_exempt
 def sleeping_sleep_handler(request):
     if request.POST:
-        user = request.session['user']
-        # 查询当前打卡用户的openid
-        openid = user.wechat_id
-        # 查询用户的nickname
-        nickname = user.nickname
-        goal_id = request.POST['goal']
-        goal = SleepingGoal.objects.get(goal_id=goal_id)
-        # 当前用户的打卡时间
-        punch_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-        # 如果record无误，则打卡成功；否则打卡失败
-        record = SleepingPunchRecord.objects.create_sleep_record(goal=goal)
-        remark_msg = "记得明天早晨也要打卡哦"
-        if record:
 
-            return JsonResponse({'status': 200,
-                                 'time': record.before_sleep_time.time().strftime("%H:%M")})
-        else:
-            return JsonResponse({'status': 201})
+        user = request.session.get("user")
+        goal_id = request.POST['goal']
+        random = int(request.POST.get("random"))
+        sleep_type = int(request.POST.get("sleep_type"))
+        # if not all([goal_id,sleep_type]):
+        #     return JsonResponse({"status":403,"errmsg":"数据不完整"})
+        goal = SleepingGoal.objects.get(goal_id=goal_id)
+        record = ""
+        try:
+            if DEBUG:
+                if sleep_type == 0:
+                    # 如果record无误，则打卡成功；否则打卡失败
+                    record = SleepingPunchRecord.objects.create_sleep_record(goal=goal, sleep_type=sleep_type,
+                                                                             user_id=user.user_id)
+                    send_img.delay(user.user_id, random, user.wechat_id, "0")
+                    print("第{}张图片的发送结果".format(random))
+                elif sleep_type == 1:
+                    record = SleepingPunchRecord.objects.update_getup_record(goal=goal, sleep_type=sleep_type,
+                                                                             user_id=user.user_id)
+                    send_img.delay(user.user_id, random, user.wechat_id, "0")
+                    print("第{}张图片的发送结果".format(random))
+                if record:
+                    return JsonResponse({'status': 200})
+                else:
+                    return JsonResponse({'status': 201})
+            else:
+
+                if sleep_type == 0:
+                    # 如果record无误，则打卡成功；否则打卡失败
+                    record = SleepingPunchRecord.objects.create_sleep_record(goal=goal, sleep_type=sleep_type,
+                                                                             user_id=user.user_id)
+                    send_img.delay(user.user_id, random, user.wechat_id, "0")
+                    print("第{}张图片的发送结果".format(random))
+                elif sleep_type == 1:
+                    record = SleepingPunchRecord.objects.update_getup_record(goal=goal, sleep_type=sleep_type,
+                                                                             user_id=user.user_id)
+                    send_img.delay(user.user_id, random, user.wechat_id, "0")
+                    print("第{}张图片的发送结果".format(random))
+
+                if record:
+                    return JsonResponse({'status': 200})
+                else:
+                    return JsonResponse({'status': 201})
+        except Exception as e:
+            print(e)
+            logger.error(e)
+            return JsonResponse({"status": 403})
+
     else:
-        return HttpResponseNotFound
+        return JsonResponse({"status": 403})
 
 
-# 作息起床打卡
-def sleeping_getup_handler(request):
-    if request.POST:
-        user = request.session['user']
-        # 查询当前打卡用户的openid
-        openid = user.wechat_id
-        # 查询用户的nickname
-        nickname = user.nickname
-        goal_id = request.POST['goal']
-        goal = SleepingGoal.objects.get(goal_id=goal_id)
-        punch_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+# @csrf_exempt
+# def get_up_time_record(request):
+#     if request.POST:
 
-        # 如果record无误，则返回早起时间；否则打卡失败
-        record = goal.punch.update_getup_record()
-        remark_msg = ""
-        if record:
-            return JsonResponse({'status': 200,
-                                 'getuptime': record.get_up_time.time().strftime("%H:%M"),
-                                 'checktime': record.check_time.time().strftime("%H:%M")})
-        else:
 
-            return JsonResponse({'status': 201})
+# # 作息起床打卡
+# def sleeping_getup_handler(request):
+#     if request.POST:
+#         user = request.session['user']
+#         goal_id = request.POST['goal']
+#         goal = SleepingGoal.objects.get(goal_id=goal_id)
+#         punch_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+#
+#         # 如果record无误，则返回早起时间；否则打卡失败
+#         record = goal.punch.update_getup_record()
+#         remark_msg = ""
+#         if record:
+#             return JsonResponse({'status': 200,
+#                                  'getuptime': record.get_up_time.time().strftime("%H:%M"),
+#                                  'checktime': record.check_time.time().strftime("%H:%M")})
+#         else:
+#
+#             return JsonResponse({'status': 201})
 
 
 # 作息确认打卡
@@ -375,9 +462,7 @@ def sleeping_confirm_handler(request):
     if request.POST:
         user = request.session['user']
         # 查询当前打卡用户的openid
-        openid = user.wechat_id
         # 查询用户的nickname
-        nickname = user.nickname
         goal_id = request.POST['goal']
         goal = SleepingGoal.objects.get(goal_id=goal_id)
         punch_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
@@ -421,7 +506,6 @@ def reading_start_handler(request):
         return HttpResponseNotFound
 
 
-#
 # 书籍阅读打卡
 @csrf_exempt
 def reading_record_handler(request):
@@ -442,7 +526,6 @@ def reading_record_handler(request):
                 return JsonResponse({"status": 201, "errmsg": "参数不完整"})
             punch_id = ReadingPunchRecord.objects.filter(record_time=timezone.now().strftime("%Y-%m-%d"),
                                                          user_id=user.user_id)
-            print(punch_id, 11111111111111111111111111)
             book = BookInfo.objects.get(book_id=book_id)
             suggest_day = book.suggest_day
             page_num = book.page_num
@@ -450,7 +533,6 @@ def reading_record_handler(request):
             # 每页的金额数
             page_avg = decimal.Decimal(guaranty / page_num)
             record_time = timezone.now().strftime("%Y-%m-%d")
-            print("金额计算成功")
             # 新建一个阅读记录，并返回返回值
             punch = ReadingPunchRecord.objects.create_record(goal_id=goal_id,
                                                              today_page=page,
@@ -460,8 +542,8 @@ def reading_record_handler(request):
                                                              punch_id=punch_id,
                                                              user_id=user.user_id,
                                                              suggest_day=suggest_day)
-            print(punch,"当前的读书系数")
-            return JsonResponse({"status": 200,"punch":punch})
+            print(punch, "当前的读书系数")
+            return JsonResponse({"status": 200, "punch": punch})
         except Exception as e:
             print(e)
     else:
@@ -530,9 +612,8 @@ def give_up_read(request):
 @csrf_exempt
 def delete_comments(request):
     from on.activities.reading.models import Comments
-    user = request.session.get("user")
-    print("开始删除")
     if request.POST:
+        user = request.session.get("user")
         id = request.POST.get("id")
         try:
             Comments.objects.filter(id=id).update(is_delete=1)
@@ -547,18 +628,14 @@ def delete_comments(request):
 # 存储用户评论
 @csrf_exempt
 def save_comments(request):
-    print("用户开始评论")
     from on.activities.reading.models import Comments
     user = request.session.get("user")
     time_now = timezone.now().strftime("%Y-%m-%d %H:%M")
     if request.POST:
         try:
             content = request.POST.get("content")
-            print(content)
             voucher_ref = request.POST.get("voucher_ref")
-            print(voucher_ref)
             voucher_store = request.POST.get("voucher_store")
-            print(voucher_store)
             # 若用户表不存在，则先给用户创建一个jilu
             Comments.objects.create(user=user, content=content, voucher_ref=voucher_ref, voucher_store=voucher_store,
                                     c_time=time_now)
@@ -575,9 +652,8 @@ def save_comments(request):
 @csrf_exempt
 def read_prise(request):
     from on.activities.reading.models import Comments
-
-    user = request.session.get("user")
     if request.POST:
+        user = request.session.get("user")
         id = request.POST.get("id")
         try:
             Comments.objects.praise_comment(user_id=user.user_id, punch_id=id)
@@ -607,27 +683,247 @@ def read_report(request):
         return JsonResponse({"status": 401})
 
 
+def get_ten_list(c_num, comm_list):
+    has_next = 1
+    # 评论的数量qq@
+    c_count = len(comm_list)
+    # 要调整绕的条数
+    finish = c_num + 10
+    if c_count >= finish:
+        comm_list = comm_list[c_num:finish]
+    else:
+        has_next = 0
+        comm_list = comm_list[c_num:c_count]
+    return has_next, comm_list, finish
+
+
+def comment_message(comm_list, reply_obj, prase_obj, user):
+    cont = []
+    for comm in comm_list:
+        reply = reply_obj.objects.filter(other_id=str(comm.id))
+        response = [{"content": i.r_content, "other_id": i.user_id, "nickname": i.get_user_message.nickname} for
+                    i in reply] if len(reply) > 0 else ""
+
+        prise = prase_obj.objects.filter(punch_id=comm.id, user_id=user.user_id)
+
+        is_no_prise = 1 if len(prise) > 0 else 0
+        ref = comm.voucher_ref.split(",") if len(comm.voucher_ref) > 0 else ""
+        top = comm.is_top
+        if top == True or top == 0 and comm.is_delete == False or comm.is_delete == 0:
+            cont.append({
+                "id": str(comm.id),
+                'user_id': str(comm.user_id),
+                "content": comm.content.decode(),
+                "c_time": str(comm.c_time),
+                "prise": comm.prise,
+                "report": comm.report,
+                "voucher_ref": ref,
+                "is_top": comm.is_top,
+                "headimgurl": comm.get_some_message.headimgurl,
+                "nickname": comm.get_some_message.nickname,
+                "is_no_prise": is_no_prise,
+                "reply_data": response
+            })
+    return cont
+
+
+def load_sleep(c_num, user):
+    from on.activities.sleeping.models import CommentSleep, ReplySleep, SleepingPunchPraise
+    comm_list = CommentSleep.objects.all().order_by('-c_time')
+    try:
+        has_next, comm_list, finish = get_ten_list(c_num, comm_list)
+        cont = comment_message(comm_list, ReplySleep, SleepingPunchPraise, user)
+        return cont, has_next, finish
+    except Exception as e:
+        logger.error(e)
+        print(e)
+
+
+def load_riding(c_num, user):
+    from on.activities.riding.model import CommentRiding, RidingReply, RidingPunchPraise
+    comm_list = CommentRiding.objects.all().order_by('-c_time')
+    try:
+        has_next, comm_list, finish = get_ten_list(c_num, comm_list)
+        cont = comment_message(comm_list, RidingReply, RidingPunchPraise, user)
+        return cont, has_next, finish
+    except Exception as e:
+        logger.error(e)
+        print(e)
+
+
+def load_read(c_num, user):
+    from on.activities.reading.models import Comments, Reply, ReadingPunchPraise
+    comm_list = Comments.objects.all().order_by('-c_time')
+    try:
+        has_next, comm_list, finish = get_ten_list(c_num, comm_list)
+        cont = comment_message(comm_list, Reply, ReadingPunchPraise, user)
+        return cont, has_next, finish
+    except Exception as e:
+        print(e)
+        logger.error(e)
+
+
+def load_run(c_num, user):
+    from on.activities.running.models import RunningPunchRecord, RunReply, RunningGoal, RunningPunchPraise, \
+        RunningPunchReport
+
+    comm_list = RunningPunchRecord.objects.all().order_by("-record_time")
+    has_next = 1
+    # 评论的数量qq@
+    c_count = len(comm_list)
+    # 要调整绕的条数
+    finish = c_num + 10
+    if c_count >= finish:
+        comm_list = comm_list[c_num:finish]
+    else:
+        has_next = 0
+        comm_list = comm_list[c_num:c_count]
+    datas = []
+    for comm in comm_list:
+        every_user = UserInfo.objects.get(user_id=comm.goal.user_id)
+        report = RunningPunchReport.objects.filter(punch_id=comm.punch_id)
+        reply = RunReply.objects.filter(other_id=str(comm.punch_id).replace("-", ""))
+        # print("用户回复的条数", len(reply), reply, comm.punch_id)
+        response = [{"content": i.r_content, "other_id": i.user_id, "nickname": user.nickname} for
+                    i in reply] if len(reply) > 0 else ""
+        # print(response, "用户回复的内容")
+        is_no_report = 1 if len(report) > 0 else 0
+        prise = RunningPunchPraise.objects.filter(punch_id=comm.punch_id, user_id=user.user_id)
+        is_no_prise = 1 if len(prise) > 0 else 0
+        ref = comm.voucher_ref.split(",") if len(comm.voucher_ref) > 0 else ""
+        nickname = every_user.nickname
+        datas.append({
+            'user_id': str(comm.goal.user_id),
+            "punch_id": str(comm.punch_id),
+            "content": comm.document,
+            "c_time": str(comm.record_time),
+            "prise": comm.praise,
+            "report": comm.report,
+            "voucher_ref": ref,
+            "headimgurl": every_user.headimgurl,
+            "nickname": nickname,
+            "is_no_report": is_no_report,
+            "is_no_prise": is_no_prise,
+            "reply_data": response,
+            "distance": comm.distance
+        })
+    return datas, has_next, finish
+
+
+def get_mine(user_id, punchrecord_obj, reply_obj, prase_obj):
+    mine = []
+    comm_list = punchrecord_obj.objects.filter(user_id=user_id)
+    for comm in comm_list:
+        reply = reply_obj.objects.filter(other_id=str(comm.id))
+        response = [{"content": i.r_content, "other_id": i.user_id, "nickname": i.get_user_message.nickname} for
+                    i in reply] if len(reply) > 0 else ""
+
+        prise = prase_obj.objects.filter(punch_id=comm.id, user_id=user_id)
+
+        is_no_prise = 1 if len(prise) > 0 else 0
+        ref = comm.voucher_ref.split(",") if len(comm.voucher_ref) > 0 else ""
+        top = comm.is_top
+        mine.append({
+            "id": str(comm.id),
+            'user_id': str(comm.user_id),
+            "content": comm.content.decode(),
+            "c_time": str(comm.c_time),
+            "prise": comm.prise,
+            "report": comm.report,
+            "voucher_ref": ref,
+            "is_top": top,
+            "headimgurl": comm.get_some_message.headimgurl,
+            "nickname": comm.get_some_message.nickname,
+            "is_no_prise": is_no_prise,
+            "reply_data": response
+        })
+    return mine
+
+
+@csrf_exempt
+def load_mine(request):
+    if request.method == "POST":
+        try:
+            user = request.session.get("user")
+            user_id = user.user_id
+            activity_type = int(request.POST.get("activity_type"))
+            # print(activity_type, type(activity_type))
+            mine = []
+            if activity_type == 1:
+
+                nickname = user.nickname
+                headimgurl = user.headimgurl
+                comm_list = RunningPunchRecord.objects.filter(goal__user_id=user_id).order_by("-record_time")
+                mine = []
+                for comm in comm_list:
+                    report = RunningPunchReport.objects.filter(punch_id=str(comm.punch_id).replace("-", ""))
+                    reply = RunReply.objects.filter(other_id=str(comm.punch_id).replace("-", ""))
+                    response = [{"content": i.r_content, "other_id": i.user_id, "nickname": i.get_user_message.nickname}
+                                for
+                                i in reply] if len(reply) > 0 else ""
+                    is_no_report = 1 if len(report) > 0 else 0
+                    prise = RunningPunchPraise.objects.filter(punch_id=comm.punch_id, user_id=user_id)
+                    is_no_prise = 1 if len(prise) > 0 else 0
+                    ref = comm.voucher_ref.split(",") if len(comm.voucher_ref) > 0 else ""
+                    mine.append({
+                        'user_id': str(comm.goal.user_id),
+                        "punch_id": str(comm.punch_id),
+                        "content": comm.document,
+                        "c_time": str(comm.record_time),
+                        "prise": comm.praise,
+                        "report": comm.report,
+                        "voucher_ref": ref,
+                        "headimgurl": headimgurl,
+                        "nickname": nickname,
+                        "is_no_report": is_no_report,
+                        "is_no_prise": is_no_prise,
+                        "reply_data": response,
+                        "distance": comm.distance
+                    })
+            elif activity_type == 0:
+
+                mine = get_mine(user_id=user_id, prase_obj=SleepingPunchPraise, punchrecord_obj=CommentSleep,
+                                reply_obj=ReplySleep)
+            elif activity_type == 2:
+
+                mine = get_mine(user_id=user_id, prase_obj=ReadingPunchPraise, punchrecord_obj=Comments,
+                                reply_obj=Reply)
+            return JsonResponse({"status": 200, "mine": json.dumps(mine)})
+        except RunningPunchRecord.DoesNotExist as e:
+            print(e)
+            return JsonResponse({"status": 404, "errmsg": "没有查询到该用户的打卡记录"})
+        except Exception as e:
+            logger.error(e)
+            print(e)
+            return JsonResponse({"status": 405})
+
+
+#
 @csrf_exempt
 def load_comments(request):
-    from on.activities.reading.models import Comments
-    if request.POST:
+    if request.method == 'POST':
+        user = request.session.get("user")
+        user_id = user.user_id
         # 当前是第几条
         c_num = int(request.POST.get("c_num"))
-        comm_list = Comments.objects.all().order_by('-c_time')
-        # 评论的数量
-        c_count = len(comm_list)
-        # 要调整绕的条数
-        finish = c_num + 10
-        if c_count >= finish:
-            is_final = 1
-            is_final = is_final
-            comm_list = comm_list[c_num:finish]
-        else:
-            is_final = 0
-            comm_list = comm_list[c_num:c_count]
-        print(is_final,comm_list)
-        # return JsonResponse({"status": 200, "is_final": is_final ,"comm_list": comm_list})
-        return JsonResponse({"status": 200,"finish":finish})
+        activate_type = int(request.POST.get("activate_type"))
+        try:
+            finish = None
+            cont = None
+            has_next = None
+            if activate_type == 2:
+                cont, has_next, finish = load_read(c_num, user)
+            elif activate_type == 0:
+                cont, has_next, finish = load_sleep(c_num, user)
+            elif activate_type == 1:
+                cont, has_next, finish = load_run(c_num, user)
+            elif activate_type == 4:
+                cont, has_next, finish = load_riding(c_num, user)
+            return JsonResponse({"status": 200, "cont": json.dumps(cont), "has_next": has_next, "finish": finish})
+        except Exception as e:
+            logger.error(e)
+            print(e)
+            return JsonResponse({"status": 405})
 
     return JsonResponse({"status": 403})
 
@@ -636,7 +932,135 @@ def load_comments(request):
 def num_test(request):
     return render(request, 'user/test.html')
 
-#用户评论回复
+
+# def send_img(user_id,random,openid,activity_type):
+@csrf_exempt
+def update_all_profit(request):
+    from on.user import BonusRank
+    sleep = SleepingGoal.objects.all()
+    for user in sleep:
+        money = user.bonus + user.extra_earn
+        rank = BonusRank.objects.filter(user_id=user.user_id)
+        if rank:
+            rank = rank[0]
+            rank.sleep = money
+            rank.save()
+        else:
+            BonusRank.objects.create(user_id=user.user_id, sleep=money)
+    print("睡眠活动成功")
+    run = RunningGoal.objects.all()
+    for user in run:
+        money = user.bonus + user.extra_earn
+        rank = BonusRank.objects.filter(user_id=user.user_id)
+        if rank:
+            rank = rank[0]
+            rank.run = money
+            rank.save()
+        else:
+            BonusRank.objects.create(user_id=user.user_id, run=money)
+    print("跑步活动成功")
+    read = ReadingGoal.objects.all()
+    for user in read:
+        money = user.bonus + user.extra_earn
+        rank = BonusRank.objects.filter(user_id=user.user_id)
+        if rank:
+            rank = rank[0]
+            rank.read = money
+            rank.save()
+        else:
+            BonusRank.objects.create(user_id=user.user_id, read=money)
+    print("读书活动成功")
+    return JsonResponse({"status": 200})
+
+
+@csrf_exempt
+def update_punchday(request):
+    # from on.activities.sleeping.models import Coefficient
+    # sleep = SleepingGoal.objects.filter(status="ACTIVE")
+    # for user in sleep:
+    #     # punch = SleepingPunchRecord.objects.filter(user_id=user.user_id, get_up_time__isnull=False)
+    #     # user.punch_day = int(len(punch))
+    #     # user.save()
+    #     if user.goal_day>30:
+    #         coeff = Coefficient.objects.get(user_id=user.user_id)
+    #         if user.sleep_type == 1:
+    #             if coeff.new_coeff > 0:
+    #                 coeff.new_coeff -= decimal.Decimal(2)
+    #         else:
+    #             if coeff.new_coeff > 0:
+    #                 coeff.new_coeff -= decimal.Decimal(2.4)
+    #         print("更新成功")
+    #         coeff.save()
+    # return JsonResponse({"status": 200})
+    run = RunningGoal.objects.all()
+    from on.activities.running.models import RunCoefficient
+    for user in run:
+        coeff = RunCoefficient.objects.filter(user_id=user.user_id)
+        if coeff:
+            print("已经有了就不需要创建")
+        else:
+            RunCoefficient.objects.create(user_id=user.user_id, goal_type=user.goal_type,
+                                          default_coeff=user.coefficient)
+            print("创建成功")
+    return JsonResponse({"status": 200})
+
+
+@csrf_exempt
+def init_profit(request):
+    for i in range(100100, 101585):
+        s_b = 0
+        run_b = 0
+        read_b = 0
+        s_e = 0
+        run_e = 0
+        read_e = 0
+        s_d = 0
+        run_d = 0
+        read_d = 0
+        user = None
+        try:
+            user = UserInfo.objects.get(user_id=i)
+        except Exception as e:
+            print(e)
+            continue
+        sleep = SleepingGoal.objects.filter(user_id=i).exclude(status="PENDING")
+        if len(sleep) > 0:
+            sleep = sleep[0]
+            s_b = sleep.bonus
+            s_e = sleep.extra_earn
+            s_d = sleep.guaranty + sleep.down_payment
+        run = RunningGoal.objects.filter(user_id=i).exclude(status="PENDING")
+        if len(run) > 0:
+            run = run[0]
+            run_b = run.bonus
+            run_e = run.extra_earn
+            run_d = run.guaranty + run.down_payment
+        read = ReadingGoal.objects.filter(user_id=i).exclude(status="PENDING")
+        if len(read) > 0:
+            read = read[0]
+            read_b = read.bonus
+            read_e = read.extra_earn
+            read_d = read.guaranty + read.down_payment
+        total_b = s_b + run_b + read_b
+        total_e = s_e + run_e + read_e
+        total_d = s_d + run_d + read_d
+        user.deposit = total_d
+        user.add_money = total_b
+        user.extra_money = total_e
+        try:
+            user.save()
+            print("保存成功", user.user_id)
+        except Exception as e:
+            print(e)
+    return JsonResponse({"status": 200})
+
+@csrf_exempt
+def sendImg(request):
+    print("测试发送图片")
+    send_img_test.delay()
+    return JsonResponse({"status":200})
+
+# 用户评论回复
 @csrf_exempt
 def reply(request):
     user = request.session.get("user")
@@ -644,11 +1068,347 @@ def reply(request):
     if request.POST:
         r_content = request.POST.get("r_content")
         other_id = request.POST.get("other_id")
+        time_now = timezone.now().strftime("%Y-%m-%d %H:%M")
         try:
-            Reply.objects.create(user_id=user.user_id,other_id=other_id.replace("-",""),r_content=r_content)
-            return JsonResponse({"status":200})
+            Reply.objects.create(user_id=user.user_id, other_id=other_id.replace("-", ""), r_content=r_content)
+            return JsonResponse({"status": 200})
         except Exception as e:
-            print("用户评论失败",e)
-            return JsonResponse({"status":403})
-    return JsonResponse({"status":403})
+            print("用户评论失败", e)
+            return JsonResponse({"status": 403})
+    return JsonResponse({"status": 403})
 
+
+# 用户评论回复,两种活动，不可共用一个表
+@csrf_exempt
+def run_reply(request):
+    user = request.session.get("user")
+    from on.activities.running.models import RunReply
+    if request.POST:
+        r_content = request.POST.get("r_content")
+        other_id = request.POST.get("other_id")
+        time_now = timezone.now().strftime("%Y-%m-%d %H:%M")
+        try:
+            RunReply.objects.create(user_id=user.user_id, other_id=other_id.replace("-", ""), r_content=r_content,
+                                    create_time=time_now)
+            return JsonResponse({"status": 200})
+        except Exception as e:
+            print("用户评论失败", e)
+            return JsonResponse({"status": 403})
+    return JsonResponse({"status": 403})
+
+
+# sleeping 评论
+@csrf_exempt
+def save_sleep_comments(request):
+    from on.activities.sleeping.models import CommentSleep
+    user = request.session.get("user")
+    time_now = timezone.now().strftime("%Y-%m-%d %H:%M")
+    if request.POST:
+        try:
+            content = request.POST.get("content")
+            voucher_ref = request.POST.get("voucher_ref")
+            voucher_store = request.POST.get("voucher_store")
+            # 若用户表不存在，则先给用户创建一个jilu
+            CommentSleep.objects.create(user=user, content=content, voucher_ref=voucher_ref,
+                                        voucher_store=voucher_store,
+                                        c_time=time_now)
+            return JsonResponse({"status": 200})
+        except Exception as e:
+            print("评论失败", e)
+            return JsonResponse({"status": 401})
+    else:
+        return JsonResponse({"status": 401})
+
+
+# sleeping 回复
+@csrf_exempt
+def sleep_reply(request):
+    user = request.session.get("user")
+    from on.activities.sleeping.models import ReplySleep
+    if request.POST:
+        r_content = request.POST.get("r_content")
+        other_id = request.POST.get("other_id")
+        try:
+            ReplySleep.objects.create(user_id=user.user_id, other_id=other_id.replace("-", ""), r_content=r_content)
+            return JsonResponse({"status": 200})
+        except Exception as e:
+            print("用户评论失败", e)
+            return JsonResponse({"status": 403})
+    return JsonResponse({"status": 403})
+
+
+# sleeping 点赞
+@csrf_exempt
+def sleep_prise(request):
+    from on.activities.sleeping.models import CommentSleep
+
+    user = request.session.get("user")
+    if request.POST:
+        id = request.POST.get("id")
+        try:
+            CommentSleep.objects.praise_comment(user_id=user.user_id, punch_id=id)
+            return JsonResponse({"status": 200})
+        except Exception as e:
+            print("点赞失败", e)
+            return JsonResponse({"status": 401})
+    else:
+        return JsonResponse({"status": 401})
+
+
+# sleeping删除评论
+@csrf_exempt
+def delete_sleep_comments(request):
+    from on.activities.sleeping.models import CommentSleep
+    if request.POST:
+        user = request.session.get("user")
+        id = request.POST.get("id")
+        try:
+            CommentSleep.objects.filter(id=id).update(is_delete=1)
+            return JsonResponse({"status": 200})
+        except Exception as e:
+            print("删除失败", e)
+            return JsonResponse({"status": 403})
+    else:
+        return JsonResponse({"status": 403})
+
+
+#  收益转余额
+active = {
+    '0': SleepingGoal,
+    '1': RunningGoal,
+    # '4': RidingGoal,
+}
+
+
+@csrf_exempt
+def bonus_to_balance(request):
+    if request.POST:
+        try:
+            user = request.session.get('user')
+            goal_id = request.POST['goal']
+            activity_type = request.POST.get('activity_type')
+            obj = active.get(activity_type)
+
+            instance = obj.objects.get(goal_id=goal_id)
+            user = UserInfo.objects.get(user_id=user.user_id)
+
+            balance = decimal.Decimal(instance.bonus) + decimal.Decimal(instance.extra_earn)
+            user.balance += balance
+            user.add_money -= instance.bonus
+            user.extra_money -= instance.extra_earn
+            user.save()
+
+            instance.bonus = 0
+            instance.extra_earn = 0
+            instance.save()
+            print('成功')
+            return JsonResponse({'status': 200})
+        except Exception as e:
+            print('操作失败', e)
+            return JsonResponse({"status": 403})
+    else:
+        return JsonResponse({'status': 403})
+
+
+@csrf_exempt
+def walk_punch(request):
+    if request.POST:
+        from on.activities.walking.models import WalkingPunchRecord
+        user = request.session.get("user")
+        record_time = timezone.now().strftime("%Y-%m-%d")
+        voucher_ref = request.POST.get("voucher_ref")
+        distance = request.POST.get("distance")
+        goal_id = request.POST.get("goal_id")
+        document = request.POST.get("document", " ")
+        if not all([distance, goal_id, document]):
+            return JsonResponse({"status": 403, "errmsg": "the argument is not enough"})
+        try:
+            goal = WalkingPunchRecord.objects.create(record_time=record_time,
+                                                     voucher_ref=voucher_ref,
+                                                     distance=distance,
+                                                     goal_id=goal_id,
+                                                     document=document)
+            return JsonResponse({"status": 200, "goal": goal})
+        except Exception as e:
+            print(e)
+
+
+@csrf_exempt
+def save_walk_comments(request):
+    pass
+
+
+@csrf_exempt
+def delete_walk_comments(request):
+    pass
+
+
+@csrf_exempt
+def walk_report(request):
+    if request.POST:
+        from on.activities.walking.models import WalkingPunchRecord
+        user = request.session.get("user")
+        id = request.POST.get("id")
+        try:
+            WalkingPunchRecord.objects.report_walk(user_id=user.user_id, punch_id=id)
+            return JsonResponse({"status": 200})
+        except Exception as e:
+            print("点赞失败", e)
+            return JsonResponse({"status": 401})
+    else:
+        return JsonResponse({"status": 401})
+
+
+@csrf_exempt
+def walk_praise(request):
+    if request.POST:
+        from on.activities.walking.models import WalkingPunchRecord
+        user = request.session.get("user")
+        id = request.POST.get("id")
+        try:
+            WalkingPunchRecord.objects.praise_walk(user_id=user.user_id, punch_id=id)
+            return JsonResponse({"status": 200})
+        except Exception as e:
+            print("点赞失败", e)
+            return JsonResponse({"status": 401})
+    else:
+        return JsonResponse({"status": 401})
+
+
+@csrf_exempt
+def goal_ranking_list(request):
+    if request.method == 'GET':
+        activity_type = int(request.GET.get('activity_type'))
+        user = request.session.get('user')
+        if activity_type == 0:
+            from on.activities.sleeping.models import sleep_ranking_list
+            sleep_list = sleep_ranking_list(user)
+            # print('sleep_list', sleep_list)
+            return JsonResponse({'status': 200, 'sleep_list': sleep_list})
+        if activity_type == 1:
+            from on.activities.running.views import run_ranking_list
+            run_list = run_ranking_list(user)
+            return JsonResponse({'status': 200, 'run_list': run_list})
+    else:
+        return JsonResponse({'status': 403})
+
+
+"""   骑行活动   """
+
+
+# @csrf_exempt
+# def riding_punch(request):
+#     print("进入骑行打卡")
+#     """获取随机数"""
+#     user = request.session.get("user")
+#     random = request.POST.get("random")
+#     if DEBUG:
+#         user_id = 101077
+#     else:
+#         user_id = user.user_id
+#     # try:
+#     #     resp = send_img.delay(user.user_id, random, user.wechat_id, "1")
+#     #     print("第{}张图片的发送结果{}".format(random, resp))
+#     # except Exception as e:
+#     #     print(e)
+#     #     logger.error(e)
+#     """获取对应的目标的goal id"""
+#     goal_id = request.POST.get('goal', ' ')
+#     distance = float(request.POST.get('distance', 0))
+#     goal = RidingGoal.objects.get(goal_id=goal_id)
+#     """获取前端传递的两个路径"""
+#     file_filepath = request.POST.get("file_filepath")
+#
+#     file_refpath = request.POST.get("file_refpath")
+#     document = request.POST.get("document", " ")
+#     """获取当前的时间"""
+#     punch_time = timezone.now()
+#     print("获取参数完成")
+#     try:
+#         punch = RidingPunchRecord.objects.create_riding_redord(goal=goal,
+#                                                                user_id=user_id,
+#                                                                voucher_ref=file_refpath,
+#                                                                voucher_store=file_filepath,
+#                                                                distance=distance,
+#                                                                record_time=punch_time,
+#                                                                document=document)
+#         # goal.punch_day += 1
+#         print('打卡成功')
+#         return JsonResponse({"status": 200})
+#     except Exception as e:
+#         logger.error(e)
+#         return JsonResponse({"status": 405})
+#
+#
+# @csrf_exempt
+# def save_riding_comments(request):
+#     from on.activities.riding.model import CommentRiding
+#     user = request.session.get("user")
+#     time_now = timezone.now().strftime("%Y-%m-%d %H:%M")
+#     if request.POST:
+#         try:
+#             content = request.POST.get("content")
+#             voucher_ref = request.POST.get("voucher_ref")
+#             voucher_store = request.POST.get("voucher_store")
+#             # 若用户表不存在，则先给用户创建一个jilu
+#             CommentRiding.objects.create(user=user, content=content, voucher_ref=voucher_ref,
+#                                          voucher_store=voucher_store,
+#                                          c_time=time_now)
+#             return JsonResponse({"status": 200})
+#         except Exception as e:
+#             print("评论失败", e)
+#             return JsonResponse({"status": 401})
+#     else:
+#         return JsonResponse({"status": 401})
+#
+#
+# # sleeping 回复
+# @csrf_exempt
+# def riding_reply(request):
+#     user = request.session.get("user")
+#     from on.activities.riding.model import RidingReply
+#     if request.POST:
+#         r_content = request.POST.get("r_content")
+#         other_id = request.POST.get("other_id")
+#         try:
+#             RidingReply.objects.create(user_id=user.user_id, other_id=other_id.replace("-", ""), r_content=r_content)
+#             return JsonResponse({"status": 200})
+#         except Exception as e:
+#             print("用户评论失败", e)
+#             return JsonResponse({"status": 403})
+#     return JsonResponse({"status": 403})
+#
+#
+# # sleeping 点赞
+# @csrf_exempt
+# def riding_prise(request):
+#     from on.activities.riding.model import CommentRiding
+#
+#     user = request.session.get("user")
+#     if request.POST:
+#         id = request.POST.get("id")
+#         try:
+#             CommentRiding.objects.praise_comment(user_id=user.user_id, punch_id=id)
+#             return JsonResponse({"status": 200})
+#         except Exception as e:
+#             print("点赞失败", e)
+#             return JsonResponse({"status": 401})
+#     else:
+#         return JsonResponse({"status": 401})
+#
+#
+# # sleeping删除评论
+# @csrf_exempt
+# def delete_riding_comments(request):
+#     from on.activities.riding.model import CommentRiding
+#     if request.POST:
+#         user = request.session.get("user")
+#         id = request.POST.get("id")
+#         try:
+#             CommentRiding.objects.filter(id=id).update(is_delete=1)
+#             return JsonResponse({"status": 200})
+#         except Exception as e:
+#             print("删除失败", e)
+#             return JsonResponse({"status": 403})
+#     else:
+#         return JsonResponse({"status": 403})

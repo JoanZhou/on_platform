@@ -28,14 +28,26 @@
 
     </div>
 
-    <script type="text/javascript" src="/static/js/jquery-2.1.4.js"></script>
-    <script type="text/javascript" src="/static/js/jquery-weui-2.1.4.js"></script>
-    <script type="text/javascript" src="/static/js/fastclick.js"></script>
-    <script type="text/javascript" src="/static/js/public.js"></script>
 
+    <script type="text/javascript" src="/static/js/jquery-2.1.4.js"></script>
+    <script type="text/javascript" src="/static/js/public.js"></script>
+	<script type="text/javascript" src="/static/js/fastclick.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-weui-2.1.4.js"></script>
     <script type='text/javascript' src='/static/js/swiper.min.js' charset='utf-8'></script>
 
-    <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+	<script>
+		// fast click binding
+		$(function() {
+			FastClick.attach(document.body);
+		});
+
+		$("iframe").detach();
+
+	</script>
+	<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/static/js/material.min.js"></script>
+
 <script>
     var colHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
     var colWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;

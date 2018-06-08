@@ -1,13 +1,17 @@
 from django.db import models
 import uuid
 from on.activities.base import Goal, Activity
-from on.user import UserInfo, UserTicket, UserRecord, UserSettlement
+from on.user import UserInfo, UserTicket, UserRecord, UserSettlement, BonusRank
 import django.utils.timezone as timezone
 from django.conf import settings
 import os
 import pytz
 import math
 from datetime import timedelta, datetime
+import decimal
+from logging import getLogger
+
+logger = getLogger("app")
 
 
 class RunningGoalManager(models.Manager):
@@ -61,11 +65,39 @@ class RunningGoalManager(models.Manager):
                            punch_day=0,
                            down_num=down_num
                            )
-        # 更新活动的免签卡券
 
         if running_type:
             nosgin_number = int(nosign)
             UserTicket.objects.create_ticket(goal.goal_id, "NS", nosgin_number)
+        return goal
+
+
+    def create_rungoal(self, user_id, start_time, goal_type, guaranty, down_payment, activate_deposit, coefficient,
+                       mode, punch_attention, is_no_use_point, goal_day, deduction_point, deduction_guaranty,
+                       distance, reality_price, deserve_price, down_num, kilos_day, multiple):
+        goal = self.create(user_id=user_id,
+                           activity_type=RunningGoal.get_activity(),
+                           start_time=start_time,
+                           goal_day=goal_day,
+                           mode=mode,
+                           guaranty=guaranty,
+                           down_payment=down_payment,
+                           activate_deposit=activate_deposit,
+                           coefficient=coefficient,
+                           goal_type=goal_type,
+                           goal_distance=distance,
+                           left_distance=distance,
+                           kilos_day=kilos_day,
+                           average=10,
+                           reality_price=reality_price,
+                           deserve_price=deserve_price,
+                           down_num=down_num,
+                           punch_attention=punch_attention,
+                           is_no_use_point=is_no_use_point,
+                           multiple=multiple,
+                           deduction_guaranty=deduction_guaranty,
+                           deduction_point=deduction_point
+                           )
         return goal
 
     # 删除一个目标
@@ -88,9 +120,21 @@ class RunningGoalManager(models.Manager):
         record.punch_day += 1
         record.save()
 
+    # def first_day(self,user_id,punch_time,goal_id):
+    #     try:
+    #         record = self.filter(user_id=user_id,goal_id=goal_id)
+    #         if record:
+    #             record=record[0]
+    #             if record.start_time.strftime("%Y-%m-%d") == punch_time:
+    #                 record.first_day_record = 1
+    #             else:
+    #                 record.first_day_record = 0
+    #     except Exception as e:
+    #         logger.info(e)
+    #         pass
 
 
-
+# punch_attention = punch_attention,is_no_use_point=is_no_use_point,
 class RunningGoal(Goal):
     """ Model for running goal
         User needs to set running duration days and distance as
@@ -101,7 +145,7 @@ class RunningGoal(Goal):
     # 单日目标距离，对于自由模式来说，kilos_day为单日目标上限
     kilos_day = models.FloatField(null=True)
     # 剩余距离, 只针对自由模式有效
-    left_distance = models.FloatField(null=True)
+    left_distance = models.FloatField(null=True, default=0)
     # 用户实际要付出的金额
     reality_price = models.DecimalField(max_digits=12, decimal_places=2, null=False)
     # 用户应该要付出的金额
@@ -115,14 +159,77 @@ class RunningGoal(Goal):
     # 累计距离,只对自由模式有效
     add_distance = models.FloatField(default=0, null=True)
     # 活动额外收益
-    extra_earn = models.DecimalField(max_digits=12, decimal_places=2, null=False)
+    extra_earn = models.DecimalField(max_digits=12, decimal_places=2, null=False, default=0)
+    punch_attention = models.IntegerField(null=False,default=1)
+    is_no_use_point = models.IntegerField(null=False,default=0)
+    deduction_point = models.IntegerField(null=False, default=0)
+    deduction_guaranty = models.IntegerField(null=False, default=0)
+    # first_day_record = models.IntegerField(null=False, default=0)
+    multiple = models.IntegerField(null=False, default=0)
+    # 这一周累计跑的距离数
+    week_distance = models.FloatField(null=False, default=0)
+    # 日常模式完成的天数
+    finish_week_day = models.IntegerField(null=False, default=0)
     # 用户打卡的天数
-    punch_day = models.IntegerField(null=False)
+    punch_day = models.IntegerField(null=False, default=0)
     objects = RunningGoalManager()
 
     @staticmethod
     def get_start_date():
         return datetime.strptime("00:01", "%H:%M").time()
+
+    @property
+    def first_day_record(self):
+        start_time = self.start_time.strftime("%Y-%m-%d")
+        user_end_time = (self.start_time + timedelta(days=1)).strftime("%Y-%m-%d")
+        if len(RunningPunchRecord.objects.filter(goal_id=self.goal_id,
+                                                 record_time__range=(start_time, user_end_time))) > 0:
+            return True
+        else:
+            return False
+
+    def update_default_run_coeff(self):
+        try:
+            coeff = RunCoefficient.objects.get(user_id=self.user_id)
+            if self.goal_day > 30:
+                coeff.default_coeff += decimal.Decimal(1 * self.multiple)
+                coeff.save()
+            return True
+        except Exception as e:
+            logger.error(e)
+            pass
+
+    # 由于是用户不需要投一天参加第二天开始，所以不需要riqi
+    def earn_run_profit(self, average_pay):
+        '''获取系数对象'''
+
+        runCoeff = RunCoefficient.objects.get(user_id=self.user_id)
+        coefficient = 1
+        if runCoeff.new_coeff:
+            coefficient = runCoeff.new_coeff
+        else:
+            coefficient = runCoeff.default_coeff
+
+        if self.status == "ACTIVE" or self.status == "DEALWITH":
+            earn_pay = math.floor((average_pay * coefficient) * 100) / 100
+            self.bonus += decimal.Decimal(earn_pay)
+            self.save()
+            try:
+                rank = BonusRank.objects.filter(user_id=self.user_id)
+                if rank:
+                    BonusRank.objects.add_run(user_id=self.user_id, profit=decimal.Decimal(earn_pay))
+                else:
+                    BonusRank.objects.create(user_id=self.user_id, run=decimal.Decimal(earn_pay))
+            except Exception as e:
+                logger.info("用户的累计收益增加失败，失败原因{}".format(e))
+            # 修改用户赚得的总金额
+            UserInfo.objects.update_balance(user_id=self.user_id, pay_delta=decimal.Decimal(earn_pay))
+
+            # 在settlement表中增加记录
+            UserSettlement.objects.earn_profit(self.goal_id, decimal.Decimal(earn_pay))
+            if self.status == "DEALWITH":
+                self.status = "FAILED"
+                self.save()
 
     def calc_pay_out(self):
         print("计算开始..........")
@@ -132,68 +239,259 @@ class RunningGoal(Goal):
             # 如果之前没有过不良记录, 则扣除保证金
             if self.none_punch_days == 0:
                 pay_out = self.guaranty
-                print(pay_out, '如果之前没有过不良记录, 则扣除保证金，扣除金额就是保证金的数量')
                 # 清除个人的保证金数额
                 self.guaranty = 0
-                print("将保证金改为0")
                 # 增加不良记录天数
                 self.none_punch_days = 1
             elif self.none_punch_days >= 1 and self.down_payment > 0:
-                print("如果不良天数不等于1")
                 if self.guaranty == 0:
                     # 底金次数
                     pay_out = self.average
-                    print(pay_out, "当保证金等于0的时候需要扣除的底金金额")
                 # 如果有降低投入
                 # 从账户中扣除金额
                 self.down_payment -= pay_out
-                print("扣除之后需要将用户的底金减去")
                 # 不良天数记录+1
                 self.none_punch_days += 1
         # 如果是自由模式
         else:
-            print("若是自由模式，开始扣款")
             if float(self.left_distance) > 0.0:
-                print("当剩余距离大于0的时候才开始扣款")
                 # 剩余的距离
                 left_distance = self.left_distance
                 # 求解剩余距离
                 if left_distance <= 1:
                     pay_out = self.guaranty
-                    print("当剩余的距离小于1的时候，直接扣除用户的保证金{}".format(self.guaranty))
                     self.guaranty = 0
                 else:
                     remain = math.floor(self.left_distance) - 1
-                    print("剩余的距离减去1是：{}".format(remain))
                     if remain <= self.down_num:
-                        print(type(remain), type(self.down_num), "remain:{},down_num{}".format(remain, self.down_num))
-                        print("走这里就对了")
+
                         pay_out = remain * self.average + self.guaranty
                         self.guaranty = 0
-                        print("用户的剩余距离减去1之后的距离数{}".format(math.floor(self.left_distance) - 1),
-                              "平均需要扣除的金额{}".format(self.average))
+
                         self.down_payment -= remain * self.average
                     else:
                         # remain = self.down_num
-                        print("若剩余距离大于底金次数，那么剩余距离{}".format(remain))
+
                         pay_out = self.down_payment + self.guaranty
 
                         self.guaranty = 0
-                        print("用户的剩余距离减去1之后的距离数{}".format(math.floor(self.left_distance) - 1),
-                              "平均需要扣除的金额{}".format(self.average))
 
-                        self.down_payment -= 0
+                        self.down_payment = 0
             else:
                 pay_out = 0
-                print("当剩余的距离大于零的时候，需要付出的金额就是保证金")
         if pay_out > 0:
             # 更新值
             self.save()
             # 把本次瓜分金额写入数据库记录中
             UserSettlement.objects.loose_pay(goal_id=self.goal_id, bonus=pay_out)
-            print("瓜分记录写入成功")
         # 完成所有瓜分金额的计算
         return pay_out
+
+    def run_pay_out(self):
+        try:
+            pay_out = 0
+            # 如果是日常模式
+            if self.goal_type:
+                if self.none_punch_days <= 3:
+                    pay_out = 0
+                elif self.none_punch_days == 4:
+                    pay_out = self.guaranty
+                    self.guaranty = 0
+                elif self.none_punch_days >= 5 and self.down_payment > 0:
+                    self.guaranty = 0
+                    pay_out = self.average
+                    self.down_payment -= pay_out
+            # 进入自由模式
+            else:
+                if self.goal_day < 30:
+                    if self.left_distance > 0:
+                        pay_out = self.guaranty
+                        self.guaranty = 0
+                else:
+                    # 此时就是无线模式
+                    print("开始进入自由模式扣钱")
+                    if self.left_distance > 0:
+                        if self.guaranty > 0:
+                            pay_out = self.guaranty
+                            self.guaranty = 0
+                        elif self.guaranty == 0 and self.down_payment > 0:
+                            pay_out = self.average
+                            self.down_payment -= pay_out
+            self.save()
+            if pay_out > 0:
+                # 更新值
+                # 把本次瓜分金额写入数据库记录中
+                UserSettlement.objects.loose_pay(goal_id=self.goal_id, bonus=pay_out)
+                print("瓜分记录写入成功")
+            # 完成所有瓜分金额的计算
+
+            return pay_out
+        except Exception as e:
+            print(e)
+
+    def data_init(self):
+        try:
+            if self.get_remainder == True:
+                self.none_punch_days = 0
+                self.add_distance = 0
+                self.left_distance = self.goal_distance
+                self.finish_week_day = 0
+                self.save()
+                print("初始化成功")
+            else:
+                print("还没到初始化的时候")
+                pass
+        except Exception as e:
+            logger.error(e)
+            print("初始化失败")
+
+    def check_run(self):
+        try:
+            pay_out = 0
+            # 用户的系数不是从活动表里面取出来，现在是在
+            coeff = RunCoefficient.objects.get(user_id=self.user_id)
+            new_coeff = coeff.new_coeff
+            # 只有处于活动状态的目标才会检查
+            if self.status == "ACTIVE":
+                # 如果是日常模式, 才会需要每天扣钱
+                if self.goal_type:
+                    if self.goal_day < 30:
+                        print("进入日常模式，开始扣除金额，当前的活动类型是{}".format(self.goal_type))
+                        # 查看前一天到今天是否存在打卡记录
+                        if self.exist_punch_last_day():
+                            # 如果存在打卡记录,则不付出钱
+                            if self.left_day < 0:
+                                print("日常模式的剩余天数小于零，说明活动结束")
+                                if self.down_payment <= 0 and self.guaranty <= 0:
+                                    self.status = "DEALWITH"
+                                    print("押金保证金都小于0，表示失败")
+                                else:
+                                    self.status = "SUCCESS"
+                                    print("押金保证金都大于0，表示成功")
+                            else:
+                                pass
+                        else:
+                            # 如果不存在打卡记录
+                            if self.is_first_day == True:
+                                print("今天是第一天，不做任何处理")
+                                # 有返回值的时候是第一天，直接pass
+                                pass
+                            else:
+                                # 如果有券,则用券,不扣钱; 如果没有券,则扣除一定金额
+                                has_ticket = self.auto_use_ticket(ticket_type="NS")
+                                if not has_ticket:
+                                    print("该用户没有打卡也不是第一天，所以需要从扣钱，并且未打卡天数需要加一", self.user_id)
+                                    pay_out = self.run_pay_out()
+                                    self.none_punch_days += 1
+                                    coeff.new_coeff = 0
+                                    new_coeff = coeff.default_coeff
+                                    print(pay_out, "若是日常模式且没有免签券，则扣除此金额")
+                                if self.down_payment <= 0 and self.guaranty <= 0:
+                                    self.status = "DEALWITH"
+                                    print("押金保证金都小于0，表示失败")
+                                # 检查目标是否已经算失败了, 在日常模式下如果两者均为0, 则判定目标失败
+                                if self.left_day < 0:
+                                    print("日常模式的剩余天数小于零，说明活动结束")
+                                    if self.down_payment <= 0 and self.guaranty <= 0:
+                                        self.status = "DEALWITH"
+                                        print("押金保证金都小于0，表示失败")
+                                    else:
+                                        self.status = "SUCCESS"
+                                        print("押金保证金都大于0，表示成功")
+                    else:
+                        print("进入日常模式的无限模式")
+                        if self.exist_punch_last_day():
+                            """查看前一天是否有打卡记录，若是有的话直接pass"""
+                            pass
+                        else:
+                            if self.is_first_day == True:
+                                print("今天是第一天，不做任何处理")
+                                # 有返回值的时候是第一天，直接pass
+                                pass
+                            else:
+                                """不是第一天"""
+                                has_ticket = self.auto_use_ticket(ticket_type="NS")
+                                if not has_ticket:
+                                    pay_out = self.run_pay_out()
+                                    # todo 当天系数清零
+                                    coeff.new_coeff = 0
+                                    new_coeff = coeff.default_coeff
+                                    self.none_punch_days += 1
+                                    print(pay_out, "若是日常模式且没有免签券，则扣除此金额")
+                                if self.down_payment <= 0 and self.guaranty <= 0:
+                                    self.status = "DEALWITH"
+                                    print("押金保证金都小于0，表示失败")
+                else:
+                    print("进入自由模式，开始扣除金额，当前的活动类型是{}".format(self.goal_type))
+
+                    # 如果是自由模式下，当left_day为负数时结算
+                    if self.exist_punch_last_day():
+                        """查看前一天是否有打卡记录，若是有的话直接pass"""
+                        pass
+                    else:
+                        # 若是昨天没有打卡记录，则把信息数初始化成默认系数
+                        coeff.new_coeff = coeff.default_coeff
+                        new_coeff = coeff.default_coeff
+                        self.none_punch_days += 1
+                    if self.goal_day < 30:
+
+                        # print("现在的left_day：{}自由模式下，当剩余天数小于零的时候开始结算".format(self.left_day))
+                        # 将自由模式下的钱数结算
+                        if self.left_day < 0:
+                            if self.guaranty == 0:
+                                self.status = "DEALWITH"
+                            else:
+                                self.status = "SUCCESS"
+                        else:
+                            pass
+                        if self.get_remainder == True:
+                            pay_out = self.run_pay_out()
+
+                        print(pay_out, "用户{}自由模式下要扣除的金额数{}".format(self.user_id, pay_out))
+                        # 如果付出的钱没有总金额多,算完成,否则算失败
+
+
+                    else:
+                        if self.get_remainder == True:
+                            pay_out = self.run_pay_out()
+                        print(pay_out, "用户{}自由模式下要扣除的金额数{}".format(self.user_id, pay_out))
+                        # 如果付出的钱没有总金额多,算完成,否则算失败
+                        if self.guaranty == 0 and self.down_payment == 0:
+                            self.status = "DEALWITH"
+
+                    # else:
+                    #     if new_coeff <= 0:
+                    #         new_coeff= coeff.default_coeff
+                # 更新到数据库中
+                self.data_init()
+                self.save()
+                coeff.save()
+                UserInfo.objects.update_deposit(user_id=self.user_id, pay_delta=-pay_out)
+
+                return pay_out, new_coeff
+        except Exception as e:
+            print(e)
+            logger.error(e)
+            return 0, 0
+
+    """first_day_record"""
+
+    @property
+    def get_remainder(self):
+        remainder = (timezone.now() - self.start_time).days
+        remain = 1
+        if self.start_time.strftime("%Y-%m-%d") == (timezone.now() - timedelta(days=1)).strftime("%Y-%m-%d"):
+            pass
+        else:
+            if self.first_day_record == True:
+                remain = remainder % 7
+            else:
+                remain = (remainder - 1) % 7
+        print(remain, "remain", remainder, "remainder")
+        if remain == 0:
+            return True
+        else:
+            return False
 
     @staticmethod
     def get_activity():
@@ -214,52 +512,64 @@ class RunningGoal(Goal):
 # TODO
 class RunningPunchRecordManager(models.Manager):
     # 创建一个新的record
-    # def create_record(self, goal, filecontent, filename, distance,punch_time, document):
-    #     # 文件存储的实际路径
-    #     filePath = os.path.join(settings.MEDIA_DIR, filename)
-    #     # 引用所使用的路径
-    #     refPath = os.path.join(settings.MEDIA_ROOT, filename)
-    #     # 写入文件内容
-    #     with open(filePath, 'wb') as f:
-    #         f.write(filecontent)
-    #     # 如果是日常模式打卡，则规定distance必须为日常距离
-    #     if goal.goal_type:
-    #         distance = goal.kilos_day
-    #     record = self.create(goal=goal, voucher_ref=refPath, voucher_store=filePath, distance=distance,record_time = punch_time,
-    #                          document=document)
-    #     # 如果是自由模式, 则计算剩余距离
-    #     if not goal.goal_type:
-    #         goal.left_distance -= distance
-    #         goal.save()
-    #     return record
-    # 创建一个新的record
-    def create_record(self, goal, filename, distance, punch_record_time, document, base64_str):
-        # 文件存储的实际路径
-        filePath = os.path.join(settings.MEDIA_DIR, timezone.now().strftime("%Y-%m-%d") + "/")
-        # # 引用所使用的路径
-        refPath = os.path.join(settings.MEDIA_ROOT, timezone.now().strftime("%Y-%m-%d") + "/")
-        # mysql存储的地址
-        file_filepath = filePath + filename
-        file_refpath = refPath + filename
-        if not os.path.exists(filePath):
-            os.makedirs(filePath)
-            # 写入文件内容
-        with open(filePath + filename, 'wb') as f:
-            f.write(base64_str)
-            print("保存图片成功")
-        # 如果是日常模式打卡，则规定distance必须为日常距离
-        if goal.goal_type:
-            distance = goal.kilos_day
-        record = self.create(goal=goal, voucher_ref=file_refpath, voucher_store=file_filepath, distance=distance,
-                             record_time=punch_record_time,
-                             document=document)
-        # 如果是自由模式, 则计算剩余距离
-        if not goal.goal_type:
-            goal.left_distance -= distance
-            goal.save()
-        return record
+    def create_run_redord(self, goal, user_id, voucher_ref, voucher_store, distance, record_time, document):
+        print("开始打卡")
+        try:
+            # run_obj = RunningGoal.objects.get(goal_id=goal.goal_id)
+            if goal.goal_type:
+                print("若是日常模式", distance, goal.kilos_day)
+                if distance >= goal.kilos_day:
+                    # 若是距离大于每日距离，求出超出的距离数量
+                    goal.finish_week_day += 1
+                    if goal.finish_week_day >= 7:
+                        goal.finish_week_day = 7
+                    goal.left_distance -= distance
+                    goal.week_distance += distance
+                    goal.add_distance += distance
+                    beyond_distance = math.floor(distance - goal.kilos_day)
+                    if beyond_distance >= 5:
+                        beyond_distance = 5
+                    RunCoefficient.objects.update_daily(user_id=user_id, beyond_distance=beyond_distance,
+                                                        finish_week_day=goal.finish_week_day)
 
-    #
+                    goal.save()
+                else:
+                    print("打卡距离没有超过自己的每日距离，所以没有系数加成，新系数等于默认系数")
+                    RunCoefficient.objects.defaultTonew(user_id=user_id, goal_id=goal.goal_id)
+            else:
+                '''进入自由模式'''
+                # 先将距离加进表里面的累计距离跟周距离
+                print("开始进入自由模式")
+                goal.add_distance += distance
+                goal.left_distance -= distance
+                goal.week_distance += distance
+                goal.finish_week_day += 1
+                goal.save()
+                print("累计距离增加成功")
+                # 若是累计的周距离大于目标距离,求出超出了多少距离
+
+                print("若是现在累计距离已经大于自己的目标距离，则根据超出的距离数生成新系数")
+                beyond_distance = math.floor(goal.add_distance - goal.goal_distance)
+                print("beyond_distance", beyond_distance)
+                if beyond_distance >= 5:
+                    beyond_distance = 5
+                RunCoefficient.objects.update_freedom(user_id=user_id, beyond_distance=beyond_distance)
+
+            print("即将创建打卡记录")
+            record = self.create(
+                goal_id=goal.goal_id,
+                voucher_ref=voucher_ref,
+                voucher_store=voucher_store,
+                distance=distance,
+                record_time=record_time,
+                document=document
+            )
+            return record
+        except Exception as e:
+            logger.error(e)
+            print(e)
+            return None
+
     # 获取时间
     def get_day_record(self, daydelta):
         """
@@ -317,6 +627,10 @@ class RunningPunchRecordManager(models.Manager):
         else:
             return False
 
+    def get_some_message(self, user_id):
+        user = UserInfo.objects.get(user_id=user_id)
+        return user
+
 
 class RunningPunchRecord(models.Model):
     """ Model for running task record
@@ -370,44 +684,44 @@ class RunningPunchReport(models.Model):
 
 
 class Finish_SaveManager(models.Manager):
-    def save_finish(self,goal_id):
-        print("打印一下用户的id，看看是不是自己的",goal_id)
+    def save_finish(self, goal_id):
+        print("打印一下用户的id，看看是不是自己的", goal_id)
         goal = RunningGoal.objects.filter(goal_id=goal_id)
-        print(goal,"看看是否查询到了值")
+        print(goal, "看看是否查询到了值")
         if goal:
             goal = goal[0]
             finish_dict = {
-                "goal_id":str(goal_id),
-                "user_id":goal.user_id,
-                "activity_type":goal.activity_type,
-                "goal_type":goal.goal_type,
-                "start_time":goal.start_time,
-                "goal_day":goal.goal_day,
-                "status":"已经结束",
-                "mode":goal.mode,
-                "guaranty":goal.guaranty,
-                "down_payment":goal.down_payment,
-                "coefficient":goal.coefficient,
-                "bonus":goal.bonus,
-                "none_punch_days":goal.none_punch_days,
-                "goal_distance":goal.goal_distance,
-                "kilos_day":goal.kilos_day,
-                "left_distance":goal.left_distance,
-                "reality_price":goal.reality_price,
-                "deserve_price":goal.deserve_price,
-                "down_num":goal.down_num,
-                "activate_deposit":goal.activate_deposit,
-                "average":goal.average,
-                "add_distance":goal.add_distance,
-                "extra_earn":goal.extra_earn,
-                "punch_day":goal.punch_day,
-                "settle_time":timezone.now().strftime("%Y-%m-%d")
+                "goal_id": str(goal_id),
+                "user_id": goal.user_id,
+                "activity_type": goal.activity_type,
+                "goal_type": goal.goal_type,
+                "start_time": goal.start_time,
+                "goal_day": goal.goal_day,
+                "status": "已经结束",
+                "mode": goal.mode,
+                "guaranty": goal.guaranty,
+                "down_payment": goal.down_payment,
+                "coefficient": goal.coefficient,
+                "bonus": goal.bonus,
+                "none_punch_days": goal.none_punch_days,
+                "goal_distance": goal.goal_distance,
+                "kilos_day": goal.kilos_day,
+                "left_distance": goal.left_distance,
+                "reality_price": goal.reality_price,
+                "deserve_price": goal.deserve_price,
+                "down_num": goal.down_num,
+                "activate_deposit": goal.activate_deposit,
+                "average": goal.average,
+                "add_distance": goal.add_distance,
+                "extra_earn": goal.extra_earn,
+                "punch_day": goal.punch_day,
+                "settle_time": timezone.now().strftime("%Y-%m-%d")
             }
             try:
                 self.create(**finish_dict)
                 return True
             except Exception as e:
-                print("创建记录失败",e)
+                print("创建记录失败", e)
         else:
             return False
 
@@ -429,8 +743,10 @@ GOAL_CHOICES = (
     (0, '自由模式'),
     (1, '日常模式')
 )
+
+
 class Running_Finish_Save(models.Model):
-    id = models.IntegerField(primary_key=True,auto_created=True)
+    id = models.IntegerField(primary_key=True, auto_created=True)
     # 目标距离
     goal_distance = models.FloatField(null=True)
     # 单日目标距离，对于自由模式来说，kilos_day为单日目标上限
@@ -453,7 +769,7 @@ class Running_Finish_Save(models.Model):
     extra_earn = models.DecimalField(max_digits=12, decimal_places=2, null=False)
     # 用户打卡的天数
     punch_day = models.IntegerField(null=False)
-    goal_id = models.CharField(max_length=255,null=True)
+    goal_id = models.CharField(max_length=255, null=True)
     user_id = models.IntegerField(null=False)
     activity_type = models.CharField(null=False, max_length=16, choices=ACTIVITY_CHOICES, default="0")
     # 0为自由模式, 1为日常模式
@@ -489,3 +805,107 @@ class Running_Finish_Save(models.Model):
 
     class Meta:
         db_table = "on_running_finish_save"
+
+
+class RunReply(models.Model):
+    id = models.IntegerField(primary_key=True, auto_created=True)
+    user_id = models.IntegerField()
+    other_id = models.CharField(null=False, max_length=255)
+    r_content = models.TextField(null=False)
+    create_time = models.DateTimeField(null=True)
+
+    @property
+    def get_user_message(self):
+        user = UserInfo.objects.filter(user_id=self.user_id)
+        if user:
+            user = user[0]
+            return user
+
+    class Meta:
+        db_table = "on_runreply"
+
+
+class RunCoefficientManager(models.Manager):
+    # todo
+    # 自由模式更新系数，beyond_distance：比基础目标多余的距离
+    def update_freedom(self, beyond_distance, user_id):
+        """每次自由模式打卡时候调用此函数，获取用户输入的距离，获取用户之前的累计距离"""
+        try:
+            user = self.filter(user_id=user_id)
+            if user:
+                user = user[0]
+            if beyond_distance <= 0:
+                user.new_coeff = decimal.Decimal(user.default_coeff)
+            elif beyond_distance <= 5 and beyond_distance > 0:
+                user.new_coeff = decimal.Decimal(user.default_coeff) * decimal.Decimal(
+                    "1.{}".format(int(beyond_distance)))
+            else:
+                user.new_coeff = decimal.Decimal(user.default_coeff) * decimal.Decimal("1.{}".format(5))
+            user.save()
+            return user.new_coeff
+        except Exception as e:
+            logger.error(e)
+            print(e)
+
+    # 更新日常模式的每日悉数加成
+    def update_daily(self, user_id, beyond_distance, finish_week_day):
+        user = self.filter(user_id=user_id)
+        try:
+            default = 1
+            if user:
+                user = user[0]
+                default = user.default_coeff
+            # 若是超出的距离大于5
+            if finish_week_day <= 4:
+                if beyond_distance <= 0:
+                    user.new_coeff = default
+                else:
+                    user.new_coeff = default * decimal.Decimal("1.{}".format(beyond_distance))
+
+                user.save()
+                return user.new_coeff
+            else:
+                extra_day = finish_week_day - 4
+
+                if extra_day > 3:
+                    extra_day = 3
+                if beyond_distance <= 0:
+                    user.new_coeff = default
+                else:
+                    user.new_coeff = default * decimal.Decimal(
+                        "1.{}".format(beyond_distance + extra_day))
+                user.save()
+                return user.new_coeff
+
+        except Exception as e:
+            logger.error(e)
+            print(e)
+
+    # 由于用户没有打卡，或者是用户打卡的距离不符合要求，此时用户的新系数等于默认系数
+    def defaultTonew(self, user_id, goal_id):
+        user = self.filter(user_id=user_id)
+        try:
+            if user:
+                user = user[0]
+                user.new_coeff = user.default_coeff
+                user.save()
+        except Exception as e:
+            logger.error(e)
+
+
+class RunCoefficient(models.Model):
+    # 用户id
+    user_id = models.IntegerField(null=False, primary_key=True)
+    # 用户的默认系数
+    default_coeff = models.DecimalField(max_digits=12, decimal_places=2, null=False, default=1)
+    # 当用户打卡之后生成的新系数
+    new_coeff = models.DecimalField(max_digits=12, decimal_places=2, null=False, default=0)
+    SLEEP_TYPE = (
+        (0, "自由"),
+        (1, '日常')
+    )
+    goal_type = models.SmallIntegerField(null=False, choices=SLEEP_TYPE, default=0)
+    objects = RunCoefficientManager()
+
+    class Meta:
+        db_table = "on_runcoefficient"
