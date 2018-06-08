@@ -95,8 +95,8 @@ DATABASES = {
         'NAME': 'newdeploy',
         # 'NAME': 'deploy',
         'USER': 'root',
-        'PASSWORD': 'Wei123..',
-        'HOST': '193.112.209.134',
+        'PASSWORD': '',
+        'HOST': '',
         'PORT': '3306',
     }
 }
