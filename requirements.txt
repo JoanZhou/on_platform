@@ -39,5 +39,5 @@ slate==0.3
 SQLAlchemy==1.1.15
 urllib3==1.22
 wechatpy==1.5.3
-Werkzeug==0.12.2
+Werkzeug==0.15.3
 xmltodict==0.11.0
